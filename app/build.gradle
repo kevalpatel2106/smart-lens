@@ -90,7 +90,7 @@ android {
             debuggable true
             jniDebuggable true
             renderscriptDebuggable false
-//            signingConfig signingConfigs.playStore
+            signingConfig signingConfigs.playStore
             minifyEnabled false
             zipAlignEnabled true
         }
