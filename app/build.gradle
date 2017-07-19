@@ -6,6 +6,34 @@ apply from: '../gradle/config.gradle'
 apply from: '../gradle/deps.gradle'
 
 android {
+    signingConfigs {
+        //This are th play store signing config.
+        playStore {
+            if (System.getenv("IS_CI_BUILD").equals("true")) {
+                //It is CI build, load it from the environment variables.
+                //See circle.yml file.
+                storeFile file(System.getenv("KEY_STORE"))
+                storePassword System.getenv("KEY_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("ALIAS_PASSWORD")
+            } else {
+                //If this is the local build, load it from the keystore.properties file
+                File signFile = rootProject.file('./misc/keystore.properties')
+                if (signFile.exists()) {
+                    Properties props = new Properties()
+                    props.load(new FileInputStream(signFile))
+
+                    keyAlias props['keystore.alias']
+                    keyPassword props['keystore.password']
+                    storeFile file(props['keystore.file'])
+                    storePassword props['keystore.aliaspassword']
+                } else {
+                    throw new GradleException("keystore.properties file not found.")
+                }
+            }
+        }
+    }
+
     compileSdkVersion buidlConfig.compile
     buildToolsVersion buidlConfig.buildToolVersion
 
@@ -38,7 +66,7 @@ android {
             debuggable false
             jniDebuggable false
             renderscriptDebuggable false
-//            signingConfig signingConfigs.playStore
+            signingConfig signingConfigs.playStore
             pseudoLocalesEnabled false
             zipAlignEnabled true
         }
@@ -46,7 +74,7 @@ android {
             debuggable true
             jniDebuggable true
             renderscriptDebuggable false
-//            signingConfig signingConfigs.playStore
+            signingConfig signingConfigs.playStore
             minifyEnabled false
             zipAlignEnabled true
         }
