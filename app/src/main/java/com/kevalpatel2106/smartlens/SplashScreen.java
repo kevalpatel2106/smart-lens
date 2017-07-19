@@ -32,8 +32,6 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //TODO Add logic for checking user login
         startActivity(new Intent(this, Dashboard.class));
     }
 }
