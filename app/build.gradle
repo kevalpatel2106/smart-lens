@@ -104,6 +104,7 @@ android {
 }
 
 dependencies {
+    implementation project(':tensorflow-android-inference')
     implementation ide.kotlin
     implementation ide.constrainlayout
 

@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://F:\Proj\smart-lens\SmartLens.iml" filepath="F:\Proj\smart-lens\SmartLens.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://F:\Proj\smart-lens\app\app.iml" filepath="F:\Proj\smart-lens\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/smart-lens.iml" filepath="$PROJECT_DIR$/smart-lens.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" filepath="$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" />
     </modules>
   </component>
 </project>
