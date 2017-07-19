@@ -1,0 +1,96 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+apply from: '../gradle/config.gradle'
+apply from: '../gradle/deps.gradle'
+
+android {
+    compileSdkVersion buidlConfig.compile
+    buildToolsVersion buidlConfig.buildToolVersion
+
+    compileOptions {
+        sourceCompatibility javaCompatibility.sourceCompatibility
+        targetCompatibility javaCompatibility.targetCompatibility
+    }
+
+    defaultConfig {
+        applicationId "com.kevalpatel2106.smartlens"
+
+        //sdks
+        minSdkVersion buidlConfig.min
+        targetSdkVersion buidlConfig.target
+
+        //Version config
+        versionCode versionConfig.versionCode
+        versionName versionConfig.versionName
+
+        //strip other than english resources
+        resConfigs "en"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), proguardConfig.proguardPath
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+//            signingConfig signingConfigs.playStore
+            pseudoLocalesEnabled false
+            zipAlignEnabled true
+        }
+        debug {
+            debuggable true
+            jniDebuggable true
+            renderscriptDebuggable false
+//            signingConfig signingConfigs.playStore
+            minifyEnabled false
+            zipAlignEnabled true
+        }
+    }
+
+    packagingOptions packageExcludes
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation ide.kotlin
+    implementation ide.constrainlayout
+
+    //Testing
+    testImplementation testLib.junit
+    androidTestImplementation(testLib.rules, excludeGrp)
+    androidTestImplementation(testLib.esspresso, excludeGrp)
+    androidTestImplementation(testLib.runner, excludeGrp)
+    androidTestImplementation(testLib.esspressoIntents, excludeGrp)
+    androidTestImplementation(testLib.contrib, excludeGrp)
+
+    //Butter knife
+    implementation butterKnifeLib.butterKnife
+    annotationProcessor butterKnifeLib.annotationProcessor
+
+    //GSON
+    implementation otherLib.gson
+
+    //Retrofit
+    implementation retrofitLib.retrofit
+    implementation retrofitLib.gsonPlugin
+    implementation retrofitLib.rxPlugin
+    implementation retrofitLib.logger
+
+    //Support
+    implementation supportLib.appCompat
+    implementation supportLib.recyclerView
+    implementation supportLib.cardView
+    implementation supportLib.design
+
+    //Rx
+    implementation rxLib.rxJava
+    implementation rxLib.rxAndroid
+}
