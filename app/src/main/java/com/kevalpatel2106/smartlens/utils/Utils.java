@@ -18,6 +18,12 @@ import android.view.inputmethod.InputMethodManager;
 
 public class Utils {
 
+    /**
+     * Check if the device has camera.
+     *
+     * @param context instance of the caller.
+     * @return true if the device has camera.
+     */
     public static boolean checkIfHasCamera(@NonNull Context context) {
         PackageManager pm = context.getPackageManager();
         return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
@@ -29,6 +35,7 @@ public class Utils {
      * @param context instance of caller.
      * @return Device unique id.
      */
+    @NonNull
     @SuppressLint("HardwareIds")
     public static String getDeviceId(@NonNull Context context) {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);

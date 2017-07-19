@@ -4,6 +4,8 @@ import android.content.Context;
 
 import java.io.File;
 
+import io.reactivex.annotations.NonNull;
+
 /**
  * Created by Keval on 20-Dec-16.
  * Utility functions related to file and storage.
@@ -13,7 +15,13 @@ import java.io.File;
 
 public class FileUtils {
 
-    public static File getCacheDir(Context context) {
-        return context.getCacheDir() == null ? context.getExternalCacheDir() : context.getCacheDir();
+    /**
+     * @param context Instance of the caller.
+     * @return If the external cache is available than this will return external cache directory or
+     * else it will display internal cache directory.
+     */
+    @NonNull
+    public static File getCacheDir(@NonNull Context context) {
+        return context.getExternalCacheDir() != null ? context.getExternalCacheDir() : context.getCacheDir();
     }
 }

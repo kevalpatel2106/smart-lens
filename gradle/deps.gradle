@@ -21,7 +21,9 @@ ext {
             runner          : 'com.android.support.test:runner:0.5',
             esspresso       : 'com.android.support.test.espresso:espresso-core:' + espressoVersion,
             esspressoIntents: 'com.android.support.test.espresso:espresso-intents:' + espressoVersion,
-            contrib         : 'com.android.support.test.espresso:espresso-contrib:' + espressoVersion
+            contrib         : 'com.android.support.test.espresso:espresso-contrib:' + espressoVersion,
+            idling          : 'com.android.support.test.espresso:espresso-idling-resource:' + espressoVersion,
+            uiAutomator     : 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     ]
 
     //Support library dependency

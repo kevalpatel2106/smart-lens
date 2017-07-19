@@ -1,5 +1,6 @@
 package com.kevalpatel2106.smartlens.base;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -25,6 +26,7 @@ public class BaseViewPager extends ViewPager {
         super(context, attrs);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return this.mIsSwipeGestureEnable && super.onTouchEvent(event);

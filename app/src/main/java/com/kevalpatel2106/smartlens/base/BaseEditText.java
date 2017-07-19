@@ -96,4 +96,8 @@ public final class BaseEditText extends AppCompatEditText {
     public String getTrimmedText() {
         return getText().toString().trim();
     }
+
+    public void clear() {
+        setText("");
+    }
 }

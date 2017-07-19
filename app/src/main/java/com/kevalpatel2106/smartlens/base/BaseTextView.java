@@ -52,7 +52,7 @@ public final class BaseTextView extends AppCompatTextView {
     private void init(Context context) {
         //set type face
         AssetManager am = context.getApplicationContext().getAssets();
-        setTypeface(Typeface.createFromAsset(am, getFont()));
+        setTypeface(Typeface.createFromAsset(am, getFont(getTypeface())));
     }
 
     /**
@@ -60,8 +60,7 @@ public final class BaseTextView extends AppCompatTextView {
      *
      * @return font file name.
      */
-    private String getFont() {
-        Typeface typeface = getTypeface();
+    private String getFont(Typeface typeface) {
         switch (typeface != null ? typeface.getStyle() : Typeface.NORMAL) {
             case Typeface.BOLD_ITALIC:
                 return String.format(Locale.US, "fonts/%s", "OpenSans-BoldItalic.ttf");
@@ -69,6 +68,7 @@ public final class BaseTextView extends AppCompatTextView {
                 return String.format(Locale.US, "fonts/%s", "OpenSans-Italic.ttf");
             case Typeface.BOLD:
                 return String.format(Locale.US, "fonts/%s", "OpenSans-Bold.ttf");
+            case Typeface.NORMAL:
             default:
                 return String.format(Locale.US, "fonts/%s", "OpenSans-Regular.ttf");
         }

@@ -1,6 +1,6 @@
 ext {
     buidlConfig = [
-            min             : 16,
+            min             : 18,
             target          : 26,
             compile         : 26,
             buildToolVersion: '26.0.0',

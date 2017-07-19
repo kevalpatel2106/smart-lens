@@ -11,9 +11,11 @@ import okhttp3.Request;
 
 /**
  * Created by Keval on 16-Jun-17.
+ * Cache controller for apis.
  *
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
+
 
 class CacheInterceptor implements Interceptor {
     static final int CACHE_SIZE = 5242880;          //5 MB //Cache size.
@@ -54,3 +56,4 @@ class CacheInterceptor implements Interceptor {
         return chain.proceed(request);
     }
 }
+

@@ -38,20 +38,24 @@ public class RetrofitBuilder {
      * Get the instance of the retrofit {@link APIService}. The api request made using this won't
      * get cache.
      *
+     * @param context Instance of caller.
      * @return {@link APIService}
      */
-    public static APIService getApiService(Context context) {
+    public static APIService getApiService(@NonNull Context context) {
         return getApiService(context, false, 0);
     }
 
     /**
      * Get the instance of the retrofit {@link APIService}.
      *
+     * @param context Instance of caller.
      * @param isCacheEnable    True if you want to cache the request for 30 seconds.
      * @param cacheTimeSeconds Cache expiration time in seconds
      * @return {@link APIService}
      */
-    public static APIService getApiService(Context context, boolean isCacheEnable, int cacheTimeSeconds) {
+    public static APIService getApiService(@NonNull Context context,
+                                           boolean isCacheEnable,
+                                           int cacheTimeSeconds) {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
