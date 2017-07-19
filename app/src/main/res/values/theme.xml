@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Base application theme with no background. -->
+    <style name="AppTheme.NoBackground">
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <!-- Base application theme with no actionbar. -->
+    <style name="AppTheme.NoActionbar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Base application theme with no actionbar and no background. -->
+    <style name="AppTheme.NoActionbar.NoBackground">
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <!--Base theme with no actionbar and translucent status bar-->
+    <!--Override in v19-->
+    <style name="AppTheme.Translucent" parent="AppTheme.NoActionbar">
+        <!--Do not remove-->
+    </style>
+
+    <!-- Base application theme with no actionbar and no background and translucent statusbar. -->
+    <!--Override in v19-->
+    <style name="AppTheme.Translucent.NoBackground">
+        <item name="android:windowBackground">@null</item>
+    </style>
+</resources>

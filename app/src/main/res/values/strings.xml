@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">SmartLens</string>
+    <!--Title of the screens-->
+    <string name="title_home_activity">Home</string>
 </resources>

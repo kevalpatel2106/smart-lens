@@ -26,5 +26,6 @@ ext {
         exclude 'META-INF/ASL2.0'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/rxjava.properties'
     }
 }
