@@ -83,8 +83,8 @@ public final class CameraConfigTest extends BaseTestClass {
     @Test
     public void checkSetFacing() throws Exception {
         // Valid input check
-        mBuilder.setCameraFacing(CameraFacing.FRONT_FACING_CAMERA);
-        assertEquals(mBuilder.build().getFacing(), CameraFacing.FRONT_FACING_CAMERA);
+        mBuilder.setCameraFacing(CameraFacing.REAR_FACING_CAMERA);
+        assertEquals(mBuilder.build().getFacing(), CameraFacing.REAR_FACING_CAMERA);
 
         // Invalid input check
         mException.expect(IllegalArgumentException.class);
