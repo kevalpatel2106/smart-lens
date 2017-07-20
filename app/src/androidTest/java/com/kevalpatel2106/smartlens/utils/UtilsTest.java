@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by Keval on 19-Jul-17.
  */
-public class UtilsTest extends BaseTestClass {
+public final class UtilsTest extends BaseTestClass {
     @Before
     public void setUp() throws Exception {
     }

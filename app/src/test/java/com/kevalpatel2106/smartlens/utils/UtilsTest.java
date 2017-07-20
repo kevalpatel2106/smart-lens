@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Keval on 19-Jul-17.
  * Unit tests for {@link Utils}.
  */
-public class UtilsTest {
+public final class UtilsTest {
 
     /**
      * Test for {@link Utils#getDeviceName()}.

@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by Keval on 19-Jul-17.
  */
-public class FileUtilsTest extends BaseTestClass {
+public final class FileUtilsTest extends BaseTestClass {
     private Context mContext;
 
     @Before

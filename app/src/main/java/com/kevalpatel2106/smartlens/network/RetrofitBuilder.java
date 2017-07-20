@@ -48,6 +48,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RetrofitBuilder {
+    @SuppressWarnings("unused")
     private static final String TAG = "RetrofitBuilder";
 
     /**

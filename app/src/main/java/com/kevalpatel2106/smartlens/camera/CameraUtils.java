@@ -96,8 +96,10 @@ public final class CameraUtils {
                 compressFormat = Bitmap.CompressFormat.WEBP;
                 break;
             case CameraImageFormat.FORMAT_PNG:
-            default:
                 compressFormat = Bitmap.CompressFormat.PNG;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid image format.");
         }
 
         try {

@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Keval on 19-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
-public class BaseEditTextTest extends BaseTestClass {
+public final class BaseEditTextTest extends BaseTestClass {
     private BaseEditText mBaseEditText;
 
     @Before

@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * Test class for {@link SharedPrefsProvider}.
  */
 @RunWith(AndroidJUnit4.class)
-public class SharedPrefsProviderTest extends BaseTestClass {
+public final class SharedPrefsProviderTest extends BaseTestClass {
     private static final String TEST_KEY = "test_key";
 
     private SharedPreferences mSharedPreferences;

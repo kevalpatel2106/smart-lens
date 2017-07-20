@@ -35,7 +35,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 
-public class IntentTestUtils {
+public final class IntentTestUtils {
 
     /**
      * Check if the activity is changed when any view is clicked.

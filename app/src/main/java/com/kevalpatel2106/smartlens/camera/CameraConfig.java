@@ -35,6 +35,7 @@ import java.io.File;
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 
+@SuppressWarnings("WeakerAccess")
 public final class CameraConfig {
     private Context mContext;
 
@@ -95,7 +96,7 @@ public final class CameraConfig {
     /**
      * This is the builder class for {@link CameraConfig}.
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UnusedReturnValue", "WeakerAccess"})
     public class Builder {
 
         /**
@@ -115,7 +116,7 @@ public final class CameraConfig {
             if (resolution != CameraResolution.HIGH_RESOLUTION &&
                     resolution != CameraResolution.MEDIUM_RESOLUTION &&
                     resolution != CameraResolution.LOW_RESOLUTION) {
-                throw new RuntimeException("Invalid camera resolution.");
+                throw new IllegalArgumentException("Invalid camera resolution.");
             }
 
             mResolution = resolution;
@@ -137,7 +138,7 @@ public final class CameraConfig {
             //Validate input
             if (cameraFacing != CameraFacing.REAR_FACING_CAMERA &&
                     cameraFacing != CameraFacing.FRONT_FACING_CAMERA) {
-                throw new RuntimeException("Invalid camera facing value.");
+                throw new IllegalArgumentException("Invalid camera facing value.");
             }
 
             mFacing = cameraFacing;
@@ -158,7 +159,7 @@ public final class CameraConfig {
             //Validate input
             if (imageFormat != CameraImageFormat.FORMAT_JPEG &&
                     imageFormat != CameraImageFormat.FORMAT_PNG) {
-                throw new RuntimeException("Invalid output image format.");
+                throw new IllegalArgumentException("Invalid output image format.");
             }
 
             mImageFormat = imageFormat;
@@ -183,7 +184,7 @@ public final class CameraConfig {
                     && rotation != CameraRotation.ROTATION_90
                     && rotation != CameraRotation.ROTATION_180
                     && rotation != CameraRotation.ROTATION_270) {
-                throw new RuntimeException("Invalid image rotation.");
+                throw new IllegalArgumentException("Invalid image rotation.");
             }
 
             mImageRotation = rotation;

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Keval on 19-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
-public class BaseTextViewTest extends BaseTestClass {
+public final class BaseTextViewTest extends BaseTestClass {
     private BaseTextView mBaseTextView;
 
     @Before

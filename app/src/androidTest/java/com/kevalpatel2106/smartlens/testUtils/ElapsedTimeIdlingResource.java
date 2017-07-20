@@ -24,7 +24,7 @@ import android.support.test.espresso.IdlingResource;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class ElapsedTimeIdlingResource implements IdlingResource {
+public final class ElapsedTimeIdlingResource implements IdlingResource {
     private final long startTime;
     private final long waitingTime;
     private ResourceCallback resourceCallback;

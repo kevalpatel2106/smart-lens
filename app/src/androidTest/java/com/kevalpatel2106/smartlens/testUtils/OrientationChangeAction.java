@@ -39,7 +39,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 
 /**
  */
-public class OrientationChangeAction implements ViewAction {
+public final class OrientationChangeAction implements ViewAction {
     private final int orientation;
 
     private OrientationChangeAction(int orientation) {
