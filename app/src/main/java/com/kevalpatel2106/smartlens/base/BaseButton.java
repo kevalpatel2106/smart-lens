@@ -24,6 +24,8 @@ import android.util.AttributeSet;
 
 import java.util.Locale;
 
+import io.reactivex.annotations.Nullable;
+
 /**
  * Created by Keval Patel on 04/03/17.
  * This base class is to extend the functionality of {@link AppCompatButton}. Use this class instead
@@ -50,7 +52,7 @@ public final class BaseButton extends AppCompatButton {
     private void init(Context context) {
         //set type face
         AssetManager am = context.getApplicationContext().getAssets();
-        setTypeface(Typeface.createFromAsset(am, getFont()));
+        setTypeface(Typeface.createFromAsset(am, getFont(getTypeface())));
     }
 
     /**
@@ -58,8 +60,7 @@ public final class BaseButton extends AppCompatButton {
      *
      * @return font file name.
      */
-    private String getFont() {
-        Typeface typeface = getTypeface();
+    String getFont(@Nullable Typeface typeface) {
         switch (typeface != null ? typeface.getStyle() : Typeface.NORMAL) {
             case Typeface.BOLD_ITALIC:
                 return String.format(Locale.US, "fonts/%s", "OpenSans-BoldItalic.ttf");
@@ -68,6 +69,7 @@ public final class BaseButton extends AppCompatButton {
             case Typeface.BOLD:
                 return String.format(Locale.US, "fonts/%s", "OpenSans-Bold.ttf");
             default:
+            case Typeface.NORMAL:
                 return String.format(Locale.US, "fonts/%s", "OpenSans-Regular.ttf");
         }
     }

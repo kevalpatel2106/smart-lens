@@ -80,6 +80,7 @@ ext {
 
     //Other libs
     otherLib = [
-            gson: 'com.google.code.gson:gson:2.7',
+            gson : 'com.google.code.gson:gson:2.7',
+            rxBus: 'com.kevalpatel2106:rxbus:1.0',
     ]
 }

@@ -50,7 +50,7 @@ import io.reactivex.schedulers.Schedulers;
 @SuppressLint("ViewConstructor")
 public final class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private CameraCallbacks mCameraCallbacks;   //Callbacks.
-
+    private Context mContext;
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
@@ -66,7 +66,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      */
     public CameraPreview(@NonNull Context context, @NonNull CameraCallbacks cameraCallbacks) {
         super(context);
-
+        mContext = context;
         mCameraCallbacks = cameraCallbacks;
 
         //Set surface holder
@@ -151,9 +151,13 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      * @see CameraConfig
      */
     public void startCamera(@NonNull CameraConfig cameraConfig) {
-        //TODO Keval Validate camera config
-        mCameraConfig = cameraConfig;
+        //Check if the camera permission is available or not?
+        if (!CameraUtils.checkIfCameraPermissionGranted(mContext)) {
+            mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_PERMISSION_NOT_AVAILABLE);
+            return;
+        }
 
+        mCameraConfig = cameraConfig;
         if (safeCameraOpen(mCameraConfig.getFacing())) {
             requestLayout();
 

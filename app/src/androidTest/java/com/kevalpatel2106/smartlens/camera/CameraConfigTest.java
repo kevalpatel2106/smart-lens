@@ -48,6 +48,7 @@ import static org.junit.Assert.assertTrue;
 public final class CameraConfigTest extends BaseTestClass {
     @Rule
     public ExpectedException mException = ExpectedException.none();
+
     private CameraConfig.Builder mBuilder;
 
     @Before
@@ -68,7 +69,7 @@ public final class CameraConfigTest extends BaseTestClass {
 
     @SuppressLint("WrongConstant")
     @Test
-    public void getResolution() throws Exception {
+    public void checkSetResolution() throws Exception {
         // Valid input check
         mBuilder.setCameraResolution(CameraResolution.HIGH_RESOLUTION);
         assertEquals(mBuilder.build().getResolution(), CameraResolution.HIGH_RESOLUTION);
@@ -80,7 +81,7 @@ public final class CameraConfigTest extends BaseTestClass {
 
     @SuppressLint("WrongConstant")
     @Test
-    public void getFacing() throws Exception {
+    public void checkSetFacing() throws Exception {
         // Valid input check
         mBuilder.setCameraFacing(CameraFacing.FRONT_FACING_CAMERA);
         assertEquals(mBuilder.build().getFacing(), CameraFacing.FRONT_FACING_CAMERA);
@@ -92,7 +93,7 @@ public final class CameraConfigTest extends BaseTestClass {
 
     @SuppressLint("WrongConstant")
     @Test
-    public void getImageFormat() throws Exception {
+    public void checkSetImageFormat() throws Exception {
         // Valid input check
         mBuilder.setImageFormat(CameraImageFormat.FORMAT_JPEG);
         assertEquals(mBuilder.build().getImageFormat(), CameraImageFormat.FORMAT_JPEG);
@@ -103,7 +104,7 @@ public final class CameraConfigTest extends BaseTestClass {
     }
 
     @Test
-    public void getImageFile() throws Exception {
+    public void checkSetImageFile() throws Exception {
         //Check with the file
         File mockFile = new File(Environment.getExternalStorageDirectory()
                 + "/IMG" + System.currentTimeMillis() + "jpg");
@@ -121,7 +122,7 @@ public final class CameraConfigTest extends BaseTestClass {
 
     @SuppressLint("WrongConstant")
     @Test
-    public void getImageRotation() throws Exception {
+    public void checkSetImageRotation() throws Exception {
         mBuilder.setImageRotation(CameraRotation.ROTATION_180);
         assertEquals(mBuilder.build().getImageRotation(), CameraRotation.ROTATION_180);
 

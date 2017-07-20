@@ -18,6 +18,9 @@ package com.kevalpatel2106.smartlens.base;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Typeface;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -27,6 +30,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +44,7 @@ public final class BaseEditTextTest extends BaseTestClass {
     private BaseEditText mBaseEditText;
 
     @Before
-    public void setUp() throws Exception {
+    public void init() throws Exception {
         mBaseEditText = new BaseEditText(InstrumentationRegistry.getTargetContext());
         mBaseEditText.setText("");
     }
@@ -73,9 +79,53 @@ public final class BaseEditTextTest extends BaseTestClass {
         assertFalse(mBaseEditText.isEmpty());
     }
 
+    @SuppressLint("SetTextI18n")
     @Test
     public void clear() throws Exception {
-        assertTrue(mBaseEditText.getText().length() == 0);
+        mBaseEditText.setText("123456789");
+        mBaseEditText.clear();
+        assertEquals(mBaseEditText.getText().length(), 0);
+    }
+
+    @Test
+    public void testGetFont() throws Exception {
+        //Test with null typeface
+        mBaseEditText.setTypeface(null, Typeface.NORMAL);
+        assertEquals(mBaseEditText.getFont(mBaseEditText.getTypeface()),
+                String.format(Locale.US, "fonts/%s", "OpenSans-Regular.ttf"));
+
+        //Test with bold typeface
+        mBaseEditText.setTypeface(null, Typeface.BOLD);
+        assertEquals(mBaseEditText.getFont(mBaseEditText.getTypeface()),
+                String.format(Locale.US, "fonts/%s", "OpenSans-Bold.ttf"));
+
+        //Test with italic typeface
+        mBaseEditText.setTypeface(null, Typeface.ITALIC);
+        assertEquals(mBaseEditText.getFont(mBaseEditText.getTypeface()),
+                String.format(Locale.US, "fonts/%s", "OpenSans-Italic.ttf"));
+
+        //Test with italic typeface
+        mBaseEditText.setTypeface(null, Typeface.BOLD_ITALIC);
+        assertEquals(mBaseEditText.getFont(mBaseEditText.getTypeface()),
+                String.format(Locale.US, "fonts/%s", "OpenSans-BoldItalic.ttf"));
+
+
+        //check with null typeface
+        mBaseEditText.setTypeface(null);
+        assertEquals(mBaseEditText.getFont(mBaseEditText.getTypeface()),
+                String.format(Locale.US, "fonts/%s", "OpenSans-Regular.ttf"));
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Test
+    public void setError() throws Exception {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            String mockErrorText = "This is mock error.";
+            mBaseEditText.setError(mockErrorText);
+            assertTrue(mBaseEditText.isFocused());
+            assertEquals(mBaseEditText.getError(), mockErrorText);
+        });
     }
 
     @Override

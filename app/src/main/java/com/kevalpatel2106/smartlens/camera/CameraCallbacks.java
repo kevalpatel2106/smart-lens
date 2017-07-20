@@ -25,7 +25,7 @@ import android.support.annotation.NonNull;
  *
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
-interface CameraCallbacks {
+public interface CameraCallbacks {
 
     /**
      * This callback will notify whenever new image is captured.

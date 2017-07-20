@@ -60,7 +60,7 @@ public final class BaseTextView extends AppCompatTextView {
      *
      * @return font file name.
      */
-    private String getFont(Typeface typeface) {
+    String getFont(Typeface typeface) {
         switch (typeface != null ? typeface.getStyle() : Typeface.NORMAL) {
             case Typeface.BOLD_ITALIC:
                 return String.format(Locale.US, "fonts/%s", "OpenSans-BoldItalic.ttf");

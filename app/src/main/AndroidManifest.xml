@@ -55,7 +55,7 @@
 
         <!--Home screen-->
         <activity
-            android:name=".Dashboard"
+            android:name=".dashboard.Dashboard"
             android:label="@string/title_home_activity"
             android:resizeableActivity="true"
             android:theme="@style/AppTheme"

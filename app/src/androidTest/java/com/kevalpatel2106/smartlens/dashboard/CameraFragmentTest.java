@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens;
+package com.kevalpatel2106.smartlens.dashboard;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import org.junit.Test;
 
-public class Dashboard extends AppCompatActivity {
+import static org.junit.Assert.assertTrue;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+/**
+ * Created by Keval on 20-Jul-17.
+ */
+public class CameraFragmentTest {
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void getNewInstance() throws Exception {
+        assertTrue(CameraFragment.getNewInstance() instanceof CameraFragment);
     }
+
+    @Test
+    public void onImageCapture() throws Exception {
+    }
+
+    @Test
+    public void onCameraError() throws Exception {
+    }
+
 }

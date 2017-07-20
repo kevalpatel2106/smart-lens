@@ -16,6 +16,7 @@
 
 package com.kevalpatel2106.smartlens.camera;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -23,6 +24,7 @@ import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
+import android.support.v4.app.ActivityCompat;
 
 import com.kevalpatel2106.smartlens.camera.config.CameraImageFormat;
 import com.kevalpatel2106.smartlens.camera.config.CameraRotation;
@@ -70,6 +72,17 @@ public final class CameraUtils {
                 bitmap.getWidth(),
                 bitmap.getHeight(),
                 matrix, true);
+    }
+
+    /**
+     * Check if the camera permission is granted or not?
+     *
+     * @param context Instance of the caller.
+     * @return true if the permission is available.
+     */
+    public static boolean checkIfCameraPermissionGranted(@NonNull Context context) {
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 
     /**

@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 public final class CameraUtilsTest extends BaseTestClass {
 
     @Test
-    public void rotateBitmap() throws Exception {
+    public void checkIfBitmapRotate() throws Exception {
         //Generate mock bmp
         int mockBmpWidth = 100;
         int mockBmpHeight = 50;
@@ -58,7 +58,12 @@ public final class CameraUtilsTest extends BaseTestClass {
     }
 
     @Test
-    public void saveImageFromFile() throws Exception {
+    public void checkIfCameraPermissionGranted() throws Exception {
+        assertTrue(CameraUtils.checkIfCameraPermissionGranted(InstrumentationRegistry.getTargetContext()));
+    }
+
+    @Test
+    public void checkIfSaveFileWorks() throws Exception {
         //Generate mock bmp
         int mockBmpWidth = 100;
         int mockBmpHeight = 50;
