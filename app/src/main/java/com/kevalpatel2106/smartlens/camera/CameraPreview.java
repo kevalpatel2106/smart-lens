@@ -48,7 +48,9 @@ import io.reactivex.schedulers.Schedulers;
 
 
 @SuppressLint("ViewConstructor")
-public final class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+public final class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.ErrorCallback {
+    private static final String TAG = "CameraPreview";
+
     private CameraCallbacks mCameraCallbacks;   //Callbacks.
     private Context mContext;
     private SurfaceHolder mHolder;
@@ -58,30 +60,61 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
     private volatile boolean isSafeToTakePicture = false;
 
+    //Create the picture callback.
+    private Camera.PictureCallback mPictureCallback = (bytes, camera) -> {
+
+        Flowable<Bitmap> flowable = Flowable.create(bitmapEmitter -> {
+            //Convert byte array to bitmap
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+            //Rotate the bitmap
+            Bitmap rotatedBitmap;
+            if (mCameraConfig.getImageRotation() != CameraRotation.ROTATION_0) {
+                rotatedBitmap = CameraUtils.rotateBitmap(bitmap, mCameraConfig.getImageRotation());
+
+                //noinspection UnusedAssignment
+                bitmap = null;
+            } else {
+                rotatedBitmap = bitmap;
+            }
+
+            bitmapEmitter.onNext(rotatedBitmap);
+        }, BackpressureStrategy.DROP);
+
+        final Subscription[] subscriptions = {null};
+        flowable.subscribeOn(Schedulers.io())
+                .filter(bitmap -> bitmap != null && bitmap.getByteCount() > 0)
+                .doOnSubscribe(subscription -> subscriptions[0] = subscription)
+                .doOnError(throwable -> {
+                    mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
+                    if (subscriptions[0] != null) subscriptions[0].cancel();
+                    isSafeToTakePicture = true;
+                })
+                .doOnNext(bitmap -> {
+                    mCameraCallbacks.onImageCapture(bitmap);
+                    if (subscriptions[0] != null) subscriptions[0].cancel();
+                    isSafeToTakePicture = true;
+                })
+                .observeOn(AndroidSchedulers.mainThread());
+    };
+
     /**
      * Public constructor.
      *
      * @param context         Instance of the caller.
      * @param cameraCallbacks {@link CameraCallbacks} to get the camera information.
      */
+    @SuppressWarnings("deprecation")
     public CameraPreview(@NonNull Context context, @NonNull CameraCallbacks cameraCallbacks) {
         super(context);
         mContext = context;
         mCameraCallbacks = cameraCallbacks;
 
         //Set surface holder
-        initSurfaceView();
-    }
-
-    /**
-     * Initialize the surface view holder.
-     */
-    private void initSurfaceView() {
         mHolder = getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
-
 
     @Override
     protected void onLayout(boolean b, int i, int i1, int i2, int i3) {
@@ -123,6 +156,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
         try {
             mCamera.setDisplayOrientation(90);
+            mCamera.setErrorCallback(this);
             mCamera.setPreviewDisplay(surfaceHolder);
             mCamera.startPreview();
 
@@ -137,11 +171,8 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // Surface will be destroyed when we return, so stop the preview.
-        if (mCamera != null) {
-
-            // Call stopPreview() to stop updating the preview surface.
-            mCamera.stopPreview();
-        }
+        // Call stopPreview() to stop updating the preview surface.
+        if (mCamera != null) mCamera.stopPreview();
     }
 
     /**
@@ -185,7 +216,6 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      */
     private boolean safeCameraOpen(int cameraFacing) {
         try {
-
             //Stop the camera first to be safe.
             stopPreviewAndReleaseCamera();
 
@@ -196,10 +226,9 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             return mCamera != null;
         } catch (Exception e) {
             //Exception occurred.
-            Log.e("CameraPreview", "failed to open Camera");
+            Log.e(TAG, "safeCameraOpen: ");
             e.printStackTrace();
         }
-
         return false;
     }
 
@@ -209,7 +238,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      * @return true if you can capture the image else false.
      */
     boolean isSafeToTakePictureInternal() {
-        return isSafeToTakePicture;
+        return mCamera != null && isSafeToTakePicture;
     }
 
     /**
@@ -217,59 +246,13 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      */
     public void takePicture() {
         //Check if it is safe to take image?
-        if (!isSafeToTakePicture) return;
+        if (!isSafeToTakePictureInternal()) return;
 
-        if (mCamera != null) {
+        //Mark unsafe
+        isSafeToTakePicture = false;
 
-            //Mark unsafe
-            isSafeToTakePicture = false;
-
-            //Create the picture callback.
-            Camera.PictureCallback mPictureCallback = (byte[] bytes, Camera camera) -> {
-
-                Flowable<Bitmap> flowable = Flowable.create(bitmapEmitter -> {
-                    //Convert byte array to bitmap
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                    //Rotate the bitmap
-                    Bitmap rotatedBitmap;
-                    if (mCameraConfig.getImageRotation() != CameraRotation.ROTATION_0) {
-                        rotatedBitmap = CameraUtils.rotateBitmap(bitmap, mCameraConfig.getImageRotation());
-
-                        //noinspection UnusedAssignment
-                        bitmap = null;
-                    } else {
-                        rotatedBitmap = bitmap;
-                    }
-
-                    bitmapEmitter.onNext(rotatedBitmap);
-                    bitmapEmitter.onComplete();
-                }, BackpressureStrategy.DROP);
-
-                final Subscription[] subscriptions = {null};
-                flowable.subscribeOn(Schedulers.io())
-                        .filter(bitmap -> bitmap != null && bitmap.getByteCount() > 0)
-                        .doOnSubscribe(subscription -> subscriptions[0] = subscription)
-                        .doOnError(throwable -> {
-                            mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
-                            isSafeToTakePicture = true;
-                        })
-                        .doOnNext(bitmap -> {
-                            mCameraCallbacks.onImageCapture(bitmap);
-                            isSafeToTakePicture = true;
-                        })
-                        .doOnComplete(() -> {
-                            if (subscriptions[0] != null) subscriptions[0].cancel();
-                        })
-                        .observeOn(AndroidSchedulers.mainThread());
-            };
-
-            //Take the picture.
-            mCamera.takePicture(null, null, mPictureCallback);
-        } else {
-            mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
-            isSafeToTakePicture = true;
-        }
+        //Take the picture.
+        mCamera.takePicture(null, null, mPictureCallback);
     }
 
     /**
@@ -300,11 +283,17 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     /**
      * Stop camera preview and release the camera.
      */
-    void stopPreviewAndReleaseCamera() {
+    public void stopPreviewAndReleaseCamera() {
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
         }
         mCamera = null;
+    }
+
+    @Override
+    public void onError(int i, Camera camera) {
+        stopPreviewAndReleaseCamera();
+        mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
     }
 }

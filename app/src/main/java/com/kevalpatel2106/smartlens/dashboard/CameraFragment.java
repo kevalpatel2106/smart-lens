@@ -21,10 +21,12 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,13 +42,25 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
+import com.kevalpatel2106.tensorflow.Classifier;
+import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
+
+import org.reactivestreams.Subscription;
+
+import java.util.List;
 
 import butterknife.BindView;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public final class CameraFragment extends BaseFragment implements CameraCallbacks {
+
+    private static final String TAG = "CameraFragment";
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
@@ -81,17 +95,33 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
         mCameraPreview = new CameraPreview(getActivity(), this);
         mContainer.removeAllViews();
         mContainer.addView(mCameraPreview);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         //Start the camera.
         if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {
             //Start the camera.
             mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
-                    .setCameraResolution(CameraResolution.HIGH_RESOLUTION)
+                    .setCameraResolution(CameraResolution.MEDIUM_RESOLUTION)
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
+
+            //Start taking the pictures after 1 second delay
+            new Handler().postDelayed(() -> mCameraPreview.takePicture(), 1000);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        //Stop and release the camera
+        if (mCameraPreview != null) mCameraPreview.stopPreviewAndReleaseCamera();
     }
 
     @Override
@@ -118,8 +148,26 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
     }
 
     @Override
-    public void onImageCapture(@NonNull Bitmap imageCaptured) {
+    public void onImageCapture(@NonNull final Bitmap imageCaptured) {
 
+        //Process the image using Tf.
+        Flowable<List<Classifier.Recognition>> flowable = Flowable.create(e -> {
+            TensorFlowImageClassifier imageClassifier = new TensorFlowImageClassifier(getActivity());
+            e.onNext(imageClassifier.recognizeImage(imageCaptured));
+        }, BackpressureStrategy.DROP);
+
+        final Subscription[] subscriptions = new Subscription[1];
+        flowable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(subscription -> subscriptions[0] = subscription)
+                .doOnError(t -> {
+                    Log.e(TAG, "onImageCapture: " + t.getMessage());
+                    subscriptions[0].cancel();
+                })
+                .subscribe(lables -> {
+                    Log.d(TAG, "onImageCapture: " + lables.get(0));
+                    subscriptions[0].cancel();
+                });
     }
 
     @Override
