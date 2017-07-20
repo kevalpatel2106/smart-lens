@@ -29,6 +29,8 @@ import java.io.File;
 
 /**
  * Created by Keval on 12-Nov-16.
+ * This class will manage the camera configuration parameters. User the {@link Builder} class to
+ * set different parameters for the camera.
  *
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
@@ -50,9 +52,17 @@ public final class CameraConfig {
 
     private File mImageFile;
 
+    /**
+     * Public constructor.
+     */
     public CameraConfig() {
+        //Do nothing
     }
 
+    /**
+     * @param context Instance.
+     * @return {@link Builder}
+     */
     public Builder getBuilder(@NonNull Context context) {
         mContext = context;
         return new Builder();
@@ -82,6 +92,9 @@ public final class CameraConfig {
         return mImageRotation;
     }
 
+    /**
+     * This is the builder class for {@link CameraConfig}.
+     */
     @SuppressWarnings("unused")
     public class Builder {
 
@@ -199,6 +212,12 @@ public final class CameraConfig {
             return CameraConfig.this;
         }
 
+        /**
+         * If no file is supplied to save the captured image, image will be saved by default to the
+         * cache directory.
+         *
+         * @return File to save image bitmap.
+         */
         @NonNull
         private File getDefaultStorageFile() {
             return new File(FileUtils.getCacheDir(mContext).getAbsolutePath()

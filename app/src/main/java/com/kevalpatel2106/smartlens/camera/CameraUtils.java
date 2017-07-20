@@ -38,7 +38,8 @@ import java.io.IOException;
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 
-public final class HiddenCameraUtils {
+@SuppressWarnings("WeakerAccess")
+public final class CameraUtils {
 
     /**
      * Check if the device has front camera or not?
@@ -74,14 +75,16 @@ public final class HiddenCameraUtils {
     /**
      * Save image to the file.
      *
-     * @param bitmap     bitmap to store.
-     * @param fileToSave file where bitmap should stored
+     * @param bitmap      bitmap to store.
+     * @param fileToSave  file where bitmap should stored
+     * @param imageFormat Format of the output file. {@link CameraImageFormat}
+     * @return True if the file saved successfully.
      */
     static boolean saveImageFromFile(@NonNull Bitmap bitmap,
                                      @NonNull File fileToSave,
                                      @CameraImageFormat.SupportedImageFormat int imageFormat) {
         FileOutputStream out = null;
-        boolean isSuccess = false;
+        boolean isSuccess;
 
         //Decide the image format
         Bitmap.CompressFormat compressFormat;
@@ -98,7 +101,9 @@ public final class HiddenCameraUtils {
         }
 
         try {
-            if (!fileToSave.exists()) fileToSave.createNewFile();
+            if (!fileToSave.exists()) //noinspection ResultOfMethodCallIgnored
+                fileToSave.createNewFile();
+
             out = new FileOutputStream(fileToSave);
             bitmap.compress(compressFormat, 100, out); // bmp is your Bitmap instance
             isSuccess = true;

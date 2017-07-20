@@ -50,7 +50,7 @@ public final class CameraError {
      * using front facing camera, this error will occur.
      * <p>
      * Developer can check if the device has
-     * front camera or not by using {@link HiddenCameraUtils#isFrontCameraAvailable(Context)}
+     * front camera or not by using {@link CameraUtils#isFrontCameraAvailable(Context)}
      * before initializing the camera.
      */
     public static final int ERROR_DOES_NOT_HAVE_FRONT_CAMERA = 8722;

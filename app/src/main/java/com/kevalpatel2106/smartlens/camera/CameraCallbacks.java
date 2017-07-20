@@ -16,18 +16,29 @@
 
 package com.kevalpatel2106.smartlens.camera;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-
-import java.io.File;
 
 /**
  * Created by Keval on 14-Oct-16.
+ * Interface to receive the camera callbacks.
  *
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 interface CameraCallbacks {
 
-    void onImageCapture(@NonNull File imageFile);
+    /**
+     * This callback will notify whenever new image is captured.
+     *
+     * @param imageCaptured The bitmap of the captured image.
+     */
+    void onImageCapture(@NonNull Bitmap imageCaptured);
 
+    /**
+     * This callback will notify whenever any error occurs while working with the camera.
+     *
+     * @param errorCode Error code for the error occurred.
+     * @see CameraError
+     */
     void onCameraError(@CameraError.CameraErrorCodes int errorCode);
 }

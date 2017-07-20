@@ -21,7 +21,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -30,8 +29,15 @@ import android.view.SurfaceView;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
 import com.kevalpatel2106.smartlens.camera.config.CameraRotation;
 
+import org.reactivestreams.Subscription;
+
 import java.io.IOException;
 import java.util.List;
+
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Keval Patel on 19/07/17.
@@ -43,16 +49,22 @@ import java.util.List;
 
 @SuppressLint("ViewConstructor")
 public final class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private CameraCallbacks mCameraCallbacks;
+    private CameraCallbacks mCameraCallbacks;   //Callbacks.
 
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
     private CameraConfig mCameraConfig;
 
-    private volatile boolean safeToTakePicture = false;
+    private volatile boolean isSafeToTakePicture = false;
 
-    public CameraPreview(@NonNull Context context, CameraCallbacks cameraCallbacks) {
+    /**
+     * Public constructor.
+     *
+     * @param context         Instance of the caller.
+     * @param cameraCallbacks {@link CameraCallbacks} to get the camera information.
+     */
+    public CameraPreview(@NonNull Context context, @NonNull CameraCallbacks cameraCallbacks) {
         super(context);
 
         mCameraCallbacks = cameraCallbacks;
@@ -62,7 +74,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     }
 
     /**
-     * Initilize the surface view holder.
+     * Initialize the surface view holder.
      */
     private void initSurfaceView() {
         mHolder = getHolder();
@@ -99,24 +111,10 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         }
 
         // Make changes in preview size
-        Camera.Parameters parameters = mCamera.getParameters();
-        List<Camera.Size> pictureSizes = mCamera.getParameters().getSupportedPictureSizes();
-
         //set the camera image size based on config provided
-        Camera.Size cameraSize;
-        switch (mCameraConfig.getResolution()) {
-            case CameraResolution.HIGH_RESOLUTION:
-                cameraSize = pictureSizes.get(0);   //Highest res
-                break;
-            case CameraResolution.MEDIUM_RESOLUTION:
-                cameraSize = pictureSizes.get(pictureSizes.size() / 2);     //Resolution at the middle
-                break;
-            case CameraResolution.LOW_RESOLUTION:
-                cameraSize = pictureSizes.get(pictureSizes.size() - 1);       //Lowest res
-                break;
-            default:
-                throw new RuntimeException("Invalid camera resolution.");
-        }
+        Camera.Parameters parameters = mCamera.getParameters();
+        Camera.Size cameraSize = getValidCameraSize(mCamera.getParameters().getSupportedPictureSizes(),
+                mCameraConfig.getResolution());
         parameters.setPictureSize(cameraSize.width, cameraSize.height);
 
         requestLayout();
@@ -128,7 +126,8 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             mCamera.setPreviewDisplay(surfaceHolder);
             mCamera.startPreview();
 
-            safeToTakePicture = true;
+            //You are safe now.
+            isSafeToTakePicture = true;
         } catch (IOException | NullPointerException e) {
             //Cannot start preview
             mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
@@ -138,8 +137,9 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // Surface will be destroyed when we return, so stop the preview.
-        // Call stopPreview() to stop updating the preview surface.
         if (mCamera != null) {
+
+            // Call stopPreview() to stop updating the preview surface.
             mCamera.stopPreview();
         }
     }
@@ -147,112 +147,160 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     /**
      * Initialize the camera and start the preview of the camera.
      *
-     * @param cameraConfig camera config builder.
+     * @param cameraConfig camera configurations.
+     * @see CameraConfig
      */
-    void startCameraInternal(@NonNull CameraConfig cameraConfig) {
+    public void startCamera(@NonNull CameraConfig cameraConfig) {
+        //TODO Keval Validate camera config
         mCameraConfig = cameraConfig;
 
         if (safeCameraOpen(mCameraConfig.getFacing())) {
-            if (mCamera != null) {
-                requestLayout();
+            requestLayout();
 
-                try {
-                    mCamera.setPreviewDisplay(mHolder);
-                    mCamera.startPreview();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                //Start the preview.
+                mCamera.setPreviewDisplay(mHolder);
+                mCamera.startPreview();
+            } catch (IOException e) {
+                e.printStackTrace();
 
-                    mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
-                }
+                //Error occurred while starting the camera preview.
+                mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
             }
         } else {
+            //Was not able to initialize the camera.
             mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
-        }
-    }
-
-    private boolean safeCameraOpen(int id) {
-        boolean qOpened = false;
-
-        try {
-            stopPreviewAndFreeCamera();
-
-            mCamera = Camera.open(id);
-            qOpened = (mCamera != null);
-        } catch (Exception e) {
-            Log.e("CameraPreview", "failed to open Camera");
-            e.printStackTrace();
-        }
-
-        return qOpened;
-    }
-
-    boolean isSafeToTakePictureInternal() {
-        return safeToTakePicture;
-    }
-
-    void takePictureInternal() {
-        safeToTakePicture = false;
-        if (mCamera != null) {
-            mCamera.takePicture(null, null, new Camera.PictureCallback() {
-                @Override
-                public void onPictureTaken(final byte[] bytes, Camera camera) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Convert byte array to bitmap
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                            //Rotate the bitmap
-                            Bitmap rotatedBitmap;
-                            if (mCameraConfig.getImageRotation() != CameraRotation.ROTATION_0) {
-                                rotatedBitmap = HiddenCameraUtils.rotateBitmap(bitmap, mCameraConfig.getImageRotation());
-
-                                //noinspection UnusedAssignment
-                                bitmap = null;
-                            } else {
-                                rotatedBitmap = bitmap;
-                            }
-
-                            //Save image to the file.
-                            if (HiddenCameraUtils.saveImageFromFile(rotatedBitmap,
-                                    mCameraConfig.getImageFile(),
-                                    mCameraConfig.getImageFormat())) {
-                                //Post image file to the main thread
-                                new android.os.Handler(Looper.getMainLooper()).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mCameraCallbacks.onImageCapture(mCameraConfig.getImageFile());
-                                    }
-                                });
-                            } else {
-                                //Post error to the main thread
-                                new android.os.Handler(Looper.getMainLooper()).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mCameraCallbacks.onCameraError(CameraError.ERROR_IMAGE_WRITE_FAILED);
-                                    }
-                                });
-                            }
-
-                            safeToTakePicture = true;
-                        }
-                    }).start();
-                }
-            });
-        } else {
-            mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
-            safeToTakePicture = true;
         }
     }
 
     /**
-     * When this function returns, mCamera will be null.
+     * Open the camera safely.
+     *
+     * @param cameraFacing Id of the camera.
+     * @return True if the camera opened successfully else false.
      */
-    void stopPreviewAndFreeCamera() {
+    private boolean safeCameraOpen(int cameraFacing) {
+        try {
+
+            //Stop the camera first to be safe.
+            stopPreviewAndReleaseCamera();
+
+            //Try to open  the camera
+            mCamera = Camera.open(cameraFacing);
+
+            //All good. Camera opened.
+            return mCamera != null;
+        } catch (Exception e) {
+            //Exception occurred.
+            Log.e("CameraPreview", "failed to open Camera");
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * You can check if it is safe to take picture right now?
+     *
+     * @return true if you can capture the image else false.
+     */
+    boolean isSafeToTakePictureInternal() {
+        return isSafeToTakePicture;
+    }
+
+    /**
+     * Take the picture.
+     */
+    public void takePicture() {
+        //Check if it is safe to take image?
+        if (!isSafeToTakePicture) return;
+
+        if (mCamera != null) {
+
+            //Mark unsafe
+            isSafeToTakePicture = false;
+
+            //Create the picture callback.
+            Camera.PictureCallback mPictureCallback = (byte[] bytes, Camera camera) -> {
+
+                Flowable<Bitmap> flowable = Flowable.create(bitmapEmitter -> {
+                    //Convert byte array to bitmap
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                    //Rotate the bitmap
+                    Bitmap rotatedBitmap;
+                    if (mCameraConfig.getImageRotation() != CameraRotation.ROTATION_0) {
+                        rotatedBitmap = CameraUtils.rotateBitmap(bitmap, mCameraConfig.getImageRotation());
+
+                        //noinspection UnusedAssignment
+                        bitmap = null;
+                    } else {
+                        rotatedBitmap = bitmap;
+                    }
+
+                    bitmapEmitter.onNext(rotatedBitmap);
+                    bitmapEmitter.onComplete();
+                }, BackpressureStrategy.DROP);
+
+                final Subscription[] subscriptions = {null};
+                flowable.subscribeOn(Schedulers.io())
+                        .filter(bitmap -> bitmap != null && bitmap.getByteCount() > 0)
+                        .doOnSubscribe(subscription -> subscriptions[0] = subscription)
+                        .doOnError(throwable -> {
+                            mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
+                            isSafeToTakePicture = true;
+                        })
+                        .doOnNext(bitmap -> {
+                            mCameraCallbacks.onImageCapture(bitmap);
+                            isSafeToTakePicture = true;
+                        })
+                        .doOnComplete(() -> {
+                            if (subscriptions[0] != null) subscriptions[0].cancel();
+                        })
+                        .observeOn(AndroidSchedulers.mainThread());
+            };
+
+            //Take the picture.
+            mCamera.takePicture(null, null, mPictureCallback);
+        } else {
+            mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
+            isSafeToTakePicture = true;
+        }
+    }
+
+    /**
+     * Get the valid camera sizes based on the supported picture sizes.
+     *
+     * @param pictureSizes  List of {@link Camera.Size} supported by the hardware camera.
+     * @param cameraQuality Quality of the camera supplied.
+     * @return Supported image.
+     */
+    @NonNull
+    private Camera.Size getValidCameraSize(@NonNull List<Camera.Size> pictureSizes,
+                                           @CameraResolution.SupportedResolution int cameraQuality) {
+        if (pictureSizes.isEmpty())
+            throw new IllegalArgumentException("Picture sizes cannot be null.");
+
+        switch (cameraQuality) {
+            case CameraResolution.HIGH_RESOLUTION:
+                return pictureSizes.get(0);   //Highest res
+            case CameraResolution.MEDIUM_RESOLUTION:
+                return pictureSizes.get(pictureSizes.size() / 2);     //Resolution at the middle
+            case CameraResolution.LOW_RESOLUTION:
+                return pictureSizes.get(pictureSizes.size() - 1);       //Lowest res
+            default:
+                throw new IllegalStateException("Invalid camera resolution.");
+        }
+    }
+
+    /**
+     * Stop camera preview and release the camera.
+     */
+    void stopPreviewAndReleaseCamera() {
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
-            mCamera = null;
         }
+        mCamera = null;
     }
 }
