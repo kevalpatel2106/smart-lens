@@ -20,7 +20,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import com.kevalpatel2106.tensorflow.test.R;
 
@@ -43,6 +42,7 @@ public class TensorFlowImageClassifierTest {
 
     @Before
     public void init() {
+        System.gc();
         mTensorFlowImageClassifier = new TensorFlowImageClassifier(InstrumentationRegistry.getTargetContext());
     }
 
@@ -50,6 +50,10 @@ public class TensorFlowImageClassifierTest {
     public void canRecognizeImage() throws Exception {
         validateImageRecognition(R.drawable.keyboard, "keyboard");
         validateImageRecognition(R.drawable.laptop, "laptop");
+
+        //Check if can close?
+        mTensorFlowImageClassifier.close();
+        assertNull(mTensorFlowImageClassifier.mTensorFlowInferenceInterface);
     }
 
     private void validateImageRecognition(int imageRes, String correctLabel) {
@@ -66,18 +70,13 @@ public class TensorFlowImageClassifierTest {
 
         boolean isMatched = false;
         for (Classifier.Recognition recognition : lables) {
-            Log.d("ImageClassifierTest", "canRecognizeImage: " + recognition.getTitle());
             if (recognition.getTitle().contains(correctLabel)) {
                 isMatched = true;
                 break;
             }
         }
         assertTrue(isMatched);
-    }
-
-    @Test
-    public void canClose() throws Exception {
-        mTensorFlowImageClassifier.close();
-        assertNull(mTensorFlowImageClassifier.mTensorFlowInferenceInterface);
+        //noinspection UnusedAssignment
+        mockKeyboardImage = null;
     }
 }
