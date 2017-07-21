@@ -38,7 +38,7 @@ before_script:
     - cd tensorflow-android-inference
     - mkdir assets
     - cd assets
-    - curl -L -o https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip ./inception5h.zip
+    - curl -L -o ./inception5h.zip https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip
     - sudo apt-get install unzip
     - unzip inception5h.zip -d .
     - rm -rf inception5h.zip
