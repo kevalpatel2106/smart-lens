@@ -57,19 +57,23 @@ task downloadFile(type: Download) {
 }
 
 task extractModels(type: Copy) {
-    if (!new File(TMP_DIR).exists() || new File(TMP_DIR).list().length == 0) {
-        //Download the files.
-        dependsOn downloadFile
-    }
+    if (new File(ASSET_DIR).exists() && new File(ASSET_DIR).list().length >= 2) {
+        //Files already downloaded.
+    } else {
+        if (!new File(TMP_DIR).exists() || new File(TMP_DIR).list().length == 0) {
+            //Download the files.
+            dependsOn downloadFile
+        }
 
-    //Extract files from the download directory.
-    for (f in models) {
-        from zipTree(TMP_DIR + '/' + f)
-    }
+        //Extract files from the download directory.
+        for (f in models) {
+            from zipTree(TMP_DIR + '/' + f)
+        }
 
-    into file(ASSET_DIR)
-    fileMode 0644
-    exclude '**/LICENSE'
+        into file(ASSET_DIR)
+        fileMode 0644
+        exclude '**/LICENSE'
+    }
 }
 
 tasks.whenTaskAdded { task ->
@@ -77,7 +81,7 @@ tasks.whenTaskAdded { task ->
         task.dependsOn 'extractModels'
     } else if (task.name == 'assembleDebug') {
         task.dependsOn 'extractModels'
-    }else if (task.name == 'connectedAndroidTest') {
+    } else if (task.name == 'connectedAndroidTest') {
         task.dependsOn 'extractModels'
     } else if (task.name == 'bundleRelease') {
         task.dependsOn 'extractModels'
