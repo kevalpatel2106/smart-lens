@@ -77,6 +77,8 @@ tasks.whenTaskAdded { task ->
         task.dependsOn 'extractModels'
     } else if (task.name == 'assembleDebug') {
         task.dependsOn 'extractModels'
+    }else if (task.name == 'connectedAndroidTest') {
+        task.dependsOn 'extractModels'
     } else if (task.name == 'bundleRelease') {
         task.dependsOn 'extractModels'
     }
