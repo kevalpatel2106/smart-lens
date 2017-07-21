@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -62,12 +63,12 @@ public class CameraFragmentTest extends BaseTestClass {
         mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
     }
 
-//    @Test
-//    public void checkTakePicture() throws Exception {
-//        //Take the picture
-//        mCameraFragment.mCameraPreview.takePicture();
-//        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
-//    }
+    @Test
+    public void checkTakePicture() throws Exception {
+        //Take the picture
+        mCameraFragment.mCameraPreview.takePicture();
+        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+    }
 
 
     @Override
