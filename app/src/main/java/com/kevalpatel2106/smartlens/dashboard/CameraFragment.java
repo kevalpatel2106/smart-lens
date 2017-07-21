@@ -67,6 +67,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
     FrameLayout mContainer;
 
     private CameraPreview mCameraPreview;
+    private TensorFlowImageClassifier mImageClassifier;
 
     public CameraFragment() {
         // Required empty public constructor
@@ -90,6 +91,8 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mImageClassifier = new TensorFlowImageClassifier(getActivity());
 
         //Add the camera preview.
         mCameraPreview = new CameraPreview(getActivity(), this);
@@ -152,22 +155,26 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
 
         //Process the image using Tf.
         Flowable<List<Classifier.Recognition>> flowable = Flowable.create(e -> {
-            TensorFlowImageClassifier imageClassifier = new TensorFlowImageClassifier(getActivity());
-            e.onNext(imageClassifier.recognizeImage(imageCaptured));
+            e.onNext(mImageClassifier.recognizeImage(imageCaptured));
+            e.onComplete();
         }, BackpressureStrategy.DROP);
 
         final Subscription[] subscriptions = new Subscription[1];
         flowable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .filter(recognitions -> !recognitions.isEmpty())
                 .doOnSubscribe(subscription -> subscriptions[0] = subscription)
                 .doOnError(t -> {
                     Log.e(TAG, "onImageCapture: " + t.getMessage());
                     subscriptions[0].cancel();
                 })
-                .subscribe(lables -> {
-                    Log.d(TAG, "onImageCapture: " + lables.get(0));
+                .doOnComplete(() -> {
+                    mCameraPreview.takePicture();
                     subscriptions[0].cancel();
+                })
+                .subscribe(lables -> {
+                    if (!lables.isEmpty()) {
+                        Log.d(TAG, "onImageCapture: " + lables.get(0));
+                    }
                 });
     }
 

@@ -38,6 +38,7 @@ android {
         resConfigs "en"
 
         consumerProguardFiles proguardConfig.proguardPath
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets {
@@ -54,6 +55,12 @@ android {
 }
 
 dependencies {
+    //Testing
+    testImplementation testLib.junit
+    androidTestImplementation(testLib.rules, excludeGrp)
+    androidTestImplementation(testLib.esspresso, excludeGrp)
+    androidTestImplementation(testLib.runner, excludeGrp)
+
     implementation files('libs/libandroid_tensorflow_inference_java.jar')
 }
 

@@ -32,6 +32,7 @@ import android.view.inputmethod.InputMethodManager;
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 
+@SuppressWarnings("WeakerAccess")
 public class Utils {
 
     /**

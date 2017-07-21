@@ -18,9 +18,11 @@ package com.kevalpatel2106.smartlens.base;
 
 import android.graphics.Typeface;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Locale;
 
@@ -29,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Keval on 20-Jul-17.
  */
+@RunWith(AndroidJUnit4.class)
 public class BaseButtonTest {
     private BaseButton mBaseButton;
 

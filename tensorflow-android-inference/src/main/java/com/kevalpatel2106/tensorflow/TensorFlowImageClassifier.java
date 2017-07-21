@@ -66,28 +66,22 @@ public class TensorFlowImageClassifier implements Classifier {
     // Only return this many results with at least this confidence.
     private static final int MAX_RESULTS = 3;
     private static final float THRESHOLD = 0.1f;
-
+    TensorFlowInferenceInterface mTensorFlowInferenceInterface;
     // Config values.
     private String inputName;
     private String outputName;
     private int inputSize;
     private int imageMean;
     private float imageStd;
-
     // Pre-allocated buffers.
     private List<String> labels;
     private float[] floatValues;
     private float[] outputs;
     private String[] outputNames;
     private int[] mBmpPixelValues;
-
-    private TensorFlowInferenceInterface mTensorFlowInferenceInterface;
-    private Comparator<Recognition> mConfidenceComparator = new Comparator<Recognition>() {
-        @Override
-        public int compare(Recognition lhs, Recognition rhs) {
-            // Intentionally reversed to put high confidence at the head of the queue.
-            return Float.compare(rhs.getConfidence(), lhs.getConfidence());
-        }
+    private Comparator<Recognition> mConfidenceComparator = (lhs, rhs) -> {
+        // Intentionally reversed to put high confidence at the head of the queue.
+        return Float.compare(rhs.getConfidence(), lhs.getConfidence());
     };
 
     /**
@@ -244,5 +238,6 @@ public class TensorFlowImageClassifier implements Classifier {
     @Override
     public void close() {
         mTensorFlowInferenceInterface.close();
+        mTensorFlowInferenceInterface = null;
     }
 }

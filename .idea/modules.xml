@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/smart-lens.iml" filepath="$PROJECT_DIR$/smart-lens.iml" />
       <module fileurl="file://$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" filepath="$PROJECT_DIR$/tensorflow-android-inference/tensorflow-android-inference.iml" />
-      <module fileurl="file://F:\Proj\smart-lens\tensorflow-android-inference\tensorflow-android-inference.iml" filepath="F:\Proj\smart-lens\tensorflow-android-inference\tensorflow-android-inference.iml" />
     </modules>
   </component>
 </project>

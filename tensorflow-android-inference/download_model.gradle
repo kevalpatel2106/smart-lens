@@ -60,7 +60,7 @@ task downloadFile(type: Download) {
 
 task extractModels(type: Copy) {
     if (new File(ASSET_DIR).exists() && new File(ASSET_DIR).list().length >= 2) {
-        //Files already downloaded.
+        //Files already downloaded and extracted.
     } else {
 
         if (!new File(TMP_DIR).exists() || new File(TMP_DIR).list().length == 0) {
@@ -81,6 +81,9 @@ task extractModels(type: Copy) {
 
 tasks.whenTaskAdded { task ->
     if (task.name == 'bundleDebug') {
+        task.dependsOn 'extractModels'
+    }
+    if (task.name == 'assembleDebugAndroidTest') {
         task.dependsOn 'extractModels'
     }
     if (task.name == 'bundleRelease') {

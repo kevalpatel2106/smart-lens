@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Keval on 20-Jul-17.
  */
 public class CameraFragmentTest {
+
     @SuppressWarnings("ConstantConditions")
     @Test
     public void getNewInstance() throws Exception {
@@ -32,6 +33,7 @@ public class CameraFragmentTest {
 
     @Test
     public void onImageCapture() throws Exception {
+
     }
 
     @Test
