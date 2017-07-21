@@ -28,9 +28,7 @@ def ASSET_DIR = projectDir.toString() + '/assets'
 def TMP_DIR = projectDir.toString() + '/build/download'
 
 // hard coded model files
-// LINT.IfChange
 def models = ['inception5h.zip']
-// LINT.ThenChange(//tensorflow/examples/android/BUILD)
 
 // Root URL for model archives
 def MODEL_URL = 'https://storage.googleapis.com/download.tensorflow.org/models'
@@ -59,34 +57,27 @@ task downloadFile(type: Download) {
 }
 
 task extractModels(type: Copy) {
-    if (new File(ASSET_DIR).exists() && new File(ASSET_DIR).list().length >= 2) {
-        //Files already downloaded and extracted.
-    } else {
-
-        if (!new File(TMP_DIR).exists() || new File(TMP_DIR).list().length == 0) {
-            //Download the files.
-            dependsOn downloadFile
-        }
-
-        //Extract files from the download directory.
-        for (f in models) {
-            from zipTree(TMP_DIR + '/' + f)
-        }
-
-        into file(ASSET_DIR)
-        fileMode 0644
-        exclude '**/LICENSE'
+    if (!new File(TMP_DIR).exists() || new File(TMP_DIR).list().length == 0) {
+        //Download the files.
+        dependsOn downloadFile
     }
+
+    //Extract files from the download directory.
+    for (f in models) {
+        from zipTree(TMP_DIR + '/' + f)
+    }
+
+    into file(ASSET_DIR)
+    fileMode 0644
+    exclude '**/LICENSE'
 }
 
 tasks.whenTaskAdded { task ->
     if (task.name == 'bundleDebug') {
         task.dependsOn 'extractModels'
-    }
-    if (task.name == 'assembleDebugAndroidTest') {
+    } else if (task.name == 'assembleDebug') {
         task.dependsOn 'extractModels'
-    }
-    if (task.name == 'bundleRelease') {
+    } else if (task.name == 'bundleRelease') {
         task.dependsOn 'extractModels'
     }
 }

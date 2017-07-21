@@ -59,7 +59,7 @@ import io.reactivex.schedulers.Schedulers;
  * A simple {@link Fragment} subclass.
  */
 public final class CameraFragment extends BaseFragment implements CameraCallbacks {
-
+    private static final long FIRST_CAPTURE_DELAY = 3000L;
     private static final String TAG = "CameraFragment";
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
@@ -113,7 +113,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
                     .build());
 
             //Start taking the pictures after 1 second delay
-            new Handler().postDelayed(() -> mCameraPreview.takePicture(), 3000);
+            new Handler().postDelayed(() -> mCameraPreview.takePicture(), FIRST_CAPTURE_DELAY);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
