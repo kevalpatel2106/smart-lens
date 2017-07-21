@@ -161,8 +161,11 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
                 mCamera.setDisplayOrientation(90);
                 mCamera.setErrorCallback(this);
                 mCamera.startPreview();
+
+                isSafeToTakePicture = true;
             } catch (IOException e) {
                 e.printStackTrace();
+                isSafeToTakePicture = false;
 
                 //Error occurred while starting the camera preview.
                 mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);

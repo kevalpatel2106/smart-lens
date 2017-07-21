@@ -31,7 +31,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
@@ -188,7 +187,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
             case CameraError.ERROR_DOES_NOT_HAVE_FRONT_CAMERA:
             case CameraError.ERROR_IMAGE_WRITE_FAILED:
             default:
-                Toast.makeText(getActivity(), "Error opening the camera.", Toast.LENGTH_LONG).show();
+                Snackbar.make(mContainer, "Error opening the camera.", Snackbar.LENGTH_LONG).show();
                 break;
         }
     }

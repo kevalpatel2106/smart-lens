@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -43,8 +44,11 @@ public class CameraFragmentTest extends BaseTestClass {
     public void init() {
         mCameraFragmentTestRule.launchActivity(null);
         mCameraFragment = mCameraFragmentTestRule.getFragment();
-    }
 
+        // We will wait for 300 seconds until the camera starts.
+        Delay.startDelay(2000);
+        Delay.stopDelay();
+    }
 
     @SuppressWarnings("ConstantConditions")
     @Test
@@ -54,11 +58,18 @@ public class CameraFragmentTest extends BaseTestClass {
 
     @Test
     public void checkIfCameraRunning() throws Exception {
-        // We will wait for 300 seconds until the camera starts.
-        Delay.startDelay(3000);
         assertTrue(mCameraFragment.mCameraPreview.isCameraOpen());
-        Delay.stopDelay();
+        assertTrue(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+        mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
     }
+
+    @Test
+    public void checkTakePicture() throws Exception {
+        //Take the picture
+        mCameraFragment.mCameraPreview.takePicture();
+        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+    }
+
 
     @Override
     public Activity getActivity() {

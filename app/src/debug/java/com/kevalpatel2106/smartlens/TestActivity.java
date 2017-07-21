@@ -19,6 +19,7 @@ package com.kevalpatel2106.smartlens;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 /**
@@ -33,6 +34,10 @@ public class TestActivity extends AppCompatActivity {
 
         FrameLayout frameLayout = new FrameLayout(this);
         frameLayout.setId(R.id.container);
+
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        frameLayout.setLayoutParams(layoutParams);
         setContentView(frameLayout);
     }
 }
