@@ -43,8 +43,10 @@ before_script:
     - adb shell input keyevent 82 &
 
 script:
-    - cd tensorflow-android-inference/assets
+    - cd tensorflow-android-inference
     - ls -l
+    - cd tensorflow-android-inference/assets
+    - ls- l
     - cd ..
     - cd ..
     - ./gradlew connectedAndroidTest test jacocoTestReport mergeAndroidReports --continue --stacktrace
