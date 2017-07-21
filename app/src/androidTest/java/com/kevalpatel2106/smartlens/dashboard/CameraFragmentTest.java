@@ -16,6 +16,14 @@
 
 package com.kevalpatel2106.smartlens.dashboard;
 
+import android.app.Activity;
+
+import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
+import com.kevalpatel2106.smartlens.testUtils.Delay;
+import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
+
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -23,21 +31,37 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by Keval on 20-Jul-17.
  */
-public class CameraFragmentTest {
+public class CameraFragmentTest extends BaseTestClass {
+
+    @Rule
+    public FragmentTestRule<CameraFragment> mCameraFragmentTestRule =
+            new FragmentTestRule<>(CameraFragment.class);
+
+    private CameraFragment mCameraFragment;
+
+    @Before
+    public void init() {
+        mCameraFragmentTestRule.launchActivity(null);
+        mCameraFragment = mCameraFragmentTestRule.getFragment();
+    }
+
 
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void getNewInstance() throws Exception {
+    public void checkNewInstance() throws Exception {
         assertTrue(CameraFragment.getNewInstance() instanceof CameraFragment);
     }
 
     @Test
-    public void onImageCapture() throws Exception {
-
+    public void checkIfCameraRunning() throws Exception {
+        // We will wait for 300 seconds until the camera starts.
+        Delay.startDelay(3000);
+        assertTrue(mCameraFragment.mCameraPreview.isCameraOpen());
+        Delay.stopDelay();
     }
 
-    @Test
-    public void onCameraError() throws Exception {
+    @Override
+    public Activity getActivity() {
+        return mCameraFragmentTestRule.getActivity();
     }
-
 }

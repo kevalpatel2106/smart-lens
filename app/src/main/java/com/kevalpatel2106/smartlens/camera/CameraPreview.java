@@ -202,8 +202,12 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      *
      * @return true if you can capture the image else false.
      */
-    private boolean isSafeToTakePictureInternal() {
-        return mCamera != null && isSafeToTakePicture;
+    public boolean isSafeToTakePicture() {
+        return isCameraOpen() && isSafeToTakePicture;
+    }
+
+    public boolean isCameraOpen() {
+        return mCamera != null;
     }
 
     /**
@@ -211,7 +215,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      */
     public void takePicture() {
         //Check if it is safe to take image?
-        if (!isSafeToTakePictureInternal()) return;
+        if (!isSafeToTakePicture()) return;
 
         //Mark unsafe
         isSafeToTakePicture = false;

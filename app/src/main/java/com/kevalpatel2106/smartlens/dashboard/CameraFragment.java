@@ -66,8 +66,8 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
     @BindView(R.id.camera_preview_container)
     FrameLayout mContainer;
 
-    private CameraPreview mCameraPreview;
-    private TensorFlowImageClassifier mImageClassifier;
+    CameraPreview mCameraPreview;
+    TensorFlowImageClassifier mImageClassifier;
 
     public CameraFragment() {
         // Required empty public constructor
