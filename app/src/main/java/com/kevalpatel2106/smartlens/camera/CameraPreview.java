@@ -18,26 +18,20 @@ package com.kevalpatel2106.smartlens.camera;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
-import com.kevalpatel2106.smartlens.camera.config.CameraRotation;
-
-import org.reactivestreams.Subscription;
 
 import java.io.IOException;
 import java.util.List;
-
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Keval Patel on 19/07/17.
@@ -51,51 +45,27 @@ import io.reactivex.schedulers.Schedulers;
 public final class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.ErrorCallback {
     private static final String TAG = "CameraPreview";
 
-    private CameraCallbacks mCameraCallbacks;   //Callbacks.
-    private Context mContext;
-    private SurfaceHolder mHolder;
-    private Camera mCamera;
+    private final Context mContext;
 
-    private CameraConfig mCameraConfig;
+    private SurfaceHolder mHolder;          //Surface holder for that surface view.
+
+    private Camera mCamera;
+    private CameraConfig mCameraConfig;     //Camera configurations.
+
+    private CameraCallbacks mCameraCallbacks;   //Camera callbacks for getting camera.
 
     private volatile boolean isSafeToTakePicture = false;
 
     //Create the picture callback.
     private Camera.PictureCallback mPictureCallback = (bytes, camera) -> {
+        Log.d(TAG, "image captured: " + bytes.length);
+        mCameraCallbacks.onImageCapture(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+        isSafeToTakePicture = true;
 
-        Flowable<Bitmap> flowable = Flowable.create(bitmapEmitter -> {
-            //Convert byte array to bitmap
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-            //Rotate the bitmap
-            Bitmap rotatedBitmap;
-            if (mCameraConfig.getImageRotation() != CameraRotation.ROTATION_0) {
-                rotatedBitmap = CameraUtils.rotateBitmap(bitmap, mCameraConfig.getImageRotation());
-
-                //noinspection UnusedAssignment
-                bitmap = null;
-            } else {
-                rotatedBitmap = bitmap;
-            }
-
-            bitmapEmitter.onNext(rotatedBitmap);
-        }, BackpressureStrategy.DROP);
-
-        final Subscription[] subscriptions = {null};
-        flowable.subscribeOn(Schedulers.io())
-                .filter(bitmap -> bitmap != null && bitmap.getByteCount() > 0)
-                .doOnSubscribe(subscription -> subscriptions[0] = subscription)
-                .doOnError(throwable -> {
-                    mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
-                    if (subscriptions[0] != null) subscriptions[0].cancel();
-                    isSafeToTakePicture = true;
-                })
-                .doOnNext(bitmap -> {
-                    mCameraCallbacks.onImageCapture(bitmap);
-                    if (subscriptions[0] != null) subscriptions[0].cancel();
-                    isSafeToTakePicture = true;
-                })
-                .observeOn(AndroidSchedulers.mainThread());
+        //Restart the preview.
+        //https://stackoverflow.com/a/31260958/4690731
+        mCamera.stopPreview();
+        mCamera.startPreview();
     };
 
     /**
@@ -136,6 +106,8 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             return;
         }
 
+        isSafeToTakePicture = false;
+
         // stop preview before making changes
         try {
             mCamera.stopPreview();
@@ -143,27 +115,14 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             // Ignore: tried to stop a non-existent preview
         }
 
-        // Make changes in preview size
-        //set the camera image size based on config provided
-        Camera.Parameters parameters = mCamera.getParameters();
-        Camera.Size cameraSize = getValidCameraSize(mCamera.getParameters().getSupportedPictureSizes(),
-                mCameraConfig.getResolution());
-        parameters.setPictureSize(cameraSize.width, cameraSize.height);
-
-        requestLayout();
-
-        mCamera.setParameters(parameters);
-
         try {
-            mCamera.setDisplayOrientation(90);
-            mCamera.setErrorCallback(this);
             mCamera.setPreviewDisplay(surfaceHolder);
+            mCamera.setParameters(modifyCameraParameters(mCamera));
             mCamera.startPreview();
 
-            //You are safe now.
             isSafeToTakePicture = true;
-        } catch (IOException | NullPointerException e) {
-            //Cannot start preview
+        } catch (IOException e) {
+            e.printStackTrace();
             mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
         }
     }
@@ -195,6 +154,8 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             try {
                 //Start the preview.
                 mCamera.setPreviewDisplay(mHolder);
+                mCamera.setDisplayOrientation(90);
+                mCamera.setErrorCallback(this);
                 mCamera.startPreview();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -237,7 +198,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      *
      * @return true if you can capture the image else false.
      */
-    boolean isSafeToTakePictureInternal() {
+    private boolean isSafeToTakePictureInternal() {
         return mCamera != null && isSafeToTakePicture;
     }
 
@@ -256,15 +217,15 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     }
 
     /**
-     * Get the valid camera sizes based on the supported picture sizes.
+     * Get the valid picture sizes based on the supported picture sizes.
      *
-     * @param pictureSizes  List of {@link Camera.Size} supported by the hardware camera.
+     * @param pictureSizes  List of {@link Camera.Size} supported picture size by the hardware camera.
      * @param cameraQuality Quality of the camera supplied.
      * @return Supported image.
      */
     @NonNull
-    private Camera.Size getValidCameraSize(@NonNull List<Camera.Size> pictureSizes,
-                                           @CameraResolution.SupportedResolution int cameraQuality) {
+    private Camera.Size getValidPictureSize(@NonNull List<Camera.Size> pictureSizes,
+                                            @CameraResolution.SupportedResolution int cameraQuality) {
         if (pictureSizes.isEmpty())
             throw new IllegalArgumentException("Picture sizes cannot be null.");
 
@@ -278,6 +239,90 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             default:
                 throw new IllegalStateException("Invalid camera resolution.");
         }
+    }
+
+
+    /**
+     * Get the valid preview sizes based on the supported preview sizes.
+     *
+     * @param previewSizes List of {@link Camera.Size} supported preview size by the hardware camera.
+     * @return Supported image.
+     */
+    @NonNull
+    private Camera.Size getValidPreviewSize(@NonNull List<Camera.Size> previewSizes) {
+        if (previewSizes.isEmpty())
+            throw new IllegalArgumentException("Picture sizes cannot be null.");
+
+        Point sizePoint = new Point();
+        ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
+                .getSize(sizePoint);
+        int viewWidth = sizePoint.x;
+        int viewHeight = sizePoint.y;
+
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) viewWidth / viewHeight;
+
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        // Try to find an size match aspect ratio and size
+        for (Camera.Size size : previewSizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+
+            if (Math.abs(size.height - viewHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - viewHeight);
+            }
+        }
+
+        // Cannot find the one match the aspect ratio, ignore the requirement
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : previewSizes) {
+                if (Math.abs(size.height - viewHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - viewHeight);
+                }
+            }
+        }
+        return optimalSize == null ? previewSizes.get(0) : optimalSize;
+    }
+
+    /**
+     * Modify the parameters of the camera control. This will set preview sizes and picture sizes
+     * according to the phone display size.
+     *
+     * @param camera {@link Camera} open.
+     * @return Modified {@link Camera.Parameters}.
+     */
+    private Camera.Parameters modifyCameraParameters(@NonNull Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+
+        //Set the image format
+        parameters.setPictureFormat(ImageFormat.JPEG);
+
+        //If the camera support focus mode auto, set it.
+        List<String> focusModes = parameters.getSupportedFocusModes();
+        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+
+        //set the flash modes
+        List<String> flashModes = parameters.getSupportedFlashModes();
+        parameters.setFocusMode(flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
+                Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON);
+
+        //Set the picture size size
+        Camera.Size pictureSize = getValidPictureSize(mCamera.getParameters().getSupportedPictureSizes(),
+                mCameraConfig.getResolution());
+        parameters.setPictureSize(pictureSize.width, pictureSize.height);
+
+        //Set the preview size
+        Camera.Size previewSize = getValidPreviewSize(mCamera.getParameters().getSupportedPreviewSizes());
+        parameters.setPreviewSize(previewSize.width, previewSize.height);
+
+        requestLayout();
+        return parameters;
     }
 
     /**

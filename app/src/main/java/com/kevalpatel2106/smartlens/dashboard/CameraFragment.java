@@ -110,7 +110,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
                     .build());
 
             //Start taking the pictures after 1 second delay
-            new Handler().postDelayed(() -> mCameraPreview.takePicture(), 1000);
+            new Handler().postDelayed(() -> mCameraPreview.takePicture(), 3000);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
@@ -159,6 +159,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
         final Subscription[] subscriptions = new Subscription[1];
         flowable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .filter(recognitions -> !recognitions.isEmpty())
                 .doOnSubscribe(subscription -> subscriptions[0] = subscription)
                 .doOnError(t -> {
                     Log.e(TAG, "onImageCapture: " + t.getMessage());

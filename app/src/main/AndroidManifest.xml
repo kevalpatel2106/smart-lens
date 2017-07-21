@@ -58,7 +58,8 @@
             android:name=".dashboard.Dashboard"
             android:label="@string/title_home_activity"
             android:resizeableActivity="true"
-            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionbar.NoBackground"
             tools:ignore="UnusedAttribute"/>
     </application>
 
