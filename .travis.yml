@@ -44,7 +44,7 @@ before_script:
     # Start creating the AVD
     - android list targets
     - android list device
-    - echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a  -d "Nexus 5"  #Create AVD for API 22
+    - echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a  -d "Nexus 6"  #Create AVD for API 22
     - emulator -avd test -no-skin -no-audio -no-window &    #Start emulator
     - android-wait-for-emulator
 
