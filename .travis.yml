@@ -32,17 +32,22 @@ licenses:
 
 before_script:
     - chmod +x gradlew      #Grant permissions
+
+    # Download the keystore
     - chmod +x ./misc/download_keystore.sh
     - bash ./misc/download_keystore.sh
 
+    # Download the tensorflow inception model.
     - cd tensorflow-android-inference
     - mkdir assets
     - cd assets
     - curl -L -o ./inception5h.zip https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip
-    - sudo apt-get install unzip
     - unzip inception5h.zip -d .
     - rm -rf inception5h.zip
+    - cd ..
+    - cd ..
 
+    # Start creating the AVD
     - echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a    #Create AVD for API 22
     - emulator -avd test -no-skin -no-audio -no-window &    #Start emulator
     - android-wait-for-emulator
