@@ -45,7 +45,7 @@ before_script:
     - android list targets
     - android list device
     - echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a  -d "Nexus 6"  #Create AVD for API 22
-    - sed -i -e 's/hw.ramSize=512/hw.ramSize=1024/g' ${HOME}/.android/avd/test.avd/config.ini"
+    - sed -i -e 's/hw.ramSize=512/hw.ramSize=1024/g' ${HOME}/.android/avd/test.avd/config.ini
     - emulator -avd test -no-skin -no-audio -no-window &    #Start emulator
     - android-wait-for-emulator
 
