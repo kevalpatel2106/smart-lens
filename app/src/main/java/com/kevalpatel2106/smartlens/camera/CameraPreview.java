@@ -81,7 +81,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         mCameraCallbacks = cameraCallbacks;
 
         //noinspection ConstantConditions
-        if (mContext == null || cameraCallbacks == null)
+        if (context == null || cameraCallbacks == null)
             throw new IllegalArgumentException("Null arguments not allowed.");
 
         //Set surface holder

@@ -17,58 +17,47 @@
 package com.kevalpatel2106.smartlens.camera;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by Keval on 21-Jul-17.
  */
-public class CameraPreviewTest extends BaseTestClass implements CameraCallbacks {
+@RunWith(AndroidJUnit4.class)
+public class CameraErrorTest extends BaseTestClass {
     @Rule
     public ExpectedException mException = ExpectedException.none();
-    private CameraPreview mCameraPreview;
-
-    @Before
-    public void initialize() {
-        mCameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(), this);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Test
-    public void checkConstructor() throws Exception {
-        mException.expect(IllegalArgumentException.class);
-        mCameraPreview = new CameraPreview(null, this);
-        mCameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(), null);
-    }
 
     @Test
-    public void startCamera() throws Exception {
-    }
+    public void checkReflection() {
+        try {
+            Class<?> c = Class.forName("CameraError");
+            Constructor constructor = c.getDeclaredConstructors()[0];
 
-    @Test
-    public void stopPreviewAndReleaseCamera() throws Exception {
+            mException.expect(RuntimeException.class);
+            constructor.newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public Activity getActivity() {
         return null;
-    }
-
-    @Override
-    public void onImageCapture(@NonNull Bitmap imageCaptured) {
-
-    }
-
-    @Override
-    public void onCameraError(int errorCode) {
-
     }
 }
