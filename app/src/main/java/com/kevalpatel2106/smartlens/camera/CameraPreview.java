@@ -324,8 +324,9 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
         //set the flash modes
         List<String> flashModes = parameters.getSupportedFlashModes();
-        parameters.setFocusMode(flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
-                Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON);
+        if (flashModes != null)
+            parameters.setFocusMode(flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
+                    Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON);
 
         //Set the picture size size
         Camera.Size pictureSize = getValidPictureSize(mCamera.getParameters().getSupportedPictureSizes(),
