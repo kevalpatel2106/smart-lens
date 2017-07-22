@@ -107,7 +107,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
         if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {
             //Start the camera.
             mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
-                    .setCameraResolution(CameraResolution.MEDIUM_RESOLUTION)
+                    .setCameraResolution(CameraResolution.LOW_RESOLUTION)
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
 
@@ -170,9 +170,9 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
                     mCameraPreview.takePicture();
                     subscriptions[0].cancel();
                 })
-                .subscribe(lables -> {
-                    if (!lables.isEmpty()) {
-                        Log.d(TAG, "onImageCapture: " + lables.get(0));
+                .subscribe(labels -> {
+                    if (!labels.isEmpty()) {
+                        Log.d(TAG, "onImageCapture: " + labels.get(0));
                     }
                 });
     }

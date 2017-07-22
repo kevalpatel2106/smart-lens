@@ -56,6 +56,18 @@ public final class CameraUtils {
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
     }
 
+    /**
+     * Check if the device has camera at all?
+     *
+     * @param context context
+     * @return true if the device has camera.
+     */
+    @SuppressWarnings("deprecation")
+    public static boolean isCameraAvailable(@NonNull Context context) {
+        PackageManager pm = context.getPackageManager();
+        return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+
 
     /**
      * Rotate the bitmap by 90 degree.

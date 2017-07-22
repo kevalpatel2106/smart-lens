@@ -21,9 +21,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.widget.NestedScrollView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseActivity;
+import com.kevalpatel2106.smartlens.camera.CameraUtils;
 
 import butterknife.BindView;
 
@@ -37,10 +39,19 @@ public class Dashboard extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        //Set the camera fragment.
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.dashboard_frame_layout_container, CameraFragment.getNewInstance())
-                .commit();
+        //First check if the camera available?
+        if (CameraUtils.isCameraAvailable(this)) {
+            //Set the camera fragment.
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.dashboard_frame_layout_container, CameraFragment.getNewInstance())
+                    .commit();
+        } else {
+            Toast.makeText(this,
+                    R.string.dashboard_error_no_camera_found,
+                    Toast.LENGTH_LONG).show();
+            finish();
+        }
+
 
         setBottomSheet();
     }

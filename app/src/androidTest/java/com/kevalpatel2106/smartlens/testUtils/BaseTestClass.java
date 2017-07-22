@@ -71,9 +71,11 @@ public abstract class BaseTestClass {
         if (getActivity() == null) return;
 
         // Set the flags on our activity so it'll appear regardless of lock screen state
-        Runnable wakeUpDevice = () -> getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        Runnable wakeUpDevice = () -> {
+            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        };
         getActivity().runOnUiThread(wakeUpDevice);
     }
 }

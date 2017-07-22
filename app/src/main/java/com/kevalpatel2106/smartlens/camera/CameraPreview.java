@@ -145,6 +145,10 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      * @see CameraConfig
      */
     public void startCamera(@NonNull CameraConfig cameraConfig) {
+        //Check if the camera hardware is available?
+        if (!CameraUtils.isCameraAvailable(mContext))
+            throw new IllegalStateException("Your deice doesn't have camera.");
+
         //Check if the camera permission is available or not?
         if (!CameraUtils.checkIfCameraPermissionGranted(mContext)) {
             mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_PERMISSION_NOT_AVAILABLE);

@@ -58,11 +58,11 @@ public class TensorFlowImageClassifierTest {
 
     private void validateImageRecognition(int imageRes, String correctLabel) {
         //Generate mock image
-        Bitmap mockKeyboardImage = BitmapFactory
+        Bitmap mockImage = BitmapFactory
                 .decodeResource(InstrumentationRegistry.getTargetContext().getResources(), imageRes);
 
         // Classify image
-        List<Classifier.Recognition> lables = mTensorFlowImageClassifier.recognizeImage(mockKeyboardImage);
+        List<Classifier.Recognition> lables = mTensorFlowImageClassifier.recognizeImage(mockImage);
 
         //Validate cases
         assertNotNull(lables);
@@ -77,6 +77,6 @@ public class TensorFlowImageClassifierTest {
         }
         assertTrue(isMatched);
         //noinspection UnusedAssignment
-        mockKeyboardImage = null;
+        mockImage = null;
     }
 }
