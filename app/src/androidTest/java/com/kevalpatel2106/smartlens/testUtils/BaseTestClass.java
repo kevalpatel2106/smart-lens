@@ -18,6 +18,8 @@ package com.kevalpatel2106.smartlens.testUtils;
 
 import android.app.Activity;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiDevice;
@@ -68,14 +70,12 @@ public abstract class BaseTestClass {
             e.printStackTrace();
         }
 
-        if (getActivity() == null) return;
-
         // Set the flags on our activity so it'll appear regardless of lock screen state
-        Runnable wakeUpDevice = () -> {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (getActivity() == null) return;
             getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                     WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        };
-        getActivity().runOnUiThread(wakeUpDevice);
+        });
     }
 }
