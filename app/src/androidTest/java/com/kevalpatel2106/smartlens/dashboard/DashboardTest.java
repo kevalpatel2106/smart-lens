@@ -22,14 +22,12 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.app.Fragment;
 
 import com.kevalpatel2106.smartlens.R;
-import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -47,13 +45,7 @@ public class DashboardTest extends BaseTestClass {
                 .getActivity()
                 .getSupportFragmentManager()
                 .findFragmentById(R.id.dashboard_frame_layout_container);
-
-        if (CameraUtils.isCameraAvailable(mDashboardActivityTestRule.getActivity())) {
-            assertTrue(fragment instanceof CameraFragment);
-        } else {
-            //If there is no camera than, there shouldn't be any fragment.
-            assertNull(fragment);
-        }
+        assertTrue(fragment instanceof CameraFragment);
     }
 
     @Override
