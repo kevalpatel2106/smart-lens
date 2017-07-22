@@ -43,6 +43,10 @@ import java.io.IOException;
 @SuppressWarnings("WeakerAccess")
 public final class CameraUtils {
 
+    private CameraUtils() {
+        throw new RuntimeException("Cannot initiate CameraUtils.");
+    }
+
     /**
      * Check if the device has front camera or not?
      *

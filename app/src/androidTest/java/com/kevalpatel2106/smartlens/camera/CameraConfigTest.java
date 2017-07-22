@@ -57,6 +57,12 @@ public final class CameraConfigTest extends BaseTestClass {
     }
 
     @Test
+    public void canInitiate() {
+        assertNotNull(mBuilder);
+        assertNotNull(mBuilder.build());
+    }
+
+    @Test
     public void checkDefaultValues() throws Exception {
         CameraConfig cameraConfig = mBuilder.build();
         assertEquals(cameraConfig.getImageRotation(), CameraRotation.ROTATION_0);

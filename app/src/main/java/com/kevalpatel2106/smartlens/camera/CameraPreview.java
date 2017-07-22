@@ -324,7 +324,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
         //set the flash modes
         List<String> flashModes = parameters.getSupportedFlashModes();
-        if (flashModes != null)
+        if (flashModes != null) //If the camera has auto focus...
             parameters.setFocusMode(flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
                     Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON);
 

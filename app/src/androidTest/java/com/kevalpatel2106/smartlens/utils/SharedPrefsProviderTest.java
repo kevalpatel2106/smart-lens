@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -40,17 +41,28 @@ public final class SharedPrefsProviderTest extends BaseTestClass {
     private static final String TEST_KEY = "test_key";
 
     private SharedPreferences mSharedPreferences;
-
     private SharedPrefsProvider mSharedPrefsProvider;
 
     @Before
     public void setUp() throws Exception {
         mSharedPrefsProvider = new SharedPrefsProvider(InstrumentationRegistry.getContext());
+
         mSharedPreferences = InstrumentationRegistry.getContext().getSharedPreferences("app_prefs",
                 Context.MODE_PRIVATE);
 
         //Clear the preference.
         mSharedPrefsProvider.removePreferences(TEST_KEY);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void canInitiate() throws Exception {
+        assertNotNull(mSharedPreferences);
+        try {
+            new SharedPrefsProvider(null);
+        } catch (RuntimeException e) {
+            //Success
+        }
     }
 
     @Test

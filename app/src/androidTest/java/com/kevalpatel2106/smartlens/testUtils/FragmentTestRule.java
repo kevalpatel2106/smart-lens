@@ -17,12 +17,12 @@
 package com.kevalpatel2106.smartlens.testUtils;
 
 import android.support.test.rule.ActivityTestRule;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.TestActivity;
+import com.kevalpatel2106.smartlens.base.BaseFragment;
 
 import org.junit.Assert;
 
@@ -30,7 +30,7 @@ import org.junit.Assert;
  * Created by Keval on 21-Jul-17.
  */
 
-public class FragmentTestRule<F extends Fragment> extends ActivityTestRule<TestActivity> {
+public class FragmentTestRule<F extends BaseFragment> extends ActivityTestRule<TestActivity> {
 
     private final Class<F> mFragmentClass;
     private F mFragment;
@@ -45,23 +45,17 @@ public class FragmentTestRule<F extends Fragment> extends ActivityTestRule<TestA
         super.afterActivityLaunched();
 
         try {
-            runOnUiThread(() -> {
-                try {
-                    //Instantiate and insert the fragment into the container layout
-                    FragmentManager manager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction transaction = manager.beginTransaction();
-                    mFragment = mFragmentClass.newInstance();
-                    transaction.replace(R.id.container, mFragment);
-                    transaction.commit();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    Assert.fail(String.format("%s: Could not insert %s into TestActivity: %s",
-                            getClass().getSimpleName(),
-                            mFragmentClass.getSimpleName(),
-                            e.getMessage()));
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            //Instantiate and insert the fragment into the container layout
+            FragmentManager manager = getActivity().getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            mFragment = mFragmentClass.newInstance();
+            transaction.replace(R.id.container, mFragment);
+            transaction.commit();
+        } catch (InstantiationException | IllegalAccessException e) {
+            Assert.fail(String.format("%s: Could not insert %s into TestActivity: %s",
+                    getClass().getSimpleName(),
+                    mFragmentClass.getSimpleName(),
+                    e.getMessage()));
         }
     }
 

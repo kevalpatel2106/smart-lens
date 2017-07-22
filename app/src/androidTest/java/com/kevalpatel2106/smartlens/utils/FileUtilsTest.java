@@ -19,24 +19,49 @@ package com.kevalpatel2106.smartlens.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 19-Jul-17.
  */
+@RunWith(AndroidJUnit4.class)
 public final class FileUtilsTest extends BaseTestClass {
     private Context mContext;
 
     @Before
     public void setUp() {
         mContext = InstrumentationRegistry.getTargetContext();
+    }
+
+    @Test
+    public void canInitiate() {
+        try {
+            Class<?> c = Class.forName("FileUtils");
+            Constructor constructor = c.getDeclaredConstructors()[0];
+            constructor.newInstance();
+            fail("Should have thrown Arithmetic exception");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

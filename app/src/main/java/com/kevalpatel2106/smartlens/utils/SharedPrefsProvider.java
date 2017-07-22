@@ -45,6 +45,9 @@ public class SharedPrefsProvider {
      * @param context instance of caller.
      */
     public SharedPrefsProvider(@NonNull Context context) {
+        //noinspection ConstantConditions
+        if (context == null) throw new RuntimeException("Context cannot be null.");
+
         mSharedPreference = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
     }
 

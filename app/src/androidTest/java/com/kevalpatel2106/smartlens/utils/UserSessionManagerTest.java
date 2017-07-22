@@ -22,41 +22,34 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.assertNotNull;
 
 /**
- * Created by Keval on 19-Jul-17.
+ * Created by Keval on 22-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
-public final class UtilsTest extends BaseTestClass {
-    @Test
-    public void canInitiate() {
-        try {
-            Class<?> c = Class.forName("Utils");
-            Constructor constructor = c.getDeclaredConstructors()[0];
-            constructor.newInstance();
-            fail("Should have thrown Arithmetic exception");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+public class UserSessionManagerTest extends BaseTestClass {
+    private UserSessionManager mUserSessionManager;
+
+    @Before
+    public void init() {
+        mUserSessionManager = new UserSessionManager(InstrumentationRegistry.getTargetContext());
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
-    public void getDeviceId() throws Exception {
-        assertNotNull(Utils.getDeviceId(InstrumentationRegistry.getContext()));
+    public void canInitiate() throws Exception {
+        assertNotNull(mUserSessionManager);
+
+        try {
+            new UserSessionManager(null);
+        } catch (RuntimeException e) {
+            //Success
+        }
     }
 
     @Override

@@ -21,30 +21,27 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 21-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
 public class CameraErrorTest extends BaseTestClass {
-    @Rule
-    public ExpectedException mException = ExpectedException.none();
 
     @Test
-    public void checkReflection() {
+    public void canInitiate() {
         try {
             Class<?> c = Class.forName("CameraError");
             Constructor constructor = c.getDeclaredConstructors()[0];
-
-            mException.expect(RuntimeException.class);
             constructor.newInstance();
+            fail("Should have thrown Arithmetic exception");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

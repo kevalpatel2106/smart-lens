@@ -31,6 +31,11 @@ import io.reactivex.annotations.NonNull;
 
 public class FileUtils {
 
+    private FileUtils() {
+        throw new RuntimeException("Cannot initialize this class.");
+    }
+
+
     /**
      * @param context Instance of the caller.
      * @return If the external cache is available than this will return external cache directory or

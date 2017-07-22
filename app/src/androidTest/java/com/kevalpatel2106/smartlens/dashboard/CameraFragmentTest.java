@@ -17,6 +17,7 @@
 package com.kevalpatel2106.smartlens.dashboard;
 
 import android.app.Activity;
+import android.support.test.InstrumentationRegistry;
 
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
@@ -25,7 +26,12 @@ import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 20-Jul-17.
@@ -33,50 +39,63 @@ import org.junit.rules.ExpectedException;
 public class CameraFragmentTest extends BaseTestClass {
 
     @Rule
-    public ExpectedException mException = ExpectedException.none();
-
-    @Rule
     public FragmentTestRule<CameraFragment> mCameraFragmentTestRule =
             new FragmentTestRule<>(CameraFragment.class);
-
     private CameraFragment mCameraFragment;
 
     @Before
     public void init() {
-        if (CameraUtils.isCameraAvailable(mCameraFragmentTestRule.getFragment().getActivity())) {
+        if (CameraUtils.isCameraAvailable(InstrumentationRegistry.getTargetContext())) {
             mCameraFragmentTestRule.launchActivity(null);
         } else {
-            mException.expect(IllegalStateException.class);
-            mCameraFragmentTestRule.launchActivity(null);
+            try {
+                mCameraFragmentTestRule.launchActivity(null);
+                fail("Should not initialize this CameraFragment if camera not there.");
+            } catch (IllegalArgumentException e) {
+                //Success
+            }
         }
-
-        mCameraFragment = mCameraFragmentTestRule.getFragment();
 
         // We will wait for 300 seconds until the camera starts.
         Delay.startDelay(2000);
         Delay.stopDelay();
+
+        mCameraFragment = mCameraFragmentTestRule.getFragment();
     }
 
-//    @SuppressWarnings("ConstantConditions")
-//    @Test
-//    public void checkNewInstance() throws Exception {
-//        assertTrue(CameraFragment.getNewInstance() instanceof CameraFragment);
-//    }
-//
-//    @Test
-//    public void checkIfCameraWorking() throws Exception {
-//        //Test if the camera opened
-//        assertTrue(mCameraFragment.mCameraPreview.isCameraOpen());
-//        assertTrue(mCameraFragment.mCameraPreview.isSafeToTakePicture());
-//
-//        //Test take the picture
-//        mCameraFragment.mCameraPreview.takePicture();
-//        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
-//
-//        // Check if it can release the camera.
-//        mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
-//        assertFalse(mCameraFragment.mCameraPreview.isCameraOpen());
-//    }
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void checkNewInstance() throws Exception {
+        assertTrue(CameraFragment.getNewInstance() instanceof CameraFragment);
+    }
+
+    @Test
+    public void checkIfInitialized() throws Exception {
+        assertNotNull(mCameraFragment);
+        assertNotNull(mCameraFragment.mCameraPreview);
+        assertNotNull(mCameraFragment.mImageClassifier);
+
+        mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+    }
+
+    @Test
+    public void checkIfCameraWorking() throws Exception {
+        // We will wait for 300 seconds until the camera starts.
+        Delay.startDelay(4000);
+        Delay.stopDelay();
+
+        //Test if the camera opened
+        assertTrue(mCameraFragment.mCameraPreview.isCameraOpen());
+        assertTrue(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+
+        //Test take the picture
+        mCameraFragment.mCameraPreview.takePicture();
+        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+
+        // Check if it can release the camera.
+        mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        assertFalse(mCameraFragment.mCameraPreview.isCameraOpen());
+    }
 
 
     @Override

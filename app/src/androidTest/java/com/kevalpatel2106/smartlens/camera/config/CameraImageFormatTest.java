@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.utils;
+package com.kevalpatel2106.smartlens.camera.config;
 
 import android.app.Activity;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
- * Created by Keval on 19-Jul-17.
+ * Created by Keval on 22-Jul-17.
  */
-@RunWith(AndroidJUnit4.class)
-public final class UtilsTest extends BaseTestClass {
+public class CameraImageFormatTest extends BaseTestClass {
+
     @Test
     public void canInitiate() {
         try {
-            Class<?> c = Class.forName("Utils");
+            Class<?> c = Class.forName("CameraImageFormat");
             Constructor constructor = c.getDeclaredConstructors()[0];
             constructor.newInstance();
             fail("Should have thrown Arithmetic exception");
@@ -52,11 +48,6 @@ public final class UtilsTest extends BaseTestClass {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    public void getDeviceId() throws Exception {
-        assertNotNull(Utils.getDeviceId(InstrumentationRegistry.getContext()));
     }
 
     @Override

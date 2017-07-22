@@ -35,6 +35,10 @@ import android.view.inputmethod.InputMethodManager;
 @SuppressWarnings("WeakerAccess")
 public class Utils {
 
+    private Utils() {
+        throw new RuntimeException("Cannot initialize this class.");
+    }
+
     /**
      * Check if the device has camera.
      *

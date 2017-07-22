@@ -30,16 +30,37 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 20-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
 public final class CameraUtilsTest extends BaseTestClass {
+
+    @Test
+    public void canInitiate() {
+        try {
+            Class<?> c = Class.forName("CameraUtils");
+            Constructor constructor = c.getDeclaredConstructors()[0];
+            constructor.newInstance();
+            fail("Should have thrown Arithmetic exception");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void checkIfBitmapRotate() throws Exception {

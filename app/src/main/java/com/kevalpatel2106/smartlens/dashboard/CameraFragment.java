@@ -21,7 +21,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -83,7 +82,6 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_camera, container, false);
     }
 
@@ -112,7 +110,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
                     .build());
 
             //Start taking the pictures after 1 second delay
-            new Handler().postDelayed(() -> mCameraPreview.takePicture(), FIRST_CAPTURE_DELAY);
+//            new Handler().postDelayed(() -> mCameraPreview.takePicture(), FIRST_CAPTURE_DELAY);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
