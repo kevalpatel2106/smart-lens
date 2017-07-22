@@ -21,6 +21,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -110,7 +111,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
                     .build());
 
             //Start taking the pictures after 1 second delay
-//            new Handler().postDelayed(() -> mCameraPreview.takePicture(), FIRST_CAPTURE_DELAY);
+            new Handler().postDelayed(() -> mCameraPreview.takePicture(), FIRST_CAPTURE_DELAY);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
@@ -131,7 +132,10 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
 
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //Start the camera.
-                    mCameraPreview.startCamera(new CameraConfig());
+                    mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
+                            .setCameraResolution(CameraResolution.LOW_RESOLUTION)
+                            .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
+                            .build());
                 } else {
                     //Permission not granted. Explain dialog.
                     Snackbar.make(mContainer, R.string.camera_frag_permission_denied_statement,
@@ -148,7 +152,7 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
     }
 
     @Override
-    public void onImageCapture(@NonNull final Bitmap imageCaptured) {
+    public void onImageCapture(@NonNull Bitmap imageCaptured) {
 
         //Process the image using Tf.
         Flowable<List<Classifier.Recognition>> flowable = Flowable.create(e -> {

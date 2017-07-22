@@ -18,7 +18,9 @@ package com.kevalpatel2106.smartlens.dashboard;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 
+import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.testUtils.Delay;
@@ -28,6 +30,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -45,6 +50,7 @@ public class CameraFragmentTest extends BaseTestClass {
 
     @Before
     public void init() {
+
         if (CameraUtils.isCameraAvailable(InstrumentationRegistry.getTargetContext())) {
             mCameraFragmentTestRule.launchActivity(null);
         } else {
@@ -56,9 +62,11 @@ public class CameraFragmentTest extends BaseTestClass {
             }
         }
 
-        // We will wait for 300 seconds until the camera starts.
-        Delay.startDelay(2000);
+        //Wait for 1200 ms.
+        //Wait for the camera to get stable
+        Delay.startDelay(1200);
         Delay.stopDelay();
+        Espresso.onView(withId(R.id.container)).check(matches(isDisplayed()));
 
         mCameraFragment = mCameraFragmentTestRule.getFragment();
     }
@@ -80,12 +88,7 @@ public class CameraFragmentTest extends BaseTestClass {
 
     @Test
     public void checkIfCameraWorking() throws Exception {
-        // We will wait for 300 seconds until the camera starts.
-        Delay.startDelay(4000);
-        Delay.stopDelay();
-
         //Test if the camera opened
-        assertTrue(mCameraFragment.mCameraPreview.isCameraOpen());
         assertTrue(mCameraFragment.mCameraPreview.isSafeToTakePicture());
 
         //Test take the picture
@@ -94,7 +97,7 @@ public class CameraFragmentTest extends BaseTestClass {
 
         // Check if it can release the camera.
         mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
-        assertFalse(mCameraFragment.mCameraPreview.isCameraOpen());
+        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
     }
 
 

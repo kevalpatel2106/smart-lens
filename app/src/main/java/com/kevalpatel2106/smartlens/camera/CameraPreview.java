@@ -268,7 +268,10 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         if (previewSizes.isEmpty())
             throw new IllegalArgumentException("Picture sizes cannot be null.");
 
+        if (mContext.getSystemService(Context.WINDOW_SERVICE) == null) return previewSizes.get(0);
+
         Point sizePoint = new Point();
+        //noinspection ConstantConditions
         ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
                 .getSize(sizePoint);
         int viewWidth = sizePoint.x;

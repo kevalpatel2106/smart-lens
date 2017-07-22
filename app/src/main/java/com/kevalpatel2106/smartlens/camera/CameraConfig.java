@@ -141,6 +141,11 @@ public final class CameraConfig {
                 throw new IllegalArgumentException("Invalid camera facing value.");
             }
 
+            //Check if the any camera available?
+            if (!CameraUtils.isCameraAvailable(mContext)) {
+                throw new IllegalStateException("Device camera is not available.");
+            }
+
             //Check if the front camera available?
             if (cameraFacing == CameraFacing.FRONT_FACING_CAMERA
                     && !CameraUtils.isFrontCameraAvailable(mContext)) {

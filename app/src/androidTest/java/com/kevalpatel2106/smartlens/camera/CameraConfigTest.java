@@ -30,9 +30,7 @@ import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.utils.FileUtils;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import java.io.File;
@@ -40,15 +38,13 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 20-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
 public final class CameraConfigTest extends BaseTestClass {
-    @Rule
-    public ExpectedException mException = ExpectedException.none();
-
     private CameraConfig.Builder mBuilder;
 
     @Before
@@ -81,20 +77,46 @@ public final class CameraConfigTest extends BaseTestClass {
         assertEquals(mBuilder.build().getResolution(), CameraResolution.HIGH_RESOLUTION);
 
         // Invalid input check
-        mException.expect(IllegalArgumentException.class);
-        mBuilder.setCameraResolution(453);
+        try {
+            mBuilder.setCameraResolution(453);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Success
+        }
     }
 
     @SuppressLint("WrongConstant")
     @Test
     public void checkSetFacing() throws Exception {
-        // Valid input check
-        mBuilder.setCameraFacing(CameraFacing.REAR_FACING_CAMERA);
-        assertEquals(mBuilder.build().getFacing(), CameraFacing.REAR_FACING_CAMERA);
+        // Check if it throws error when device has no camera
+        try {
+            mBuilder.setCameraFacing(CameraFacing.REAR_FACING_CAMERA);
+            assertEquals(mBuilder.build().getFacing(), CameraFacing.REAR_FACING_CAMERA);
+        } catch (IllegalStateException e) {
+            if (CameraUtils.isCameraAvailable(InstrumentationRegistry.getTargetContext())) {
+                //Device has camera. Test fail
+                fail();
+            }
+        }
+
+        // Valid input check with front facing camera.
+        try {
+            mBuilder.setCameraFacing(CameraFacing.FRONT_FACING_CAMERA);
+            assertEquals(mBuilder.build().getFacing(), CameraFacing.FRONT_FACING_CAMERA);
+        } catch (IllegalStateException e) {
+            if (CameraUtils.isFrontCameraAvailable(InstrumentationRegistry.getTargetContext())) {
+                //Fail. Device have front camera
+                fail();
+            }
+        }
 
         // Invalid input check
-        mException.expect(IllegalArgumentException.class);
-        mBuilder.setCameraFacing(3);
+        try {
+            mBuilder.setCameraFacing(3);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Success
+        }
     }
 
     @SuppressLint("WrongConstant")
@@ -105,8 +127,12 @@ public final class CameraConfigTest extends BaseTestClass {
         assertEquals(mBuilder.build().getImageFormat(), CameraImageFormat.FORMAT_JPEG);
 
         // Invalid input check
-        mException.expect(IllegalArgumentException.class);
-        mBuilder.setImageFormat(3);
+        try {
+            mBuilder.setImageFormat(3);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Success
+        }
     }
 
     @Test
@@ -133,8 +159,12 @@ public final class CameraConfigTest extends BaseTestClass {
         assertEquals(mBuilder.build().getImageRotation(), CameraRotation.ROTATION_180);
 
         // Invalid input check
-        mException.expect(IllegalArgumentException.class);
-        mBuilder.setImageRotation(3);
+        try {
+            mBuilder.setImageRotation(3);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Success
+        }
     }
 
     @Override

@@ -119,6 +119,8 @@ dependencies {
     androidTestImplementation(testLib.contrib, excludeGrp)
     androidTestImplementation(testLib.idling, excludeGrp)
     androidTestImplementation(testLib.uiAutomator, excludeGrp)
+    androidTestImplementation(testLib.mokitoCore, excludeGrp)
+    androidTestImplementation(testLib.mokitoAndroid, excludeGrp)
 
     //Butter knife
     implementation butterKnifeLib.butterKnife
@@ -143,4 +145,5 @@ dependencies {
     //Rx
     implementation rxLib.rxJava
     implementation rxLib.rxAndroid
+    implementation 'com.android.support:support-v4:26.0.0-beta2'
 }
