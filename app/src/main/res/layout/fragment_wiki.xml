@@ -14,16 +14,23 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.kevalpatel2106.smartlens.wikipage.WikiFragment">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.kevalpatel2106.smartlens.wikipage.WikiFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.kevalpatel2106.smartlens.base.BaseImageView
+        android:id="@+id/wiki_page_iv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment"/>
+        android:layout_height="200dp"
+        android:src="@color/colorPrimaryDark"/>
 
-</FrameLayout>
+    <com.kevalpatel2106.smartlens.base.BaseTextView
+        android:id="@+id/wiki_page_tv"
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/wiki_page_iv"/>
+</RelativeLayout>

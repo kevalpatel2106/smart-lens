@@ -18,15 +18,19 @@ package com.kevalpatel2106.smartlens.dashboard;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 
+import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
+import com.kevalpatel2106.smartlens.testUtils.Delay;
 import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -56,15 +60,13 @@ public class CameraFragmentTest extends BaseTestClass {
             }
         }
 
+        //Wait for 1200 ms.
+        //Wait for the camera to get stable
+        Delay.startDelay(1200);
+        Delay.stopDelay();
+        Espresso.onView(withId(R.id.container));
 
-        try {
-            Thread.sleep(1200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            mCameraFragment = mCameraFragmentTestRule.getFragment();
-        }
-
+        mCameraFragment = mCameraFragmentTestRule.getFragment();
     }
 
     @SuppressWarnings("ConstantConditions")

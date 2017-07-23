@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
+import com.kevalpatel2106.smartlens.wikipage.WikiFragment;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,8 +45,17 @@ public class DashboardTest extends BaseTestClass {
         Fragment fragment = mDashboardActivityTestRule
                 .getActivity()
                 .getSupportFragmentManager()
-                .findFragmentById(R.id.dashboard_frame_layout_container);
+                .findFragmentById(R.id.dashboard_camera_container);
         assertTrue(fragment instanceof CameraFragment);
+    }
+
+    @Test
+    public void checkWikiFragmentLoaded() {
+        Fragment fragment = mDashboardActivityTestRule
+                .getActivity()
+                .getSupportFragmentManager()
+                .findFragmentById(R.id.dashboard_bottom_sheet_container);
+        assertTrue(fragment instanceof WikiFragment);
     }
 
     @Override
