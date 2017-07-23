@@ -189,7 +189,9 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
             case CameraError.ERROR_DOES_NOT_HAVE_FRONT_CAMERA:
             case CameraError.ERROR_IMAGE_WRITE_FAILED:
             default:
-                Snackbar.make(mContainer, "Error opening the camera.", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mContainer, "Error opening the camera.", Snackbar.LENGTH_LONG)
+                        .setAction(android.R.string.ok, view -> getActivity().finish())
+                        .show();
                 break;
         }
     }

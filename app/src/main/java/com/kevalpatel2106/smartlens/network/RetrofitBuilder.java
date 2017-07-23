@@ -17,25 +17,13 @@
 package com.kevalpatel2106.smartlens.network;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.kevalpatel2106.smartlens.BuildConfig;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -47,6 +35,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 
+@SuppressWarnings("WeakerAccess")
 public class RetrofitBuilder {
     @SuppressWarnings("unused")
     private static final String TAG = "RetrofitBuilder";
@@ -70,6 +59,7 @@ public class RetrofitBuilder {
      * @param cacheTimeSeconds Cache expiration time in seconds
      * @return {@link APIService}
      */
+    @SuppressWarnings("SameParameterValue")
     public static APIService getApiService(@NonNull Context context,
                                            boolean isCacheEnable,
                                            int cacheTimeSeconds) {
@@ -91,100 +81,5 @@ public class RetrofitBuilder {
                 .build();
 
         return retrofit.create(APIService.class);
-    }
-
-    /**
-     * Make in api call on the separate thread.
-     *
-     * @param observable {@link Observable}
-     * @param listener   {@link ResponseListener}.
-     * @return {@link Disposable}
-     * @see <a href="https://github.com/ReactiveX/RxJava/issues/4942">How to handle exceptions and errors?</a>
-     */
-    @Nullable
-    public static Disposable makeApiCall(@NonNull final Observable observable,
-                                         @NonNull final ResponseListener listener) {
-        return makeApiCall(observable, listener, false);
-    }
-
-    /**
-     * Make in api call on the separate thread.
-     *
-     * @param observable           {@link Observable}
-     * @param listener             {@link ResponseListener}.
-     * @param isRetryOnNetworkFail If set true, this method will try for the api call on network not
-     *                             available situation for three times with the period of 10 seconds.
-     * @return {@link Disposable}
-     * @see <a href="https://github.com/ReactiveX/RxJava/issues/4942">How to handle exceptions and errors?</a>
-     */
-    @Nullable
-    public static Disposable makeApiCall(@NonNull final Observable observable,
-                                         @NonNull final ResponseListener listener,
-                                         final boolean isRetryOnNetworkFail) {
-        //noinspection unchecked
-        return observable
-                .retryWhen(new RetryWithDelay(isRetryOnNetworkFail ? 3 : 0, 10000))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<BaseResult>() {
-                    @Override
-                    public void accept(@NonNull BaseResult response) throws Exception {
-                        listener.onSuccess(response);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        try {
-                            if (throwable instanceof HttpException) { //Error frm the server.
-                                listener.onError("Something went wrong.");
-                            } else if (throwable instanceof IOException) {  //Internet not available.
-                                listener.onError("Internet is not available. Please try again.");
-                            }
-                        } catch (Exception e1) {
-                            listener.onError(throwable.getMessage());
-                            e1.printStackTrace();
-                        }
-                    }
-                });
-    }
-
-    /**
-     * Function to retry for the particular number of times with interval.
-     */
-    public static class RetryWithDelay implements Function<Observable<? extends Throwable>, Observable<?>> {
-        private final int mMaxRetries;
-        private final int mRetryInMills;
-        private int mRetryCount;
-
-        /**
-         * Public constructor.
-         *
-         * @param maxRetries       Maximum number of retries.
-         * @param retryDelayMillis Interval between
-         */
-        public RetryWithDelay(final int maxRetries, final int retryDelayMillis) {
-            mMaxRetries = maxRetries;
-            mRetryInMills = retryDelayMillis;
-
-            mRetryCount = 0;
-        }
-
-        @Override
-        public Observable<?> apply(final Observable<? extends Throwable> attempts) {
-            return attempts
-                    .flatMap(new Function<Throwable, Observable<?>>() {
-                        @Override
-                        public Observable<?> apply(final Throwable throwable) {
-                            if (throwable instanceof UnknownHostException && ++mRetryCount <= mMaxRetries) {
-                                // When this Observable calls onNext, the original
-                                // Observable will be retried (i.e. re-subscribed).
-                                return Observable.timer(mRetryInMills, TimeUnit.MILLISECONDS);
-                            }
-
-                            // Max retries hit. Just pass the error along.
-                            return Observable.error(throwable);
-                        }
-                    });
-        }
     }
 }
