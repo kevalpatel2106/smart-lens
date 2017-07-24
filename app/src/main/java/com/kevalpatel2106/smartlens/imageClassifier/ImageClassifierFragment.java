@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.dashboard;
+package com.kevalpatel2106.smartlens.imageClassifier;
 
 
 import android.Manifest;
@@ -41,6 +41,8 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
+import com.kevalpatel2106.smartlens.utils.rxBus.Event;
+import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 import com.kevalpatel2106.tensorflow.Classifier;
 import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
 
@@ -57,9 +59,9 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * A simple {@link Fragment} subclass.
  */
-public final class CameraFragment extends BaseFragment implements CameraCallbacks {
+public final class ImageClassifierFragment extends BaseFragment implements CameraCallbacks {
     private static final long FIRST_CAPTURE_DELAY = 3000L;
-    private static final String TAG = "CameraFragment";
+    private static final String TAG = "ImageClassifierFragment";
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
@@ -68,15 +70,15 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
     CameraPreview mCameraPreview;
     TensorFlowImageClassifier mImageClassifier;
 
-    public CameraFragment() {
+    public ImageClassifierFragment() {
         // Required empty public constructor
     }
 
     /**
-     * @return new instance of {@link CameraFragment}.
+     * @return new instance of {@link ImageClassifierFragment}.
      */
-    public static CameraFragment getNewInstance() {
-        return new CameraFragment();
+    public static ImageClassifierFragment getNewInstance() {
+        return new ImageClassifierFragment();
     }
 
     @Override
@@ -174,7 +176,8 @@ public final class CameraFragment extends BaseFragment implements CameraCallback
                 })
                 .subscribe(labels -> {
                     if (!labels.isEmpty()) {
-                        Log.d(TAG, "onImageCapture: " + labels.get(0));
+                        Log.d(TAG, "onImageCapture: " + labels.get(0).getTitle());
+                        RxBus.getDefault().post(new Event(new ImageClassifiedEvent(labels)));
                     }
                 });
     }

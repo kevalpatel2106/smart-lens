@@ -56,7 +56,7 @@
 
         <!--Home screen-->
         <activity
-            android:name=".dashboard.Dashboard"
+            android:name=".Dashboard"
             android:label="@string/title_home_activity"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"

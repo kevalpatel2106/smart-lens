@@ -22,7 +22,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".dashboard.Dashboard">
+    tools:context=".Dashboard">
 
     <FrameLayout
         android:id="@+id/dashboard_camera_container"

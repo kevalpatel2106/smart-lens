@@ -20,4 +20,4 @@
     android:id="@+id/camera_preview_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.kevalpatel2106.smartlens.dashboard.CameraFragment"/>
+    tools:context="com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment"/>

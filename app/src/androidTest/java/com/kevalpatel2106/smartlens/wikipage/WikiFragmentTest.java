@@ -16,7 +16,7 @@
 
 package com.kevalpatel2106.smartlens.wikipage;
 
-import com.kevalpatel2106.smartlens.dashboard.CameraFragment;
+import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
 import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
 
 import org.junit.Before;
@@ -46,7 +46,7 @@ public class WikiFragmentTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkNewInstance() throws Exception {
-        assertTrue(CameraFragment.getNewInstance() instanceof CameraFragment);
+        assertTrue(ImageClassifierFragment.getNewInstance() instanceof ImageClassifierFragment);
     }
 
 }

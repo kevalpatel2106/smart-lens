@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.dashboard;
+package com.kevalpatel2106.smartlens;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,9 +23,9 @@ import android.support.v4.widget.NestedScrollView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseActivity;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
+import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
 import com.kevalpatel2106.smartlens.wikipage.WikiFragment;
 
 import butterknife.BindView;
@@ -35,7 +35,7 @@ public class Dashboard extends BaseActivity {
     @BindView(R.id.bottom_sheet)
     NestedScrollView mNestedScrollView;
 
-    CameraFragment mCameraFragment;
+    ImageClassifierFragment mCameraFragment;
     WikiFragment mWikiFragment;
 
     @Override
@@ -43,7 +43,7 @@ public class Dashboard extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        mCameraFragment = CameraFragment.getNewInstance();
+        mCameraFragment = ImageClassifierFragment.getNewInstance();
         mWikiFragment = WikiFragment.getNewInstance();
 
         //First check if the camera available?

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.dashboard;
+package com.kevalpatel2106.smartlens.imageClassifier;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
@@ -42,9 +42,9 @@ import static org.junit.Assert.fail;
 public class CameraFragmentTest extends BaseTestClass {
 
     @Rule
-    public FragmentTestRule<CameraFragment> mCameraFragmentTestRule =
-            new FragmentTestRule<>(CameraFragment.class);
-    private CameraFragment mCameraFragment;
+    public FragmentTestRule<ImageClassifierFragment> mCameraFragmentTestRule =
+            new FragmentTestRule<>(ImageClassifierFragment.class);
+    private ImageClassifierFragment mCameraFragment;
 
     @Before
     public void init() {
@@ -54,7 +54,7 @@ public class CameraFragmentTest extends BaseTestClass {
         } else {
             try {
                 mCameraFragmentTestRule.launchActivity(null);
-                fail("Should not initialize this CameraFragment if camera not there.");
+                fail("Should not initialize this ImageClassifierFragment if camera not there.");
             } catch (IllegalArgumentException e) {
                 //Success
             }
@@ -72,7 +72,7 @@ public class CameraFragmentTest extends BaseTestClass {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkNewInstance() throws Exception {
-        assertTrue(CameraFragment.getNewInstance() instanceof CameraFragment);
+        assertTrue(ImageClassifierFragment.getNewInstance() instanceof ImageClassifierFragment);
     }
 
     @Test

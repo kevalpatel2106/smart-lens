@@ -21,8 +21,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.kevalpatel2106.smartlens.dashboard.Dashboard;
-
 /**
  * Created by Keval on 30-Jan-17.
  *

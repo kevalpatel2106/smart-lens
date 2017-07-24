@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.dashboard;
+package com.kevalpatel2106.smartlens.imageClassifier;
 
 import android.app.Activity;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.app.Fragment;
 
+import com.kevalpatel2106.smartlens.Dashboard;
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.wikipage.WikiFragment;
@@ -46,7 +47,7 @@ public class DashboardTest extends BaseTestClass {
                 .getActivity()
                 .getSupportFragmentManager()
                 .findFragmentById(R.id.dashboard_camera_container);
-        assertTrue(fragment instanceof CameraFragment);
+        assertTrue(fragment instanceof ImageClassifierFragment);
     }
 
     @Test

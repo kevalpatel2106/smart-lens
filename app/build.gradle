@@ -128,7 +128,6 @@ dependencies {
 
     //GSON
     implementation otherLib.gson
-    implementation otherLib.rxBus
 
     //Retrofit
     implementation retrofitLib.retrofit
@@ -141,9 +140,9 @@ dependencies {
     implementation supportLib.recyclerView
     implementation supportLib.cardView
     implementation supportLib.design
+    implementation supportLib.supportv4
 
     //Rx
     implementation rxLib.rxJava
     implementation rxLib.rxAndroid
-    implementation 'com.android.support:support-v4:26.0.0-beta2'
 }
