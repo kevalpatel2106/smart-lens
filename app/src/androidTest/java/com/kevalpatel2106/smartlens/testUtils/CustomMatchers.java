@@ -19,10 +19,12 @@ package com.kevalpatel2106.smartlens.testUtils;
 import android.support.annotation.NonNull;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Created by Keval on 02-Feb-17.
@@ -30,7 +32,7 @@ import org.hamcrest.Matcher;
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 
-public final class TextMarchers {
+public final class CustomMatchers {
 
     /**
      * Returns a matcher that matches {@link TextView}s based on text property value.
@@ -114,6 +116,42 @@ public final class TextMarchers {
             @Override
             public boolean matchesSafely(final TextView textView) {
                 return textView.getText().length() == length;
+            }
+        };
+    }
+
+    /**
+     * Returns a matcher that matches {@link TextView}s based on text property value.
+     */
+    @NonNull
+    public static Matcher<View> hasText() {
+
+        return new BoundedMatcher<View, TextView>(TextView.class) {
+
+            @Override
+            public void describeTo(final Description description) {
+                description.appendText("Text length is : " + description);
+            }
+
+            @Override
+            public boolean matchesSafely(final TextView textView) {
+                return textView.getText().length() > 0;
+            }
+        };
+    }
+
+    @NonNull
+    public static TypeSafeMatcher<View> hasImage() {
+        return new TypeSafeMatcher<View>() {
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("No image found.");
+            }
+
+            @Override
+            protected boolean matchesSafely(View actualImageView) {
+                return ((ImageView) actualImageView).getDrawable() != null;
             }
         };
     }

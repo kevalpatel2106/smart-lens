@@ -18,15 +18,16 @@ package com.kevalpatel2106.smartlens;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import com.kevalpatel2106.smartlens.base.BaseActivity;
 
 /**
  * Created by Keval on 21-Jul-17.
  */
 
-public class TestActivity extends AppCompatActivity {
+public class TestActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {

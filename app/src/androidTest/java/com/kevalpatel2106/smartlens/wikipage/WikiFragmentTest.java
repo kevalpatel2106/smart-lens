@@ -16,13 +16,22 @@
 
 package com.kevalpatel2106.smartlens.wikipage;
 
-import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
+import android.app.Activity;
+import android.support.test.espresso.assertion.ViewAssertions;
+
+import com.kevalpatel2106.smartlens.R;
+import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
+import com.kevalpatel2106.smartlens.testUtils.CustomMatchers;
+import com.kevalpatel2106.smartlens.testUtils.Delay;
 import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -30,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public class WikiFragmentTest {
+public class WikiFragmentTest extends BaseTestClass {
 
     @Rule
     public FragmentTestRule<WikiFragment> mWikiFragmentFragmentTestRule =
@@ -46,7 +55,40 @@ public class WikiFragmentTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkNewInstance() throws Exception {
-        assertTrue(ImageClassifierFragment.getNewInstance() instanceof ImageClassifierFragment);
+        assertTrue(WikiFragment.getNewInstance() instanceof WikiFragment);
     }
 
+    @Test
+    public void checkWikiSummary() throws Exception {
+        mWikiFragment.getWikiPageDetail(getActivity(), "computer keyboard");
+
+        //Wait for the api call
+        Delay.startDelay(15000);
+
+        //Check if there are text?
+        onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
+        Delay.stopDelay();
+    }
+
+//    @Test
+//    public void checkWikiImage() throws Exception {
+//        mWikiFragment.getWikiImage(getActivity(), "computer keyboard");
+//
+//        //Wait for the api call
+//        Delay.startDelay(15000);
+//
+//        //Check if there are text?
+//        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
+//        Delay.stopDelay();
+//    }
+
+    @After
+    public void tearDown() {
+        getActivity().finish();
+    }
+
+    @Override
+    public Activity getActivity() {
+        return mWikiFragmentFragmentTestRule.getActivity();
+    }
 }
