@@ -17,7 +17,6 @@
 package com.kevalpatel2106.smartlens.camera;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -46,7 +45,7 @@ public class CameraPreviewTest extends BaseTestClass {
             CameraPreview cameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     new CameraCallbacks() {
                         @Override
-                        public void onImageCapture(@NonNull Bitmap imageCaptured) {
+                        public void onImageCapture(@NonNull byte[] imageCaptured) {
 
                         }
 
@@ -73,7 +72,7 @@ public class CameraPreviewTest extends BaseTestClass {
             CameraPreview cameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     new CameraCallbacks() {
                         @Override
-                        public void onImageCapture(@NonNull Bitmap imageCaptured) {
+                        public void onImageCapture(@NonNull byte[] imageCaptured) {
 
                         }
 

@@ -71,13 +71,14 @@ public class WikiFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         //Register image classifier.
-        RxBus.getDefault().register(ImageClassifiedEvent.class)
+        RxBus.getDefault().register(new Class[]{ImageClassifiedEvent.class})
                 .filter(event -> !((ImageClassifiedEvent) event.getObject()).getRecognitions().isEmpty())
                 .doOnSubscribe(this::addSubscription)
                 .doOnNext(event -> getWikiPageDetail(((ImageClassifiedEvent) event.getObject())
                         .getRecognitions()
                         .get(0)
-                        .getTitle()));
+                        .getTitle()))
+                .subscribe();
     }
 
     public void getWikiPageDetail(@NonNull String label) {

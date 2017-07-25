@@ -35,6 +35,10 @@ public class ImageClassifiedEvent {
     private long timeStamp;
 
     public ImageClassifiedEvent(@NonNull List<Classifier.Recognition> recognitions) {
+        //noinspection ConstantConditions
+        if (recognitions == null)
+            throw new IllegalArgumentException("Cannot initialize with null.");
+
         mRecognitions = recognitions;
         this.timeStamp = System.currentTimeMillis();
     }

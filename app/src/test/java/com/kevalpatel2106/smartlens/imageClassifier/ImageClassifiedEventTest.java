@@ -14,40 +14,43 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.utils.rxBus;
+package com.kevalpatel2106.smartlens.imageClassifier;
 
-import org.junit.Before;
+import com.kevalpatel2106.tensorflow.Classifier;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Created by Keval Patel on 24/07/17.
+ * Created by Keval Patel on 25/07/17.
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public class RxBusTest {
-    private RxBus mRxBus;
-
-    @Before
-    public void setUp() {
-        mRxBus = RxBus.getDefault();
-    }
-
-    @Test
-    public void isSingleton() throws Exception {
-        assertEquals(mRxBus, RxBus.getDefault());
-    }
+public class ImageClassifiedEventTest {
 
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void postNull() throws Exception {
+    public void canInitialize() throws Exception {
         try {
-            mRxBus.post(null);
+            new ImageClassifiedEvent(null);
             fail();
         } catch (IllegalArgumentException e) {
             //Success
         }
     }
+
+    @Test
+    public void getTimeStamp() throws Exception {
+        Classifier.Recognition mockRecognition = new Classifier.Recognition("1",
+                "mock", 1.0f, null);
+        ArrayList<Classifier.Recognition> mockList = new ArrayList<>(1);
+        mockList.add(mockRecognition);
+        ImageClassifiedEvent classifiedEvent = new ImageClassifiedEvent(mockList);
+        assertTrue(System.currentTimeMillis() - classifiedEvent.getTimeStamp() < 100);
+    }
+
 }

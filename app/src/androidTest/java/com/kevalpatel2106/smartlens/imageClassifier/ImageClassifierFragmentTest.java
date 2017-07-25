@@ -39,12 +39,12 @@ import static org.junit.Assert.fail;
 /**
  * Created by Keval on 20-Jul-17.
  */
-public class CameraFragmentTest extends BaseTestClass {
+public class ImageClassifierFragmentTest extends BaseTestClass {
 
     @Rule
     public FragmentTestRule<ImageClassifierFragment> mCameraFragmentTestRule =
             new FragmentTestRule<>(ImageClassifierFragment.class);
-    private ImageClassifierFragment mCameraFragment;
+    private ImageClassifierFragment mImageClassifierFragment;
 
     @Before
     public void init() {
@@ -66,7 +66,7 @@ public class CameraFragmentTest extends BaseTestClass {
         Delay.stopDelay();
         Espresso.onView(withId(R.id.container));
 
-        mCameraFragment = mCameraFragmentTestRule.getFragment();
+        mImageClassifierFragment = mCameraFragmentTestRule.getFragment();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -77,27 +77,26 @@ public class CameraFragmentTest extends BaseTestClass {
 
     @Test
     public void checkIfInitialized() throws Exception {
-        assertNotNull(mCameraFragment);
-        assertNotNull(mCameraFragment.mCameraPreview);
-        assertNotNull(mCameraFragment.mImageClassifier);
+        assertNotNull(mImageClassifierFragment);
+        assertNotNull(mImageClassifierFragment.mCameraPreview);
+        assertNotNull(mImageClassifierFragment.mImageClassifier);
 
-        mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
     }
 
     @Test
     public void checkIfCameraWorking() throws Exception {
         //Test if the camera opened
-        assertTrue(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+        assertTrue(mImageClassifierFragment.mCameraPreview.isSafeToTakePicture());
 
         //Test take the picture
-        mCameraFragment.mCameraPreview.takePicture();
-        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+        mImageClassifierFragment.mCameraPreview.takePicture();
+        assertFalse(mImageClassifierFragment.mCameraPreview.isSafeToTakePicture());
 
         // Check if it can release the camera.
-        mCameraFragment.mCameraPreview.stopPreviewAndReleaseCamera();
-        assertFalse(mCameraFragment.mCameraPreview.isSafeToTakePicture());
+        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        assertFalse(mImageClassifierFragment.mCameraPreview.isSafeToTakePicture());
     }
-
 
     @Override
     public Activity getActivity() {

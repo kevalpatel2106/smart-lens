@@ -16,7 +16,6 @@
 
 package com.kevalpatel2106.smartlens.camera;
 
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 /**
@@ -32,7 +31,7 @@ public interface CameraCallbacks {
      *
      * @param imageCaptured The bitmap of the captured image.
      */
-    void onImageCapture(@NonNull Bitmap imageCaptured);
+    void onImageCapture(@NonNull byte[] imageCaptured);
 
     /**
      * This callback will notify whenever any error occurs while working with the camera.

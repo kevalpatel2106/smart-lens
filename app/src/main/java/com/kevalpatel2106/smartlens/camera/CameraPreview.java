@@ -18,7 +18,6 @@ package com.kevalpatel2106.smartlens.camera;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.hardware.Camera;
@@ -57,15 +56,15 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     private volatile boolean isSafeToTakePicture = false;
 
     //Create the picture callback.
-    private Camera.PictureCallback mPictureCallback = (bytes, camera) -> {
-        Log.d(TAG, "image captured: " + bytes.length);
-        mCameraCallbacks.onImageCapture(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+    private Camera.PictureCallback mPictureCallback = (byte[] bytes, Camera camera) -> {
+        Log.d(TAG, "image captured: " + System.currentTimeMillis());
+        mCameraCallbacks.onImageCapture(bytes);
+
         isSafeToTakePicture = true;
 
         //Restart the preview.
         //https://stackoverflow.com/a/31260958/4690731
-        mCamera.stopPreview();
-        mCamera.startPreview();
+        camera.startPreview();
     };
 
     /**

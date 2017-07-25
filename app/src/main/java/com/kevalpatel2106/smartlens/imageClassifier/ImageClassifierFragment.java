@@ -20,8 +20,8 @@ package com.kevalpatel2106.smartlens.imageClassifier;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -49,19 +49,23 @@ import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
 import org.reactivestreams.Subscription;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public final class ImageClassifierFragment extends BaseFragment implements CameraCallbacks {
-    private static final long FIRST_CAPTURE_DELAY = 3000L;
     private static final String TAG = "ImageClassifierFragment";
+    private static final long FIRST_CAPTURE_DELAY = 3000L;
+    private static final long INTERVAL_DELAY = 2000L;
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
@@ -69,6 +73,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
 
     CameraPreview mCameraPreview;
     TensorFlowImageClassifier mImageClassifier;
+    private Disposable mTakePicDisposable;
 
     public ImageClassifierFragment() {
         // Required empty public constructor
@@ -112,8 +117,14 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
 
-            //Start taking the pictures after 1 second delay
-            new Handler().postDelayed(() -> mCameraPreview.takePicture(), FIRST_CAPTURE_DELAY);
+            //Start taking picture after every second.
+            Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .filter(l -> mCameraPreview != null && mCameraPreview.isSafeToTakePicture())
+                    .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
+                    .doOnNext(aLong -> mCameraPreview.takePicture())
+                    .subscribe();
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
@@ -124,7 +135,10 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
         super.onStop();
 
         //Stop and release the camera
-        if (mCameraPreview != null) mCameraPreview.stopPreviewAndReleaseCamera();
+        if (mCameraPreview != null) {
+            mCameraPreview.stopPreviewAndReleaseCamera();
+            if (mTakePicDisposable != null) mTakePicDisposable.dispose();
+        }
     }
 
     @Override
@@ -154,16 +168,17 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     }
 
     @Override
-    public void onImageCapture(@NonNull Bitmap imageCaptured) {
+    public void onImageCapture(@NonNull byte[] imageCaptured) {
 
         //Process the image using Tf.
         Flowable<List<Classifier.Recognition>> flowable = Flowable.create(e -> {
-            e.onNext(mImageClassifier.recognizeImage(imageCaptured));
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageCaptured, 0, imageCaptured.length);
+            e.onNext(mImageClassifier.recognizeImage(bitmap));
             e.onComplete();
         }, BackpressureStrategy.DROP);
 
         final Subscription[] subscriptions = new Subscription[1];
-        flowable.subscribeOn(Schedulers.io())
+        flowable.subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(subscription -> subscriptions[0] = subscription)
                 .doOnError(t -> {
@@ -171,13 +186,13 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     subscriptions[0].cancel();
                 })
                 .doOnComplete(() -> {
-                    mCameraPreview.takePicture();
                     subscriptions[0].cancel();
                 })
                 .subscribe(labels -> {
                     if (!labels.isEmpty()) {
                         Log.d(TAG, "onImageCapture: " + labels.get(0).getTitle());
-                        RxBus.getDefault().post(new Event(new ImageClassifiedEvent(labels)));
+                        ImageClassifiedEvent imageClassifiedEvent = new ImageClassifiedEvent(labels);
+                        RxBus.getDefault().post(new Event(imageClassifiedEvent));
                     }
                 });
     }
@@ -197,5 +212,6 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                         .show();
                 break;
         }
+        if (mTakePicDisposable != null) mTakePicDisposable.dispose();
     }
 }
