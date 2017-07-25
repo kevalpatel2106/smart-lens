@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
@@ -64,7 +65,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 public final class ImageClassifierFragment extends BaseFragment implements CameraCallbacks {
     private static final String TAG = "ImageClassifierFragment";
-    private static final long FIRST_CAPTURE_DELAY = 3000L;
+    private static final long FIRST_CAPTURE_DELAY = 4000L;
     private static final long INTERVAL_DELAY = 2000L;
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
@@ -124,6 +125,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     .filter(l -> mCameraPreview != null && mCameraPreview.isSafeToTakePicture())
                     .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
                     .doOnNext(aLong -> mCameraPreview.takePicture())
+                    .doOnError(throwable -> Snackbar.make(mContainer, "Image detection failed.", Toast.LENGTH_LONG).show())
                     .subscribe();
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);

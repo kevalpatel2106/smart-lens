@@ -19,7 +19,7 @@ ext {
             min             : 18,
             target          : 26,
             compile         : 26,
-            buildToolVersion: '26.0.0',
+            buildToolVersion: '25.0.3',
     ]
 
     versionConfig = [
