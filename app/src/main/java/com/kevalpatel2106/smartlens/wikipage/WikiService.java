@@ -16,19 +16,17 @@
 
 package com.kevalpatel2106.smartlens.wikipage;
 
+import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import rx.Observable;
 
 /**
- * Created by Keval Patel on 23/07/17.
- *
- * @author 'https://github.com/kevalpatel2106'
- * @see <a href='https://stackoverflow.com/a/28401782/4690731>https://stackoverflow.com/a/28401782/4690731</a>
+ * Created by Keval on 25-Jul-17.
  */
 
-public interface WikiService {
+@SuppressWarnings("SameParameterValue")
+interface WikiService {
 
     @GET("api.php")
     Observable<ResponseBody> getInfo(@Query("format") String format,
@@ -39,10 +37,10 @@ public interface WikiService {
                                      @Query("titles") String title);
 
     @GET("api.php")
-    Observable<ResponseBody> getImage(@Query("action") String action,
+    Observable<ResponseBody> getImage(@Query("format") String format,
+                                      @Query("action") String action,
                                       @Query("prop") String prp,
-                                      @Query("exintro") String extraInfo,
-                                      @Query("explaintext") String explainText,
+                                      @Query("piprop") String piprop,
                                       @Query("titles") String title);
 
 }

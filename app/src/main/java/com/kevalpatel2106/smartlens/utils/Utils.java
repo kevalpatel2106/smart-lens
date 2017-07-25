@@ -25,6 +25,11 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 /**
  * Created by Keval on 20-Dec-16.
  * General utility functions.
@@ -37,6 +42,22 @@ public class Utils {
 
     private Utils() {
         throw new RuntimeException("Cannot initialize this class.");
+    }
+
+    /**
+     * Get the string from the input stream.
+     *
+     * @param inputStream {@link InputStream} to read.
+     * @return String.
+     * @throws IOException - If unable to read
+     */
+    public static String getStringFromStream(@NonNull InputStream inputStream) throws IOException {
+        //noinspection ConstantConditions
+        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder total = new StringBuilder();
+        String line;
+        while ((line = r.readLine()) != null) total.append(line).append('\n');
+        return total.toString();
     }
 
     /**

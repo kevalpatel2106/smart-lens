@@ -28,23 +28,40 @@ import io.reactivex.annotations.NonNull;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class WikiRetrofitBuilder extends BaseRetrofitBuilder {
-    public WikiRetrofitBuilder(@NonNull Context context) {
+class WikiRetrofitBuilder extends BaseRetrofitBuilder {
+    @SuppressWarnings("unused")
+    private static final String TAG = "WikiRetrofitBuilder";
+
+    WikiRetrofitBuilder(@NonNull Context context) {
         super(context);
     }
 
+    @NonNull
     @Override
     protected String getBaseUrl() {
         return "https://en.wikipedia.org/w/";
     }
 
-    public WikiService getApiService() {
+    /**
+     * Get the api service.
+     *
+     * @return {@link WikiService}
+     */
+    WikiService getApiService() {
         return getRetrofitBuilder(false, 0)
                 .create(WikiService.class);
     }
 
-    public WikiService getApiService(boolean isCacheEnable,
-                                     int cacheTimeSeconds) {
+    /**
+     * Get the api service.
+     *
+     * @param cacheTimeSeconds Cache time in seconds.
+     * @param isCacheEnable    True if the cache should be enable.
+     * @return {@link WikiService}
+     */
+    @SuppressWarnings("unused")
+    WikiService getApiService(boolean isCacheEnable,
+                              int cacheTimeSeconds) {
         return getRetrofitBuilder(isCacheEnable, cacheTimeSeconds)
                 .create(WikiService.class);
     }

@@ -31,8 +31,9 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.HttpException;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -78,7 +79,7 @@ public abstract class BaseRetrofitBuilder {
                                           int cacheTimeSeconds) {
         //Building retrofit
         return new Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(getBaseUrl())
                 .client(buildHttpClient(mContext, isCacheEnable, cacheTimeSeconds))
@@ -86,6 +87,25 @@ public abstract class BaseRetrofitBuilder {
     }
 
     protected abstract String getBaseUrl();
+
+    /**
+     * Get the error message from the {@link Throwable}.
+     *
+     * @param throwable {@link Throwable}
+     * @return Error message.
+     */
+    public String getErrorMessage(@NonNull Throwable throwable) {
+        try {
+            if (throwable instanceof HttpException) { //Error frm the server.
+                return "Something went wrong.";
+            } else if (throwable instanceof IOException) {  //Internet not available.
+                return "Internet is not available. Please try again.";
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return throwable.getMessage();
+    }
 
     private class CacheInterceptor implements Interceptor {
         static final int CACHE_SIZE = 5242880;          //5 MB //Cache size.

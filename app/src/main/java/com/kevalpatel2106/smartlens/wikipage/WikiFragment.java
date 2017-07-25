@@ -21,21 +21,31 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
 import com.kevalpatel2106.smartlens.base.BaseImageView;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
+import com.kevalpatel2106.smartlens.utils.Utils;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
+import com.kevalpatel2106.tensorflow.Classifier;
+
+import org.json.JSONObject;
+
+import java.util.List;
 
 import butterknife.BindView;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
-import rx.Observable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,7 +82,11 @@ public class WikiFragment extends BaseFragment {
 
         //Register image classifier.
         RxBus.getDefault().register(new Class[]{ImageClassifiedEvent.class})
-                .filter(event -> !((ImageClassifiedEvent) event.getObject()).getRecognitions().isEmpty())
+                .filter(event -> {
+                    List<Classifier.Recognition> recognitions =
+                            ((ImageClassifiedEvent) event.getObject()).getRecognitions();
+                    return recognitions != null && !recognitions.isEmpty();
+                })
                 .doOnSubscribe(this::addSubscription)
                 .doOnNext(event -> getWikiPageDetail(((ImageClassifiedEvent) event.getObject())
                         .getRecognitions()
@@ -82,8 +96,80 @@ public class WikiFragment extends BaseFragment {
     }
 
     public void getWikiPageDetail(@NonNull String label) {
+        //Convert first character to cap.
+        label = Character.toUpperCase(label.charAt(0)) + label.substring(1).toLowerCase();
+        String[] split = label.split("\\s");
+        label = TextUtils.join("_", split);
+
         Log.d(TAG, "getWikiPageDetail: " + label);
-        Observable<ResponseBody> observable = new WikiRetrofitBuilder(mContext).getApiService()
+
+        String finalLabel = label;
+
+        WikiRetrofitBuilder wikiRetrofitBuilder = new WikiRetrofitBuilder(mContext);
+        Observable<ResponseBody> observable = wikiRetrofitBuilder.getApiService()
                 .getInfo("json", "query", "extracts", "", "", label);
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(this::addSubscription)
+                .doOnNext(responseBody -> {
+                    String responseStr = Utils.getStringFromStream(responseBody.byteStream());
+                    JSONObject pagesObj = new JSONObject(responseStr)
+                            .getJSONObject("query")
+                            .getJSONObject("pages");
+                    String summaryText = pagesObj
+                            .getJSONObject(pagesObj.names().getString(0))
+                            .getString("extract");
+
+                    if (isValidSummary(finalLabel, summaryText)) {
+                        WikiPage wikiPage = new WikiPage(finalLabel);
+                        wikiPage.setSummaryMessage(summaryText);
+                        mWikiTextView.setText(wikiPage.getSummaryMessage());
+
+                        //Get the image.
+                        getWikiImage(finalLabel);
+                    } else {
+                        //TODO Handle no result found
+                    }
+                })
+                .doOnError(throwable -> {
+                    Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable));
+                })
+                .subscribe();
+    }
+
+    public void getWikiImage(@NonNull String label) {
+        WikiRetrofitBuilder wikiRetrofitBuilder = new WikiRetrofitBuilder(mContext);
+        Observable<ResponseBody> observable = wikiRetrofitBuilder.getApiService()
+                .getImage("json", "query", "pageimages", "original", label);
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(this::addSubscription)
+                .doOnNext(responseBody -> {
+                    String responseStr = Utils.getStringFromStream(responseBody.byteStream());
+                    JSONObject pagesObj = new JSONObject(responseStr)
+                            .getJSONObject("query")
+                            .getJSONObject("pages");
+                    String imageUrl = pagesObj
+                            .getJSONObject(pagesObj.names().getString(0))
+                            .getJSONObject("thumbnail")
+                            .getString("original");
+
+                    Log.d(TAG, "getWikiImage: " + imageUrl);
+                    Glide.with(WikiFragment.this)
+                            .load(imageUrl)
+                            .thumbnail(0.1f)
+                            .into(mWikiImage);
+
+                })
+                .doOnError(throwable -> {
+                    Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable));
+                })
+                .subscribe();
+    }
+
+
+    private boolean isValidSummary(String label, String summary) {
+        int thresholdLength = (label + " may refer to:").length();
+        return summary.length() > thresholdLength;
     }
 }
