@@ -25,6 +25,7 @@ import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.wikipage.WikiFragment;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +57,11 @@ public class DashboardTest extends BaseTestClass {
                 .getSupportFragmentManager()
                 .findFragmentById(R.id.dashboard_bottom_sheet_container);
         assertTrue(fragment instanceof WikiFragment);
+    }
+
+    @After
+    public void tearDown() {
+        mDashboardActivityTestRule.getActivity().finish();
     }
 
     @Override
