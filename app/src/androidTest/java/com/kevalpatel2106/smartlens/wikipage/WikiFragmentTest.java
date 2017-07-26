@@ -20,15 +20,23 @@ import android.app.Activity;
 import android.support.test.espresso.assertion.ViewAssertions;
 
 import com.kevalpatel2106.smartlens.R;
+import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.testUtils.CustomMatchers;
 import com.kevalpatel2106.smartlens.testUtils.Delay;
 import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
+import com.kevalpatel2106.smartlens.testUtils.TestConfig;
+import com.kevalpatel2106.smartlens.utils.rxBus.Event;
+import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
+import com.kevalpatel2106.tensorflow.Classifier;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -40,6 +48,9 @@ import static org.junit.Assert.assertTrue;
  * @author 'https://github.com/kevalpatel2106'
  */
 public class WikiFragmentTest extends BaseTestClass {
+    @SuppressWarnings("unused")
+    private static final String TAG = "WikiFragmentTest";
+    private static final String MOCK_LABEL = "electric locomotive";
 
     @Rule
     public FragmentTestRule<WikiFragment> mWikiFragmentFragmentTestRule =
@@ -59,28 +70,29 @@ public class WikiFragmentTest extends BaseTestClass {
     }
 
     @Test
-    public void checkWikiSummary() throws Exception {
-        mWikiFragment.getWikiPageDetail(getActivity(), "computer keyboard");
+    public void checkRegistrationWithRxBus() throws Exception {
+        //Generate the mock event
+        List<Classifier.Recognition> recognitions = new ArrayList<>();
+        Classifier.Recognition mockRecognition = new Classifier.Recognition("1", MOCK_LABEL,
+                0.56f, null);
+        recognitions.add(mockRecognition);
+        Event event = new Event(new ImageClassifiedEvent(recognitions));
+
+        //Wait for the rx bus to get register after view creation
+        Delay.startDelay(1000);
+        onView(withId(R.id.wiki_page_tv));
+
+        //Publish it with RxBus
+        RxBus.getDefault().post(event);
 
         //Wait for the api call
-        Delay.startDelay(15000);
+        Delay.startDelay(TestConfig.DELAY_FOR_API);
 
         //Check if there are text?
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
+        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
         Delay.stopDelay();
     }
-
-//    @Test
-//    public void checkWikiImage() throws Exception {
-//        mWikiFragment.getWikiImage(getActivity(), "computer keyboard");
-//
-//        //Wait for the api call
-//        Delay.startDelay(15000);
-//
-//        //Check if there are text?
-//        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
-//        Delay.stopDelay();
-//    }
 
     @After
     public void tearDown() {

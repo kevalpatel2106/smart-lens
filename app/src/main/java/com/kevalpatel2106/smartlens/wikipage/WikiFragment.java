@@ -121,10 +121,17 @@ public class WikiFragment extends BaseFragment {
                     return recognitions != null && !recognitions.isEmpty();
                 })
                 .doOnSubscribe(this::addSubscription)
-                .doOnNext(event -> getWikiPageDetail(mContext, ((ImageClassifiedEvent) event.getObject())
-                        .getRecognitions()
-                        .get(0)
-                        .getTitle()))
+                .doOnNext(event -> {
+
+                    Log.e(TAG, "onViewCreated: " + ((ImageClassifiedEvent) event.getObject())
+                            .getRecognitions()
+                            .get(0)
+                            .getTitle());
+                    getWikiPageDetail(mContext, ((ImageClassifiedEvent) event.getObject())
+                            .getRecognitions()
+                            .get(0)
+                            .getTitle());
+                })
                 .subscribe();
     }
 
