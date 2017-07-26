@@ -42,7 +42,8 @@ public class DashboardTest extends BaseTestClass {
     public ActivityTestRule<Dashboard> mDashboardActivityTestRule = new ActivityTestRule<>(Dashboard.class);
 
     @Test
-    public void checkCameraFragmentLoaded() {
+    public void checkCameraFragmentLoaded() throws Exception {
+        Thread.sleep(1000);
         Fragment fragment = mDashboardActivityTestRule
                 .getActivity()
                 .getSupportFragmentManager()
@@ -51,7 +52,8 @@ public class DashboardTest extends BaseTestClass {
     }
 
     @Test
-    public void checkWikiFragmentLoaded() {
+    public void checkWikiFragmentLoaded() throws Exception {
+        Thread.sleep(1000);
         Fragment fragment = mDashboardActivityTestRule
                 .getActivity()
                 .getSupportFragmentManager()
