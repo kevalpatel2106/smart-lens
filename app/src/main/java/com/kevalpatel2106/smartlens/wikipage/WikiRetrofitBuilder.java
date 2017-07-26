@@ -31,6 +31,7 @@ import io.reactivex.annotations.NonNull;
 class WikiRetrofitBuilder extends BaseRetrofitBuilder {
     @SuppressWarnings("unused")
     private static final String TAG = "WikiRetrofitBuilder";
+    static String BASE_WIKI_URL = "https://en.wikipedia.org/w/";
 
     WikiRetrofitBuilder(@NonNull Context context) {
         super(context);
@@ -39,7 +40,7 @@ class WikiRetrofitBuilder extends BaseRetrofitBuilder {
     @NonNull
     @Override
     protected String getBaseUrl() {
-        return "https://en.wikipedia.org/w/";
+        return BASE_WIKI_URL;
     }
 
     /**
@@ -49,20 +50,6 @@ class WikiRetrofitBuilder extends BaseRetrofitBuilder {
      */
     WikiService getApiService() {
         return getRetrofitBuilder(false, 0)
-                .create(WikiService.class);
-    }
-
-    /**
-     * Get the api service.
-     *
-     * @param cacheTimeSeconds Cache time in seconds.
-     * @param isCacheEnable    True if the cache should be enable.
-     * @return {@link WikiService}
-     */
-    @SuppressWarnings("unused")
-    WikiService getApiService(boolean isCacheEnable,
-                              int cacheTimeSeconds) {
-        return getRetrofitBuilder(isCacheEnable, cacheTimeSeconds)
                 .create(WikiService.class);
     }
 }

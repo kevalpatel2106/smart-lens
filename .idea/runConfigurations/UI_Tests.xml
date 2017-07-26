@@ -42,6 +42,9 @@
     <Profilers>
       <option name="ADVANCED_PROFILING_ENABLED" value="false" />
     </Profilers>
-    <method />
+    <method>
+      <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1501058893601" />
+    </method>
   </configuration>
 </component>

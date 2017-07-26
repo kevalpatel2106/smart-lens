@@ -35,11 +35,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -55,12 +60,11 @@ public class WikiFragmentTest extends BaseTestClass {
     @Rule
     public FragmentTestRule<WikiFragment> mWikiFragmentFragmentTestRule =
             new FragmentTestRule<>(WikiFragment.class);
-    private WikiFragment mWikiFragment;
+    private MockWebServer mMockWebServer;
 
     @Before
     public void init() {
         mWikiFragmentFragmentTestRule.launchActivity(null);
-        mWikiFragment = mWikiFragmentFragmentTestRule.getFragment();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -70,7 +74,7 @@ public class WikiFragmentTest extends BaseTestClass {
     }
 
     @Test
-    public void checkRegistrationWithRxBus() throws Exception {
+    public void checkApiResponse() throws Exception {
         //Generate the mock event
         List<Classifier.Recognition> recognitions = new ArrayList<>();
         Classifier.Recognition mockRecognition = new Classifier.Recognition("1", MOCK_LABEL,
@@ -92,6 +96,38 @@ public class WikiFragmentTest extends BaseTestClass {
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
         Delay.stopDelay();
+    }
+
+    @Test
+    public void checkApiResponseFail() throws Exception {
+        try {
+            mMockWebServer = new MockWebServer();
+            mMockWebServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        WikiRetrofitBuilder.BASE_WIKI_URL = mMockWebServer.url("/").toString();
+        mMockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        //Generate the mock event
+        List<Classifier.Recognition> recognitions = new ArrayList<>();
+        Classifier.Recognition mockRecognition = new Classifier.Recognition("1", MOCK_LABEL,
+                0.56f, null);
+        recognitions.add(mockRecognition);
+        Event event = new Event(new ImageClassifiedEvent(recognitions));
+
+        //Wait for the rx bus to get register after view creation
+        Delay.startDelay(2000);
+        onView(withId(R.id.wiki_page_tv));
+        Delay.stopDelay();
+
+        //Publish it with RxBus
+        RxBus.getDefault().post(event);
+
+        //Check if there are text?
+        onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
+        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
     }
 
     @After

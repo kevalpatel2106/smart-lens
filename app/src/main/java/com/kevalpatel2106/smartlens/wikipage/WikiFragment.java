@@ -122,7 +122,6 @@ public class WikiFragment extends BaseFragment {
                 })
                 .doOnSubscribe(this::addSubscription)
                 .doOnNext(event -> {
-
                     Log.e(TAG, "onViewCreated: " + ((ImageClassifiedEvent) event.getObject())
                             .getRecognitions()
                             .get(0)
@@ -149,7 +148,7 @@ public class WikiFragment extends BaseFragment {
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(this::addSubscription)
-                .doOnNext(responseBody -> {
+                .subscribe(responseBody -> {
                     String responseStr = Utils.getStringFromStream(responseBody.byteStream());
                     JSONObject pagesObj = new JSONObject(responseStr)
                             .getJSONObject("query")
@@ -164,15 +163,11 @@ public class WikiFragment extends BaseFragment {
                         mWikiTextView.setText(wikiPage.getSummaryMessage());
 
                         //Get the image.
-                        getWikiImage(mContext, finalLabel);
+                        WikiFragment.this.getWikiImage(mContext, finalLabel);
                     } else {
                         //TODO Handle no result found
                     }
-                })
-                .doOnError(throwable -> {
-                    Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable));
-                })
-                .subscribe();
+                }, throwable -> Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable)));
     }
 
     void getWikiImage(@NonNull Context context, @NonNull String label) {
@@ -182,26 +177,25 @@ public class WikiFragment extends BaseFragment {
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(this::addSubscription)
-                .doOnNext(responseBody -> {
-                    String responseStr = Utils.getStringFromStream(responseBody.byteStream());
-                    JSONObject pagesObj = new JSONObject(responseStr)
-                            .getJSONObject("query")
-                            .getJSONObject("pages");
-                    String imageUrl = pagesObj
-                            .getJSONObject(pagesObj.names().getString(0))
-                            .getJSONObject("thumbnail")
-                            .getString("original");
+                .subscribe(responseBody -> {
+                            String responseStr = Utils.getStringFromStream(responseBody.byteStream());
+                            JSONObject pagesObj = new JSONObject(responseStr)
+                                    .getJSONObject("query")
+                                    .getJSONObject("pages");
+                            String imageUrl = pagesObj
+                                    .getJSONObject(pagesObj.names().getString(0))
+                                    .getJSONObject("thumbnail")
+                                    .getString("original");
 
-                    Log.d(TAG, "getWikiImage: " + imageUrl);
-                    Glide.with(WikiFragment.this)
-                            .load(imageUrl)
-                            .thumbnail(0.1f)
-                            .into(mWikiImage);
+                            Log.d(TAG, "getWikiImage: " + imageUrl);
+                            Glide.with(WikiFragment.this)
+                                    .load(imageUrl)
+                                    .thumbnail(0.1f)
+                                    .into(mWikiImage);
 
-                })
-                .doOnError(throwable -> {
-                    Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable));
-                })
-                .subscribe();
+                        },
+                        throwable -> {
+                            Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable));
+                        });
     }
 }
