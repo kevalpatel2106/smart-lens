@@ -163,7 +163,7 @@ public class WikiFragment extends BaseFragment {
                         mWikiTextView.setText(wikiPage.getSummaryMessage());
 
                         //Get the image.
-                        WikiFragment.this.getWikiImage(mContext, finalLabel);
+                        getWikiImage(mContext, finalLabel);
                     } else {
                         //TODO Handle no result found
                     }

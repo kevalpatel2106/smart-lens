@@ -16,6 +16,7 @@
 
 package com.kevalpatel2106.smartlens.base;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -91,6 +92,7 @@ public class BaseActivity extends AppCompatActivity {
      * @param title        Activity title string.
      * @param showUpButton true if toolbar should display up indicator.
      */
+    @SuppressLint("RestrictedApi")
     @SuppressWarnings("ConstantConditions")
     protected void setToolbar(@NonNull String title, boolean showUpButton) {
         //set the title

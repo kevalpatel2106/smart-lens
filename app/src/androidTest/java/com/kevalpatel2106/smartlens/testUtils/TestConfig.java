@@ -24,5 +24,6 @@ package com.kevalpatel2106.smartlens.testUtils;
 
 public class TestConfig {
 
-    public static final long DELAY_FOR_API = 15000L;
+    public static final long DELAY_FOR_REAL_API = 15000L;
+    public static final long DELAY_FOR_MOCK_API = 5000L;
 }

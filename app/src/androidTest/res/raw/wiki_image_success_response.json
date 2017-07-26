@@ -1,0 +1,25 @@
+{
+  "batchcomplete": "",
+  "warnings": {
+    "pageimages": {
+      "*": "The original image's source URL is now provided with its dimensions in its own property for the page object. It will be removed from the 'thumbnail' property in a future release."
+    }
+  },
+  "query": {
+    "pages": {
+      "390883": {
+        "pageid": 390883,
+        "ns": 0,
+        "title": "Electric locomotive",
+        "thumbnail": {
+          "original": "https://upload.wikimedia.org/wikipedia/commons/f/f8/87030_%27Black_Douglas%27_at_Carlisle.jpg"
+        },
+        "original": {
+          "source": "https://upload.wikimedia.org/wikipedia/commons/f/f8/87030_%27Black_Douglas%27_at_Carlisle.jpg",
+          "width": 2048,
+          "height": 1536
+        }
+      }
+    }
+  }
+}

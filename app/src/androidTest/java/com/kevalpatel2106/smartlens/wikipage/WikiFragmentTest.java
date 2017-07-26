@@ -17,6 +17,9 @@
 package com.kevalpatel2106.smartlens.wikipage;
 
 import android.app.Activity;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.assertion.ViewAssertions;
 
 import com.kevalpatel2106.smartlens.R;
@@ -35,7 +38,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +52,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval Patel on 23/07/17.
@@ -60,7 +67,31 @@ public class WikiFragmentTest extends BaseTestClass {
     @Rule
     public FragmentTestRule<WikiFragment> mWikiFragmentFragmentTestRule =
             new FragmentTestRule<>(WikiFragment.class);
-    private MockWebServer mMockWebServer;
+
+    private static String getStringFromInputStream(InputStream is) {
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        try {
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sb.toString();
+    }
 
     @Before
     public void init() {
@@ -74,23 +105,17 @@ public class WikiFragmentTest extends BaseTestClass {
     }
 
     @Test
-    public void checkApiResponse() throws Exception {
-        //Generate the mock event
-        List<Classifier.Recognition> recognitions = new ArrayList<>();
-        Classifier.Recognition mockRecognition = new Classifier.Recognition("1", MOCK_LABEL,
-                0.56f, null);
-        recognitions.add(mockRecognition);
-        Event event = new Event(new ImageClassifiedEvent(recognitions));
-
+    public void checkRealApiResponse() throws Exception {
+        WikiRetrofitBuilder.BASE_WIKI_URL = "https://en.wikipedia.org/w/";
         //Wait for the rx bus to get register after view creation
         Delay.startDelay(1000);
         onView(withId(R.id.wiki_page_tv));
 
         //Publish it with RxBus
-        RxBus.getDefault().post(event);
+        RxBus.getDefault().post(generateMockLabelsEvent());
 
         //Wait for the api call
-        Delay.startDelay(TestConfig.DELAY_FOR_API);
+        Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
 
         //Check if there are text?
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
@@ -99,35 +124,157 @@ public class WikiFragmentTest extends BaseTestClass {
     }
 
     @Test
-    public void checkApiResponseFail() throws Exception {
-        try {
-            mMockWebServer = new MockWebServer();
-            mMockWebServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        WikiRetrofitBuilder.BASE_WIKI_URL = mMockWebServer.url("/").toString();
-        mMockWebServer.enqueue(new MockResponse().setResponseCode(500));
-
-        //Generate the mock event
-        List<Classifier.Recognition> recognitions = new ArrayList<>();
-        Classifier.Recognition mockRecognition = new Classifier.Recognition("1", MOCK_LABEL,
-                0.56f, null);
-        recognitions.add(mockRecognition);
-        Event event = new Event(new ImageClassifiedEvent(recognitions));
+    public void checkInfoFoundApiResponse() throws Exception {
+        MockWebServer mockWebServer = startMockWebServer();
+        //Success response for the info api
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
+                        com.kevalpatel2106.smartlens.test.R.raw.wiki_info_success_response)));
+        //Success response for the image api.
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
+                        com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
 
         //Wait for the rx bus to get register after view creation
-        Delay.startDelay(2000);
+        Delay.startDelay(1000);
         onView(withId(R.id.wiki_page_tv));
-        Delay.stopDelay();
 
         //Publish it with RxBus
-        RxBus.getDefault().post(event);
+        RxBus.getDefault().post(generateMockLabelsEvent());
+
+        //Wait for mock api
+        Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
+
+        //Check if there are text?
+        onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
+        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
+
+        Delay.stopDelay();
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    public void checkInfoNotFoundApiResponse() throws Exception {
+        MockWebServer mockWebServer = startMockWebServer();
+        //Success response for the info api
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
+                        com.kevalpatel2106.smartlens.test.R.raw.wiki_info_not_found_success_response)));
+        //Success response for the image api.
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
+                        com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
+
+        //Wait for the rx bus to get register after view creation
+        Delay.startDelay(1000);
+        onView(withId(R.id.wiki_page_tv));
+
+        //Publish it with RxBus
+        RxBus.getDefault().post(generateMockLabelsEvent());
+
+        //Wait for mock api
+        Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
         //Check if there are text?
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
+
+        Delay.stopDelay();
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    public void checkInfoApiResponseFail() throws Exception {
+        MockWebServer mockWebServer = startMockWebServer();
+        //Fail response for the info api.
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        //Success response for the image api.
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
+                        com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
+
+        //Wait for the rx bus to get register after view creation
+        Delay.startDelay(1000);
+        onView(withId(R.id.wiki_page_tv));
+
+        //Publish it with RxBus
+        RxBus.getDefault().post(generateMockLabelsEvent());
+
+        //Wait for mock api
+        Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
+
+        //Check if there are text?
+        onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
+        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
+
+        Delay.stopDelay();
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    public void checkImageApiResponseFail() throws Exception {
+        MockWebServer mockWebServer = startMockWebServer();
+        //Success response for the info api
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
+                        com.kevalpatel2106.smartlens.test.R.raw.wiki_info_success_response)));
+        //Fail response for the image api.
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        //Wait for the rx bus to get register after view creation
+        Delay.startDelay(1000);
+        onView(withId(R.id.wiki_page_tv));
+
+        //Publish it with RxBus
+        RxBus.getDefault().post(generateMockLabelsEvent());
+
+        //Wait for mock api
+        Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
+
+        //Check if there are text?
+        onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
+        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
+
+        Delay.stopDelay();
+        mockWebServer.shutdown();
+    }
+
+    /**
+     * Start mock web server for the wikipedia api.
+     *
+     * @return {@link MockWebServer}
+     */
+    private MockWebServer startMockWebServer() {
+        try {
+            MockWebServer mockWebServer = new MockWebServer();
+            mockWebServer.start();
+            WikiRetrofitBuilder.BASE_WIKI_URL = mockWebServer.url("/").toString();
+            return mockWebServer;
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Failed to start mock server.");
+            throw new RuntimeException("Failed to start mock server.");
+        }
+    }
+
+    private String getStringFromFile(Context context, int filename) {
+        return getStringFromInputStream(context.getResources().openRawResource(filename));
+
+    }
+
+    @NonNull
+    private Event generateMockLabelsEvent() {
+        List<Classifier.Recognition> recognitions = new ArrayList<>();
+        Classifier.Recognition mockRecognition = new Classifier.Recognition("1", MOCK_LABEL,
+                0.56f, null);
+        recognitions.add(mockRecognition);
+        return new Event(new ImageClassifiedEvent(recognitions));
     }
 
     @After
