@@ -36,8 +36,8 @@ public class WikiFragmentUnitTest {
         assertFalse(WikiFragment.isValidSummary(null, null));
         assertFalse(WikiFragment.isValidSummary(null, "abcdefghijklmnopqrstuvwxyz1234567890"));
         assertFalse(WikiFragment.isValidSummary("xyz", ""));
-        assertFalse(WikiFragment.isValidSummary("xyz", "xyz  may refer to:"));
-        assertFalse(WikiFragment.isValidSummary("xyz", "xyz  may refer to: "));
+        assertFalse(WikiFragment.isValidSummary("xyz", "xyz may refer to:"));
+        assertFalse(WikiFragment.isValidSummary("xyz", "xyz may refer to: "));
         assertTrue(WikiFragment.isValidSummary("xyz", "abcdefghijklmnopqrstuvwxyz1234567890"));
     }
 
@@ -46,8 +46,7 @@ public class WikiFragmentUnitTest {
     @Test
     public void checkWikiLabel() {
         assertFalse(WikiFragment.generateWikiLabel("computer keyboard").contains("\\s"));
-        assertFalse(WikiFragment.generateWikiLabel("computer keyboard").equals("Computer keyboard"));
-        assertFalse(WikiFragment.generateWikiLabel("computer keyboard").substring(0, 1).equals("C"));
+        assertFalse(WikiFragment.generateWikiLabel("computer keyboard").equals("Computer_keyboard"));
 
         try {
             WikiFragment.generateWikiLabel(null);
