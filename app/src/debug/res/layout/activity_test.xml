@@ -15,13 +15,18 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.kevalpatel2106.smartlens">
+<!--Created by Keval Patel. Author: 'https://github.com/kevalpatel2106' -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <application>
-        <activity
-            android:name=".TestActivity"
-            android:theme="@style/AppTheme.NoActionbar"/>
-    </application>
+    <include layout="@layout/layout_simple_toolbar"/>
 
-</manifest>
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

@@ -39,6 +39,7 @@ import io.reactivex.disposables.Disposable;
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
 
+@SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity {
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
@@ -124,6 +125,11 @@ public class BaseActivity extends AppCompatActivity {
     protected void addSubscription(@Nullable Disposable disposable) {
         if (disposable == null) return;
         mCompositeDisposable.add(disposable);
+    }
+
+    @NonNull
+    public CompositeDisposable getDisposables() {
+        return mCompositeDisposable;
     }
 
     @Override
