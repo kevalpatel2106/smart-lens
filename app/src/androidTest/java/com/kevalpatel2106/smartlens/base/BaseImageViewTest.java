@@ -14,39 +14,30 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.camera.config;
+package com.kevalpatel2106.smartlens.base;
 
 import android.app.Activity;
+import android.support.test.InstrumentationRegistry;
 
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Test;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import static org.junit.Assert.fail;
 
 /**
- * Created by Keval on 22-Jul-17.
+ * Created by Keval on 26-Jul-17.
  */
-public class CameraResolutionTest extends BaseTestClass {
+public class BaseImageViewTest extends BaseTestClass {
 
     @Test
-    public void canInitiate() throws Exception {
+    public void canInitialize() throws Exception {
         try {
-            Class<?> c = Class.forName("CameraResolution");
-            Constructor constructor = c.getDeclaredConstructors()[0];
-            constructor.newInstance();
-            fail("Should have thrown Arithmetic exception");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            new BaseImageView(InstrumentationRegistry.getTargetContext());
+            new BaseImageView(InstrumentationRegistry.getTargetContext(), null);
+            new BaseImageView(InstrumentationRegistry.getTargetContext(), null, 1);
+        } catch (Exception e) {
+            fail();
         }
     }
 

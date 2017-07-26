@@ -43,6 +43,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public abstract class BaseRetrofitBuilder {
+    public static final String GENERALIZE_ERROR = "Something went wrong.";
+    public static final String INTERNET_NOT_AVAILABLE_ERROR = "Internet is not available. Please try again.";
 
     private final Context mContext;
 
@@ -52,6 +54,25 @@ public abstract class BaseRetrofitBuilder {
             throw new IllegalArgumentException("Cannot be null.");
 
         mContext = context;
+    }
+
+    /**
+     * Get the error message from the {@link Throwable}.
+     *
+     * @param throwable {@link Throwable}
+     * @return Error message.
+     */
+    public static String getErrorMessage(@NonNull Throwable throwable) {
+        try {
+            if (throwable instanceof HttpException) { //Error frm the server.
+                return GENERALIZE_ERROR;
+            } else if (throwable instanceof IOException) {  //Internet not available.
+                return INTERNET_NOT_AVAILABLE_ERROR;
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return throwable.getMessage();
     }
 
     private OkHttpClient buildHttpClient(@NonNull Context context,
@@ -87,25 +108,6 @@ public abstract class BaseRetrofitBuilder {
     }
 
     protected abstract String getBaseUrl();
-
-    /**
-     * Get the error message from the {@link Throwable}.
-     *
-     * @param throwable {@link Throwable}
-     * @return Error message.
-     */
-    public String getErrorMessage(@NonNull Throwable throwable) {
-        try {
-            if (throwable instanceof HttpException) { //Error frm the server.
-                return "Something went wrong.";
-            } else if (throwable instanceof IOException) {  //Internet not available.
-                return "Internet is not available. Please try again.";
-            }
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return throwable.getMessage();
-    }
 
     private class CacheInterceptor implements Interceptor {
         static final int CACHE_SIZE = 5242880;          //5 MB //Cache size.

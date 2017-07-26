@@ -16,32 +16,44 @@
 
 package com.kevalpatel2106.smartlens.base;
 
+import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Before;
+import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 20-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
-public class BaseViewPagerTest {
-    private BaseViewPager mBaseViewPager;
+public class BaseViewPagerTest extends BaseTestClass {
 
-    @Before
-    public void init() throws Exception {
-        mBaseViewPager = new BaseViewPager(InstrumentationRegistry.getTargetContext());
+    @Test
+    public void canInitialize() throws Exception {
+        try {
+            new BaseViewPager(InstrumentationRegistry.getTargetContext());
+            new BaseViewPager(InstrumentationRegistry.getTargetContext(), null);
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test
     public void setSwipeGestureEnable() throws Exception {
-        mBaseViewPager.setSwipeGestureEnable(false);
-        assertTrue(!mBaseViewPager.onInterceptTouchEvent(null));
-        assertTrue(!mBaseViewPager.onTouchEvent(null));
+        BaseViewPager baseViewPager = new BaseViewPager(InstrumentationRegistry.getTargetContext());
+        baseViewPager.setSwipeGestureEnable(false);
+        assertTrue(!baseViewPager.onInterceptTouchEvent(null));
+        assertTrue(!baseViewPager.onTouchEvent(null));
     }
 
+    @Override
+    public Activity getActivity() {
+        return null;
+    }
 }

@@ -16,57 +16,71 @@
 
 package com.kevalpatel2106.smartlens.base;
 
+import android.app.Activity;
 import android.graphics.Typeface;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Before;
+import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 20-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
-public class BaseButtonTest {
-    private BaseButton mBaseButton;
+public class BaseButtonTest extends BaseTestClass {
 
-    @Before
-    public void setUp() throws Exception {
-        mBaseButton = new BaseButton(InstrumentationRegistry.getTargetContext());
+    @Test
+    public void canInitialize() throws Exception {
+        try {
+            new BaseButton(InstrumentationRegistry.getTargetContext());
+            new BaseButton(InstrumentationRegistry.getTargetContext(), null);
+            new BaseButton(InstrumentationRegistry.getTargetContext(), null, 1);
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test
     public void testGetFont() throws Exception {
+        BaseButton baseButton = new BaseButton(InstrumentationRegistry.getTargetContext());
+
         //Test with null typeface
-        mBaseButton.setTypeface(null, Typeface.NORMAL);
-        assertEquals(mBaseButton.getFont(mBaseButton.getTypeface()),
+        baseButton.setTypeface(null, Typeface.NORMAL);
+        assertEquals(baseButton.getFont(baseButton.getTypeface()),
                 String.format(Locale.US, "fonts/%s", "OpenSans-Regular.ttf"));
 
         //Test with bold typeface
-        mBaseButton.setTypeface(null, Typeface.BOLD);
-        assertEquals(mBaseButton.getFont(mBaseButton.getTypeface()),
+        baseButton.setTypeface(null, Typeface.BOLD);
+        assertEquals(baseButton.getFont(baseButton.getTypeface()),
                 String.format(Locale.US, "fonts/%s", "OpenSans-Bold.ttf"));
 
         //Test with italic typeface
-        mBaseButton.setTypeface(null, Typeface.ITALIC);
-        assertEquals(mBaseButton.getFont(mBaseButton.getTypeface()),
+        baseButton.setTypeface(null, Typeface.ITALIC);
+        assertEquals(baseButton.getFont(baseButton.getTypeface()),
                 String.format(Locale.US, "fonts/%s", "OpenSans-Italic.ttf"));
 
         //Test with italic typeface
-        mBaseButton.setTypeface(null, Typeface.BOLD_ITALIC);
-        assertEquals(mBaseButton.getFont(mBaseButton.getTypeface()),
+        baseButton.setTypeface(null, Typeface.BOLD_ITALIC);
+        assertEquals(baseButton.getFont(baseButton.getTypeface()),
                 String.format(Locale.US, "fonts/%s", "OpenSans-BoldItalic.ttf"));
 
 
         //check with null typeface
-        mBaseButton.setTypeface(null);
-        assertEquals(mBaseButton.getFont(mBaseButton.getTypeface()),
+        baseButton.setTypeface(null);
+        assertEquals(baseButton.getFont(baseButton.getTypeface()),
                 String.format(Locale.US, "fonts/%s", "OpenSans-Regular.ttf"));
     }
 
+    @Override
+    public Activity getActivity() {
+        return null;
+    }
 }

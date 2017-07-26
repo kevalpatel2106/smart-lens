@@ -31,6 +31,7 @@ import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 19-Jul-17.
@@ -42,6 +43,17 @@ public final class BaseTextViewTest extends BaseTestClass {
     @Before
     public void init() throws Exception {
         mBaseTextView = new BaseTextView(InstrumentationRegistry.getTargetContext());
+    }
+
+    @Test
+    public void canInitialize() throws Exception {
+        try {
+            new BaseTextView(InstrumentationRegistry.getTargetContext());
+            new BaseTextView(InstrumentationRegistry.getTargetContext(), null);
+            new BaseTextView(InstrumentationRegistry.getTargetContext(), null, 1);
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test

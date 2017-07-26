@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 public class CameraImageFormatTest extends BaseTestClass {
 
     @Test
-    public void canInitiate() {
+    public void canInitiate() throws Exception {
         try {
             Class<?> c = Class.forName("CameraImageFormat");
             Constructor constructor = c.getDeclaredConstructors()[0];

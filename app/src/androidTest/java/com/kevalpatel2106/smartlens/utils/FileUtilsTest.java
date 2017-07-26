@@ -47,7 +47,7 @@ public final class FileUtilsTest extends BaseTestClass {
     }
 
     @Test
-    public void canInitiate() {
+    public void canInitiate() throws Exception {
         try {
             Class<?> c = Class.forName("FileUtils");
             Constructor constructor = c.getDeclaredConstructors()[0];

@@ -31,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
 import com.kevalpatel2106.smartlens.base.BaseImageView;
+import com.kevalpatel2106.smartlens.base.BaseRetrofitBuilder;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
 import com.kevalpatel2106.smartlens.utils.Utils;
@@ -167,7 +168,7 @@ public class WikiFragment extends BaseFragment {
                     } else {
                         //TODO Handle no result found
                     }
-                }, throwable -> Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable)));
+                }, throwable -> Log.d(TAG, "accept: " + BaseRetrofitBuilder.getErrorMessage(throwable)));
     }
 
     void getWikiImage(@NonNull Context context, @NonNull String label) {
@@ -195,7 +196,7 @@ public class WikiFragment extends BaseFragment {
 
                         },
                         throwable -> {
-                            Log.d(TAG, "accept: " + wikiRetrofitBuilder.getErrorMessage(throwable));
+                            Log.d(TAG, "accept: " + BaseRetrofitBuilder.getErrorMessage(throwable));
                         });
     }
 }

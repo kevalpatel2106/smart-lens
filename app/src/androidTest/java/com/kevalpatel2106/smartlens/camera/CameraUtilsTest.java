@@ -45,7 +45,7 @@ import static org.junit.Assert.fail;
 public final class CameraUtilsTest extends BaseTestClass {
 
     @Test
-    public void canInitiate() {
+    public void canInitiate() throws Exception {
         try {
             Class<?> c = Class.forName("CameraUtils");
             Constructor constructor = c.getDeclaredConstructors()[0];

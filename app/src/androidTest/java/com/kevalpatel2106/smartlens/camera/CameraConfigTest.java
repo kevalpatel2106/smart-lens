@@ -53,7 +53,7 @@ public final class CameraConfigTest extends BaseTestClass {
     }
 
     @Test
-    public void canInitiate() {
+    public void canInitiate() throws Exception {
         assertNotNull(mBuilder);
         assertNotNull(mBuilder.build());
     }

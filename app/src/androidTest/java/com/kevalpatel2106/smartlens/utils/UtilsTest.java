@@ -37,7 +37,7 @@ import static org.junit.Assert.fail;
 @RunWith(AndroidJUnit4.class)
 public final class UtilsTest extends BaseTestClass {
     @Test
-    public void canInitiate() {
+    public void canInitiate() throws Exception {
         try {
             Class<?> c = Class.forName("Utils");
             Constructor constructor = c.getDeclaredConstructors()[0];

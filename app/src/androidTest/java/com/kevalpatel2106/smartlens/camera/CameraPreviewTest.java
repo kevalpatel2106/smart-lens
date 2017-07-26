@@ -40,7 +40,7 @@ public class CameraPreviewTest extends BaseTestClass {
 
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void canInitiate() {
+    public void canInitiate() throws Exception {
         new Handler(Looper.getMainLooper()).post(() -> {
             CameraPreview cameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     new CameraCallbacks() {
@@ -67,7 +67,7 @@ public class CameraPreviewTest extends BaseTestClass {
 
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void canClose() {
+    public void canClose() throws Exception {
         new Handler(Looper.getMainLooper()).post(() -> {
             CameraPreview cameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     new CameraCallbacks() {
