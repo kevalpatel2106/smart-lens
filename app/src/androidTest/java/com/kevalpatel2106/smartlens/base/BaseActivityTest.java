@@ -120,7 +120,7 @@ public class BaseActivityTest extends BaseTestClass {
         });
 
         //Allow keyboard to open.
-        Delay.startDelay(1500);
+        Delay.startDelay(5000);
         Espresso.onView(withContentDescription("Navigate up")).perform(click());
         Delay.stopDelay();
 
