@@ -17,14 +17,10 @@
 package com.kevalpatel2106.smartlens.base;
 
 import android.app.Activity;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.TestActivity;
@@ -45,7 +41,6 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
  * Created by Keval on 26-Jul-17.
@@ -100,17 +95,17 @@ public class BaseActivityTest extends BaseTestClass {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkHomeButton() throws Exception {
-        // Add a view to focus
-        EditText editText = new EditText(mTestActivity);
-        editText.setText("This is test.");
-        editText.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            FrameLayout frameLayout = mTestActivity.findViewById(R.id.container);
-            frameLayout.addView(editText);
-        });
-        Espresso.onView(withText("This is test.")).perform(click());
+//        // Add a view to focus
+//        EditText editText = new EditText(mTestActivity);
+//        editText.setText("This is test.");
+//        editText.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//
+//        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+//            FrameLayout frameLayout = mTestActivity.findViewById(R.id.container);
+//            frameLayout.addView(editText);
+//        });
+//        Espresso.onView(withText("This is test.")).perform(click());
 
         //Allow keyboard to open.
         Delay.startDelay(5000);
