@@ -25,6 +25,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.base.MainThread;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.LargeTest;
@@ -79,19 +80,22 @@ public class CameraPreviewTest extends BaseTestClass {
     @MainThread
     public void launchCameraPreview(@NonNull CameraCallbacks cameraCallbacks,
                                     @NonNull CameraConfig cameraConfig) {
-        FrameLayout frameLayout = mActivityTestRule.getActivity().findViewById(R.id.container);
-        frameLayout.removeAllViews();
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            FrameLayout frameLayout = mActivityTestRule.getActivity().findViewById(R.id.container);
+            frameLayout.removeAllViews();
 
-        //Add the camera preview.
-        mCameraPreview = new CameraPreview(getActivity(), cameraCallbacks);
-        mCameraPreview.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        frameLayout.addView(mCameraPreview);
+            //Add the camera preview.
+            mCameraPreview = new CameraPreview(getActivity(), cameraCallbacks);
+            mCameraPreview.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            frameLayout.addView(mCameraPreview);
 
-        mCameraPreview.startCamera(cameraConfig);
+            mCameraPreview.startCamera(cameraConfig);
+        });
 
-        Delay.startDelay(3000);
-        Espresso.onView(ViewMatchers.withId(R.id.container));
+        //Wait for the camera to start
+        Delay.startDelay(2800);
+        Espresso.onView(ViewMatchers.withId(R.id.toolbar)).perform(ViewActions.click());
         Delay.stopDelay();
     }
 
@@ -109,119 +113,107 @@ public class CameraPreviewTest extends BaseTestClass {
             } catch (IllegalArgumentException e) {
                 //success
             }
-
-            cameraPreview.stopPreviewAndReleaseCamera();
         });
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test
     public void canClose() throws Exception {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            launchCameraPreview(mMockCallbacks, new CameraConfig());
+        launchCameraPreview(mMockCallbacks, new CameraConfig());
 
-            try {
-                mCameraPreview.stopPreviewAndReleaseCamera();
-                assertFalse(mCameraPreview.isCameraOpen());
-            } catch (Exception e) {
-                fail("Cannot close the camera.");
-            }
-        });
+        try {
+            mCameraPreview.stopPreviewAndReleaseCamera();
+            assertFalse(mCameraPreview.isCameraOpen());
+        } catch (Exception e) {
+            fail("Cannot close the camera.");
+        }
     }
 
     @SuppressLint("WrongConstant")
     @Test
     public void checkPictureSize() throws Exception {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            launchCameraPreview(mMockCallbacks, new CameraConfig());
+        launchCameraPreview(mMockCallbacks, new CameraConfig());
 
-            List<Camera.Size> pictureSizes = mCameraPreview.getCamera()
-                    .getParameters()
-                    .getSupportedPictureSizes();
+        List<Camera.Size> pictureSizes = mCameraPreview.getCamera()
+                .getParameters()
+                .getSupportedPictureSizes();
 
-            //Check for the high res
-            assertEquals(mCameraPreview.getValidPictureSize(pictureSizes,
-                    CameraResolution.HIGH_RESOLUTION), pictureSizes.get(0));
+        //Check for the high res
+        assertEquals(mCameraPreview.getValidPictureSize(pictureSizes,
+                CameraResolution.HIGH_RESOLUTION), pictureSizes.get(0));
 
-            //Check for the medium res
-            assertEquals(mCameraPreview.getValidPictureSize(pictureSizes,
-                    CameraResolution.MEDIUM_RESOLUTION), pictureSizes.get(pictureSizes.size() / 2));
+        //Check for the medium res
+        assertEquals(mCameraPreview.getValidPictureSize(pictureSizes,
+                CameraResolution.MEDIUM_RESOLUTION), pictureSizes.get(pictureSizes.size() / 2));
 
-            //Check for the low res
-            assertEquals(mCameraPreview.getValidPictureSize(pictureSizes,
-                    CameraResolution.LOW_RESOLUTION), pictureSizes.get(pictureSizes.size() - 1));
+        //Check for the low res
+        assertEquals(mCameraPreview.getValidPictureSize(pictureSizes,
+                CameraResolution.LOW_RESOLUTION), pictureSizes.get(pictureSizes.size() - 1));
 
-            //Check for invalid resolution
-            try {
-                mCameraPreview.getValidPictureSize(pictureSizes, 123);
-                fail();
-            } catch (IllegalArgumentException e) {
-                //Pass
-            }
+        //Check for invalid resolution
+        try {
+            mCameraPreview.getValidPictureSize(pictureSizes, 123);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
 
-            //Check for empty supported picture sizes
-            try {
-                pictureSizes.clear();
-                mCameraPreview.getValidPictureSize(pictureSizes, 123);
-                fail();
-            } catch (IllegalArgumentException e) {
-                //Pass
-            }
-        });
+        //Check for empty supported picture sizes
+        try {
+            pictureSizes.clear();
+            mCameraPreview.getValidPictureSize(pictureSizes, 123);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
     }
 
     @Test
     public void checkPreviewSize() throws Exception {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            launchCameraPreview(mMockCallbacks, new CameraConfig());
+        launchCameraPreview(mMockCallbacks, new CameraConfig());
 
-            List<Camera.Size> previewSizes = mCameraPreview.getCamera()
-                    .getParameters()
-                    .getSupportedPreviewSizes();
+        List<Camera.Size> previewSizes = mCameraPreview.getCamera()
+                .getParameters()
+                .getSupportedPreviewSizes();
 
-            //Check for empty supported picture sizes
-            try {
-                previewSizes.clear();
-                mCameraPreview.getValidPreviewSize(previewSizes);
-                fail();
-            } catch (IllegalArgumentException e) {
-                //Pass
-            }
-        });
+        //Check for empty supported picture sizes
+        try {
+            previewSizes.clear();
+            mCameraPreview.getValidPreviewSize(previewSizes);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
     }
 
     @SuppressLint("WrongConstant")
     @Test
     public void checkFlashMode() throws Exception {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            launchCameraPreview(mMockCallbacks, new CameraConfig());
+        launchCameraPreview(mMockCallbacks, new CameraConfig());
 
-            Camera.Parameters parameters = mCameraPreview.getCamera().getParameters();
+        Camera.Parameters parameters = mCameraPreview.getCamera().getParameters();
 
-            if (parameters.getSupportedFlashModes() == null)
-                assertEquals(mCameraPreview.getFlashMode(parameters), null);
-            else if (parameters.getSupportedFlashModes().contains(Camera.Parameters.FLASH_MODE_AUTO))
-                assertEquals(mCameraPreview.getFlashMode(parameters), Camera.Parameters.FLASH_MODE_AUTO);
-            else
-                assertEquals(mCameraPreview.getFlashMode(parameters), Camera.Parameters.FLASH_MODE_ON);
-        });
+        if (parameters.getSupportedFlashModes() == null)
+            assertEquals(mCameraPreview.getFlashMode(parameters), null);
+        else if (parameters.getSupportedFlashModes().contains(Camera.Parameters.FLASH_MODE_AUTO))
+            assertEquals(mCameraPreview.getFlashMode(parameters), Camera.Parameters.FLASH_MODE_AUTO);
+        else
+            assertEquals(mCameraPreview.getFlashMode(parameters), Camera.Parameters.FLASH_MODE_ON);
     }
 
     @SuppressLint("WrongConstant")
     @Test
     public void checkFocusMode() throws Exception {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            launchCameraPreview(mMockCallbacks, new CameraConfig());
+        launchCameraPreview(mMockCallbacks, new CameraConfig());
 
-            Camera.Parameters parameters = mCameraPreview.getCamera().getParameters();
+        Camera.Parameters parameters = mCameraPreview.getCamera().getParameters();
 
-            if (parameters.getSupportedFocusModes() == null)
-                assertEquals(mCameraPreview.getFocusMode(parameters), null);
-            else if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
-                assertEquals(mCameraPreview.getFocusMode(parameters), Camera.Parameters.FOCUS_MODE_AUTO);
-            else
-                assertEquals(mCameraPreview.getFocusMode(parameters), null);
-        });
+        if (parameters.getSupportedFocusModes() == null)
+            assertEquals(mCameraPreview.getFocusMode(parameters), null);
+        else if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
+            assertEquals(mCameraPreview.getFocusMode(parameters), Camera.Parameters.FOCUS_MODE_AUTO);
+        else
+            assertEquals(mCameraPreview.getFocusMode(parameters), null);
     }
 
     @Override

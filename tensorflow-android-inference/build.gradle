@@ -54,6 +54,13 @@ android {
     }
 }
 
+// Test Logging
+tasks.withType(Test) {
+    testLogging {
+        events "started", "passed", "skipped", "failed"
+    }
+}
+
 dependencies {
     //Testing
     testImplementation testLib.junit

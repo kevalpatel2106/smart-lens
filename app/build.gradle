@@ -125,6 +125,13 @@ afterEvaluate {
     }
 }
 
+// Test Logging
+tasks.withType(Test) {
+    testLogging {
+        events "started", "passed", "skipped", "failed"
+    }
+}
+
 dependencies {
     implementation project(':tensorflow-android-inference')
     implementation ide.kotlin
