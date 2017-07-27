@@ -99,7 +99,7 @@ public class BaseActivityTest extends BaseTestClass {
 
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void checkHomeButton() {
+    public void checkHomeButton() throws Exception {
         // Add a view to focus
         EditText editText = new EditText(mTestActivity);
         editText.setText("This is test.");
@@ -114,7 +114,7 @@ public class BaseActivityTest extends BaseTestClass {
 
         //Allow keyboard to open.
         Delay.startDelay(5000);
-        Espresso.onView(withContentDescription("Navigate up")).perform(click());
+        Espresso.onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
         Delay.stopDelay();
 
         //Check if the activity is destroying?
