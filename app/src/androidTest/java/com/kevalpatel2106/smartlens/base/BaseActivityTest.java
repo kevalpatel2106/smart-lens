@@ -17,14 +17,12 @@
 package com.kevalpatel2106.smartlens.base;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
@@ -47,6 +45,7 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
  * Created by Keval on 26-Jul-17.
@@ -101,31 +100,22 @@ public class BaseActivityTest extends BaseTestClass {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkHomeButton() {
-        //Open the keyboard.
-        InputMethodManager imm = (InputMethodManager) mTestActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            // Add a view to focus
-            EditText editText = new EditText(mTestActivity);
-            editText.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
+        // Add a view to focus
+        EditText editText = new EditText(mTestActivity);
+        editText.setText("This is test.");
+        editText.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
 
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             FrameLayout frameLayout = mTestActivity.findViewById(R.id.container);
             frameLayout.addView(editText);
-
-            editText.requestFocus();
-
-            //Open keyboard forcefully
-            imm.toggleSoftInputFromWindow(editText.getWindowToken(),
-                    InputMethodManager.SHOW_FORCED, 0);
         });
+        Espresso.onView(withText("This is test.")).perform(click());
 
         //Allow keyboard to open.
         Delay.startDelay(5000);
         Espresso.onView(withContentDescription("Navigate up")).perform(click());
         Delay.stopDelay();
-
-        //Check if keyboard is closed.
-        Assert.assertFalse(imm.isAcceptingText());
 
         //Check if the activity is destroying?
         Assert.assertTrue(mTestActivity.isFinishing());
