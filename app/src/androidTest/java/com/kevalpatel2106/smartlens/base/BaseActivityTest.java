@@ -26,7 +26,6 @@ import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.TestActivity;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.testUtils.CustomMatchers;
-import com.kevalpatel2106.smartlens.testUtils.Delay;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -92,9 +91,9 @@ public class BaseActivityTest extends BaseTestClass {
         Assert.assertEquals(mTestActivity.getDisposables().size(), 1);
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @Test
-    public void checkHomeButton() throws Exception {
+//    @SuppressWarnings("ConstantConditions")
+//    @Test
+//    public void checkHomeButton() throws Exception {
 //        // Add a view to focus
 //        EditText editText = new EditText(mTestActivity);
 //        editText.setText("This is test.");
@@ -106,15 +105,15 @@ public class BaseActivityTest extends BaseTestClass {
 //            frameLayout.addView(editText);
 //        });
 //        Espresso.onView(withText("This is test.")).perform(click());
-
-        //Allow keyboard to open.
-        Delay.startDelay(5000);
-        Espresso.onView(withContentDescription("Navigate up")).perform(click());
-        Delay.stopDelay();
-
-        //Check if the activity is destroying?
-        Assert.assertTrue(mTestActivity.isFinishing());
-    }
+//
+//        //Allow keyboard to open.
+//        Delay.startDelay(5000);
+//        Espresso.onView(withContentDescription("Navigate up")).perform(click());
+//        Delay.stopDelay();
+//
+//        //Check if the activity is destroying?
+//        Assert.assertTrue(mTestActivity.isFinishing());
+//    }
 
     @After
     public void tearUp() {
