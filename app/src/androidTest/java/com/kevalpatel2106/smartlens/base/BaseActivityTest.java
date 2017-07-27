@@ -109,7 +109,7 @@ public class BaseActivityTest extends BaseTestClass {
 
         //Allow keyboard to open.
         Delay.startDelay(5000);
-        Espresso.onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+        Espresso.onView(withContentDescription("Navigate up")).perform(click());
         Delay.stopDelay();
 
         //Check if the activity is destroying?
