@@ -22,6 +22,7 @@ import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -87,6 +88,10 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         mHolder = getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    }
+
+    Camera getCamera() {
+        return mCamera;
     }
 
     @Override
@@ -186,21 +191,14 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      * @return True if the camera opened successfully else false.
      */
     private boolean safeCameraOpen(int cameraFacing) {
-        try {
-            //Stop the camera first to be safe.
-            stopPreviewAndReleaseCamera();
+        //Stop the camera first to be safe.
+        stopPreviewAndReleaseCamera();
 
-            //Try to open  the camera
-            mCamera = Camera.open(cameraFacing);
+        //Try to open  the camera
+        mCamera = Camera.open(cameraFacing);
 
-            //All good. Camera opened.
-            return mCamera != null;
-        } catch (Exception e) {
-            //Exception occurred.
-            Log.e(TAG, "safeCameraOpen: ");
-            e.printStackTrace();
-        }
-        return false;
+        //All good. Camera opened.
+        return mCamera != null;
     }
 
     /**
@@ -238,8 +236,8 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      * @return Supported image.
      */
     @NonNull
-    private Camera.Size getValidPictureSize(@NonNull List<Camera.Size> pictureSizes,
-                                            @CameraResolution.SupportedResolution int cameraQuality) {
+    Camera.Size getValidPictureSize(@NonNull List<Camera.Size> pictureSizes,
+                                    @CameraResolution.SupportedResolution int cameraQuality) {
         if (pictureSizes.isEmpty())
             throw new IllegalArgumentException("Picture sizes cannot be null.");
 
@@ -251,7 +249,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             case CameraResolution.LOW_RESOLUTION:
                 return pictureSizes.get(pictureSizes.size() - 1);       //Lowest res
             default:
-                throw new IllegalStateException("Invalid camera resolution.");
+                throw new IllegalArgumentException("Invalid camera resolution.");
         }
     }
 
@@ -263,7 +261,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
      * @return Supported image.
      */
     @NonNull
-    private Camera.Size getValidPreviewSize(@NonNull List<Camera.Size> previewSizes) {
+    Camera.Size getValidPreviewSize(@NonNull List<Camera.Size> previewSizes) {
         if (previewSizes.isEmpty())
             throw new IllegalArgumentException("Picture sizes cannot be null.");
 
@@ -306,6 +304,23 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         return optimalSize == null ? previewSizes.get(0) : optimalSize;
     }
 
+    @Nullable
+    String getFocusMode(Camera.Parameters parameters) {
+        List<String> focusModes = parameters.getSupportedFocusModes();
+        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
+            return (Camera.Parameters.FOCUS_MODE_AUTO);
+        return null;
+    }
+
+    @Nullable
+    String getFlashMode(Camera.Parameters parameters) {
+        List<String> flashModes = parameters.getSupportedFlashModes();
+        if (flashModes != null) //If the camera has auto focus...
+            return flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
+                    Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON;
+        return null;
+    }
+
     /**
      * Modify the parameters of the camera control. This will set preview sizes and picture sizes
      * according to the phone display size.
@@ -320,15 +335,10 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         parameters.setPictureFormat(ImageFormat.JPEG);
 
         //If the camera support focus mode auto, set it.
-        List<String> focusModes = parameters.getSupportedFocusModes();
-        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
-            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        if (getFocusMode(parameters) != null) parameters.setFocusMode(getFocusMode(parameters));
 
         //set the flash modes
-        List<String> flashModes = parameters.getSupportedFlashModes();
-        if (flashModes != null) //If the camera has auto focus...
-            parameters.setFocusMode(flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
-                    Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON);
+        if (getFlashMode(parameters) != null) parameters.setFocusMode(getFlashMode(parameters));
 
         //Set the picture size size
         Camera.Size pictureSize = getValidPictureSize(mCamera.getParameters().getSupportedPictureSizes(),
