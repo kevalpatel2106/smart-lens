@@ -16,23 +16,16 @@
 
 package com.kevalpatel2106.smartlens.utils;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
 import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.kevalpatel2106.smartlens.R;
-import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraImageFormat;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -116,7 +109,7 @@ public final class UtilsTest extends BaseTestClass {
 
     @Test
     public void getDeviceId() throws Exception {
-        assertNotNull(Utils.getDeviceId(InstrumentationRegistry.getContext()));
+        assertNotNull(Utils.getDeviceId(InstrumentationRegistry.getTargetContext()));
     }
 
     @Override
