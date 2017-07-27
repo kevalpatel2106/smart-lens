@@ -16,8 +16,10 @@
 
 package com.kevalpatel2106.smartlens;
 
+import android.Manifest;
 import android.app.Activity;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.app.Fragment;
 
@@ -37,7 +39,8 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(AndroidJUnit4.class)
 public class DashboardTest extends BaseTestClass {
-
+    @Rule
+    public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA);
     @Rule
     public ActivityTestRule<Dashboard> mDashboardActivityTestRule = new ActivityTestRule<>(Dashboard.class);
 

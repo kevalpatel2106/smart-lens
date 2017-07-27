@@ -25,6 +25,7 @@ import com.kevalpatel2106.smartlens.camera.config.CameraImageFormat;
 import com.kevalpatel2106.smartlens.camera.config.CameraRotation;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.utils.FileUtils;
+import com.kevalpatel2106.smartlens.utils.Utils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,24 +82,6 @@ public final class CameraUtilsTest extends BaseTestClass {
     @Test
     public void checkIfCameraPermissionGranted() throws Exception {
         assertTrue(CameraUtils.checkIfCameraPermissionGranted(InstrumentationRegistry.getTargetContext()));
-    }
-
-    @Test
-    public void checkIfSaveFileWorks() throws Exception {
-        //Generate mock bmp
-        int mockBmpWidth = 100;
-        int mockBmpHeight = 50;
-        Bitmap mockBmp = Bitmap.createBitmap(mockBmpWidth, mockBmpHeight, Bitmap.Config.RGB_565);
-
-        //Create mock file.
-        File mockSaveFile = new File(FileUtils.getCacheDir(InstrumentationRegistry.getTargetContext())
-                + "/IMG" + System.currentTimeMillis() + ".png");
-
-        //Check the output
-        assertTrue(CameraUtils.saveImageFromFile(mockBmp,
-                mockSaveFile,
-                CameraImageFormat.FORMAT_PNG));
-        assertTrue(mockSaveFile.length() > 0);
     }
 
     @Override

@@ -19,13 +19,18 @@ package com.kevalpatel2106.smartlens.utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.kevalpatel2106.smartlens.camera.config.CameraImageFormat;
+
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -104,5 +109,55 @@ public class Utils {
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    /**
+     * Save image to the file.
+     *
+     * @param bitmap      bitmap to store.
+     * @param fileToSave  file where bitmap should stored
+     * @param imageFormat Format of the output file. {@link CameraImageFormat}
+     * @return True if the file saved successfully.
+     */
+    public static boolean saveImageFromFile(@NonNull Bitmap bitmap,
+                                     @NonNull File fileToSave,
+                                     @CameraImageFormat.SupportedImageFormat int imageFormat) {
+        FileOutputStream out = null;
+        boolean isSuccess;
+
+        //Decide the image format
+        Bitmap.CompressFormat compressFormat;
+        switch (imageFormat) {
+            case CameraImageFormat.FORMAT_JPEG:
+                compressFormat = Bitmap.CompressFormat.JPEG;
+                break;
+            case CameraImageFormat.FORMAT_WEBP:
+                compressFormat = Bitmap.CompressFormat.WEBP;
+                break;
+            case CameraImageFormat.FORMAT_PNG:
+                compressFormat = Bitmap.CompressFormat.PNG;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid image format.");
+        }
+
+        try {
+            if (!fileToSave.exists()) //noinspection ResultOfMethodCallIgnored
+                fileToSave.createNewFile();
+
+            out = new FileOutputStream(fileToSave);
+            bitmap.compress(compressFormat, 100, out); // bmp is your Bitmap instance
+            isSuccess = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            isSuccess = false;
+        } finally {
+            try {
+                if (out != null) out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return isSuccess;
     }
 }

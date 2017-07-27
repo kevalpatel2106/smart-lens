@@ -73,7 +73,7 @@ android {
         //strip other than english resources
         resConfigs "en"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.kevalpatel2106.smartlens.testUtils.CustomTestRunner"
     }
 
     buildTypes {
@@ -105,6 +105,26 @@ android {
     }
 }
 
+// Grant animation permissions to avoid test failure because of ui sync.
+task grantAnimationPermissions(type: Exec, dependsOn: 'installMock') {
+    group = 'test'
+    description = 'Grant permissions for testing.'
+
+    def absolutePath = file('..') // Get project absolute path
+    commandLine "$absolutePath/misc/set_animation_permissions.sh org.bookdash.android".split(" ")
+}
+
+// Source: http://stackoverflow.com/q/29908110/112705
+afterEvaluate {
+    // When launching individual tests from Android Studio, it seems that only the assemble tasks
+    // get called directly, not the install* versions
+    tasks.each { task ->
+        if (task.name.startsWith('assembleMockAndroidTest')) {
+            task.dependsOn grantAnimationPermissions
+        }
+    }
+}
+
 dependencies {
     implementation project(':tensorflow-android-inference')
     implementation ide.kotlin
@@ -124,12 +144,12 @@ dependencies {
     androidTestImplementation(testLib.mockWebServer, excludeGrp)
 
     //Butter knife
-    implementation butterKnifeLib.butterKnife
+    implementation(butterKnifeLib.butterKnife, excludeGrp)
     annotationProcessor butterKnifeLib.annotationProcessor
 
     //GSON
-    implementation otherLib.gson
-    implementation otherLib.glide
+    implementation(otherLib.gson, excludeGrp)
+    implementation(otherLib.glide, excludeGrp)
 
     //Retrofit
     implementation retrofitLib.retrofit
