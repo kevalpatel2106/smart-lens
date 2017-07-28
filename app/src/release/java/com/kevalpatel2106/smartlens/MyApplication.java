@@ -17,12 +17,6 @@
 package com.kevalpatel2106.smartlens;
 
 import android.app.Application;
-import android.content.Context;
-import android.os.StrictMode;
-
-import com.facebook.stetho.DumperPluginsProvider;
-import com.facebook.stetho.Stetho;
-import com.facebook.stetho.dumpapp.DumperPlugin;
 
 import timber.log.Timber;
 
