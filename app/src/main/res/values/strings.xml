@@ -23,4 +23,7 @@
     <string name="camera_frag_btn_grant_access">Grant Permission</string>
     <string name="camera_frag_permission_denied_statement">Camera permission is not available.</string>
     <string name="dashboard_error_no_camera_found">Your device doesn\'t have the camera.</string>
+    <string name="image_classifier_frag_error_camera_open">Error opening the camera.</string>
+    <string name="image_classifier_frag_error_no_front_camera">Your device doesn\'t have front camera.</string>
+    <string name="image_classifier_frag_error_save_image">Cannot save the captured image.</string>
 </resources>

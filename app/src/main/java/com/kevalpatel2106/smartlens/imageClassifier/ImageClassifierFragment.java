@@ -205,11 +205,17 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
             case CameraError.ERROR_CAMERA_PERMISSION_NOT_AVAILABLE:
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
                 break;
-            case CameraError.ERROR_CAMERA_OPEN_FAILED:
             case CameraError.ERROR_DOES_NOT_HAVE_FRONT_CAMERA:
+                Snackbar.make(mContainer, R.string.image_classifier_frag_error_no_front_camera, Snackbar.LENGTH_LONG)
+                        .setAction(android.R.string.ok, view -> getActivity().finish())
+                        .show();
             case CameraError.ERROR_IMAGE_WRITE_FAILED:
+                Snackbar.make(mContainer, R.string.image_classifier_frag_error_save_image, Snackbar.LENGTH_LONG)
+                        .setAction(android.R.string.ok, view -> getActivity().finish())
+                        .show();
+            case CameraError.ERROR_CAMERA_OPEN_FAILED:
             default:
-                Snackbar.make(mContainer, "Error opening the camera.", Snackbar.LENGTH_LONG)
+                Snackbar.make(mContainer, R.string.image_classifier_frag_error_camera_open, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
                 break;

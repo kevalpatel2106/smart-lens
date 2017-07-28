@@ -115,6 +115,23 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         }
     }
 
+    @Nullable
+    static String getFocusMode(Camera.Parameters parameters) {
+        List<String> focusModes = parameters.getSupportedFocusModes();
+        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
+            return (Camera.Parameters.FOCUS_MODE_AUTO);
+        return null;
+    }
+
+    @Nullable
+    static String getFlashMode(Camera.Parameters parameters) {
+        List<String> flashModes = parameters.getSupportedFlashModes();
+        if (flashModes != null) //If the camera has auto focus...
+            return flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
+                    Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON;
+        return null;
+    }
+
     Camera getCamera() {
         return mCamera;
     }
@@ -301,23 +318,6 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
             }
         }
         return optimalSize == null ? previewSizes.get(0) : optimalSize;
-    }
-
-    @Nullable
-    String getFocusMode(Camera.Parameters parameters) {
-        List<String> focusModes = parameters.getSupportedFocusModes();
-        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
-            return (Camera.Parameters.FOCUS_MODE_AUTO);
-        return null;
-    }
-
-    @Nullable
-    String getFlashMode(Camera.Parameters parameters) {
-        List<String> flashModes = parameters.getSupportedFlashModes();
-        if (flashModes != null) //If the camera has auto focus...
-            return flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO) ?
-                    Camera.Parameters.FLASH_MODE_AUTO : Camera.Parameters.FLASH_MODE_ON;
-        return null;
     }
 
     /**
