@@ -44,6 +44,7 @@ ext {
             mokitoCore      : 'org.mockito:mockito-core:2.8.47',
             mokitoAndroid   : 'org.mockito:mockito-android:2.8.47',
             mockWebServer   : 'com.squareup.okhttp3:mockwebserver:' + okHttpVersion,
+            conditionWatcher: 'com.azimolabs.conditionwatcher:conditionwatcher:0.1',
     ]
 
     //Support library dependency

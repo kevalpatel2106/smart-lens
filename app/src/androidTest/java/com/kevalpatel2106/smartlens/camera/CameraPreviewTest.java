@@ -95,7 +95,7 @@ public class CameraPreviewTest extends BaseTestClass {
 
         //Wait for the camera to start
         Delay.startDelay(2800);
-        Espresso.onView(ViewMatchers.withId(R.id.toolbar)).perform(ViewActions.click());
+        Espresso.onView(ViewMatchers.withId(R.id.toolbar)).perform(ViewActions.closeSoftKeyboard());
         Delay.stopDelay();
     }
 
@@ -119,14 +119,16 @@ public class CameraPreviewTest extends BaseTestClass {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void canClose() throws Exception {
-        launchCameraPreview(mMockCallbacks, new CameraConfig());
-
-        try {
-            mCameraPreview.stopPreviewAndReleaseCamera();
-            assertFalse(mCameraPreview.isCameraOpen());
-        } catch (Exception e) {
-            fail("Cannot close the camera.");
-        }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            CameraPreview cameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
+                    mMockCallbacks);
+            try {
+                cameraPreview.stopPreviewAndReleaseCamera();
+                assertFalse(cameraPreview.isCameraOpen());
+            } catch (Exception e) {
+                fail("Cannot close the camera.");
+            }
+        });
     }
 
     @SuppressLint("WrongConstant")

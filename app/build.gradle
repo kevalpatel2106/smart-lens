@@ -149,6 +149,7 @@ dependencies {
     androidTestImplementation(testLib.mokitoCore, excludeGrp)
     androidTestImplementation(testLib.mokitoAndroid, excludeGrp)
     androidTestImplementation(testLib.mockWebServer, excludeGrp)
+    androidTestImplementation(testLib.conditionWatcher, excludeGrp)
 
     //Butter knife
     implementation(butterKnifeLib.butterKnife, excludeGrp)
