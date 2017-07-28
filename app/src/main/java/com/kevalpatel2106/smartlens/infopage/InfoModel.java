@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.wikipage;
+package com.kevalpatel2106.smartlens.infopage;
 
 import android.support.annotation.NonNull;
 
@@ -22,29 +22,30 @@ import android.support.annotation.NonNull;
  * Created by Keval on 25-Jul-17.
  */
 
-class WikiPage {
+@SuppressWarnings("WeakerAccess")
+public class InfoModel {
 
     private final String label;
 
-    private String summaryMessage;
+    private String info;
 
     private String imageUrl;
 
-    WikiPage(@NonNull String label) {
+    public InfoModel(@NonNull String label) {
         //noinspection ConstantConditions
         if (label == null) throw new IllegalArgumentException("Label cannot be null.");
         this.label = label;
     }
 
-    String getSummaryMessage() {
-        return summaryMessage;
+    public String getInfo() {
+        return info;
     }
 
-    void setSummaryMessage(@NonNull String summaryMessage) {
+    public void setInfo(@NonNull String info) {
         //noinspection ConstantConditions
-        if (summaryMessage == null) throw new IllegalArgumentException("Summary cannot be null.");
+        if (info == null) throw new IllegalArgumentException("Summary cannot be null.");
 
-        this.summaryMessage = summaryMessage;
+        this.info = info;
     }
 
     public String getImageUrl() {

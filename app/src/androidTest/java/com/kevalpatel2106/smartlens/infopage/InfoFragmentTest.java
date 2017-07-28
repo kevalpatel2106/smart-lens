@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.wikipage;
+package com.kevalpatel2106.smartlens.infopage;
 
 import android.app.Activity;
 import android.content.Context;
@@ -31,6 +31,7 @@ import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
 import com.kevalpatel2106.smartlens.testUtils.TestConfig;
 import com.kevalpatel2106.smartlens.utils.rxBus.Event;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
+import com.kevalpatel2106.smartlens.wikipedia.WikiRetrofitHelper;
 import com.kevalpatel2106.tensorflow.Classifier;
 
 import org.junit.After;
@@ -59,14 +60,14 @@ import static org.junit.Assert.fail;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public class WikiFragmentTest extends BaseTestClass {
+public class InfoFragmentTest extends BaseTestClass {
     @SuppressWarnings("unused")
-    private static final String TAG = "WikiFragmentTest";
+    private static final String TAG = "InfoFragmentTest";
     private static final String MOCK_LABEL = "electric locomotive";
 
     @Rule
-    public FragmentTestRule<WikiFragment> mWikiFragmentFragmentTestRule =
-            new FragmentTestRule<>(WikiFragment.class);
+    public FragmentTestRule<InfoFragment> mWikiFragmentFragmentTestRule =
+            new FragmentTestRule<>(InfoFragment.class);
 
     private static String getStringFromInputStream(InputStream is) {
         BufferedReader br = null;
@@ -101,12 +102,12 @@ public class WikiFragmentTest extends BaseTestClass {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkNewInstance() throws Exception {
-        assertTrue(WikiFragment.getNewInstance() instanceof WikiFragment);
+        assertTrue(InfoFragment.getNewInstance() instanceof InfoFragment);
     }
 
     @Test
     public void checkRealApiResponse() throws Exception {
-        WikiRetrofitBuilder.BASE_WIKI_URL = "https://en.wikipedia.org/w/";
+        WikiRetrofitHelper.BASE_WIKI_URL = "https://en.wikipedia.org/w/";
         //Wait for the rx bus to get register after view creation
         Delay.startDelay(1000);
         onView(withId(R.id.wiki_page_tv));
@@ -254,7 +255,7 @@ public class WikiFragmentTest extends BaseTestClass {
         try {
             MockWebServer mockWebServer = new MockWebServer();
             mockWebServer.start();
-            WikiRetrofitBuilder.BASE_WIKI_URL = mockWebServer.url("/").toString();
+            WikiRetrofitHelper.BASE_WIKI_URL = mockWebServer.url("/").toString();
             return mockWebServer;
         } catch (IOException e) {
             e.printStackTrace();

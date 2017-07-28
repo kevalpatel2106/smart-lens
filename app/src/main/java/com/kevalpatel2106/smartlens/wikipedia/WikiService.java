@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.wikipage;
+package com.kevalpatel2106.smartlens.wikipedia;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;

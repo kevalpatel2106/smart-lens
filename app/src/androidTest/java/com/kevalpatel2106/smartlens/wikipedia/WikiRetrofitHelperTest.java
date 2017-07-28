@@ -14,35 +14,49 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.wikipage;
+package com.kevalpatel2106.smartlens.wikipedia;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
 
+import com.kevalpatel2106.smartlens.infopage.InfoModel;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
- * Created by Keval Patel on 24/07/17.
- *
- * @author 'https://github.com/kevalpatel2106'
+ * Created by Keval on 28-Jul-17.
  */
-public class WikiRetrofitBuilderTest extends BaseTestClass {
-    private WikiRetrofitBuilder mWikiRetrofitBuilder;
+public class WikiRetrofitHelperTest extends BaseTestClass {
+    private WikiRetrofitHelper mWikiRetrofitHelper;
+    private WikiCallbacks mWikiCallbacks = new WikiCallbacks() {
+        @Override
+        public void onSuccess(InfoModel infoModel) {
+            //Do nothing
+        }
+
+        @Override
+        public void onError(String message) {
+            //Do nothing
+        }
+    };
 
     @Before
     public void setUp() {
-        mWikiRetrofitBuilder = new WikiRetrofitBuilder(InstrumentationRegistry.getTargetContext());
+        mWikiRetrofitHelper = new WikiRetrofitHelper(InstrumentationRegistry.getTargetContext(),
+                mWikiCallbacks);
     }
 
     @Test
     public void canInit() throws Exception {
         try {
-            new WikiRetrofitBuilder(null);
+            new WikiRetrofitHelper(null, mWikiCallbacks);
+            new WikiRetrofitHelper(InstrumentationRegistry.getTargetContext(), null);
+            fail();
         } catch (IllegalArgumentException e) {
             //Success
         }
@@ -50,8 +64,8 @@ public class WikiRetrofitBuilderTest extends BaseTestClass {
 
     @Test
     public void getBaseUrl() throws Exception {
-        assertNotNull(mWikiRetrofitBuilder.getBaseUrl());
-//        assertTrue(mWikiRetrofitBuilder.getBaseUrl().contains("wikipedia"));
+        assertNotNull(mWikiRetrofitHelper.getBaseUrl());
+//        assertTrue(mWikiRetrofitHelper.getBaseUrl().contains("wikipedia"));
     }
 
     @Override

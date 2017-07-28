@@ -26,7 +26,7 @@ import android.widget.Toast;
 import com.kevalpatel2106.smartlens.base.BaseActivity;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
-import com.kevalpatel2106.smartlens.wikipage.WikiFragment;
+import com.kevalpatel2106.smartlens.infopage.InfoFragment;
 
 import butterknife.BindView;
 
@@ -36,7 +36,7 @@ public class Dashboard extends BaseActivity {
     NestedScrollView mNestedScrollView;
 
     ImageClassifierFragment mCameraFragment;
-    WikiFragment mWikiFragment;
+    InfoFragment mInfoFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class Dashboard extends BaseActivity {
         setContentView(R.layout.activity_home);
 
         mCameraFragment = ImageClassifierFragment.getNewInstance();
-        mWikiFragment = WikiFragment.getNewInstance();
+        mInfoFragment = InfoFragment.getNewInstance();
 
         //First check if the camera available?
         if (CameraUtils.isCameraAvailable(this)) {
@@ -82,7 +82,7 @@ public class Dashboard extends BaseActivity {
 
         //Set the wiki fragment.
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.dashboard_bottom_sheet_container, mWikiFragment)
+                .replace(R.id.dashboard_bottom_sheet_container, mInfoFragment)
                 .commit();
     }
 }

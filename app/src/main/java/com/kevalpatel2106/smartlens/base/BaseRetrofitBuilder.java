@@ -46,7 +46,7 @@ public abstract class BaseRetrofitBuilder {
     public static final String GENERALIZE_ERROR = "Something went wrong.";
     public static final String INTERNET_NOT_AVAILABLE_ERROR = "Internet is not available. Please try again.";
 
-    private final Context mContext;
+    protected final Context mContext;
 
     public BaseRetrofitBuilder(@NonNull Context context) {
         //noinspection ConstantConditions

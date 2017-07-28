@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.wikipage;
+package com.kevalpatel2106.smartlens.wikipedia;
 
 import org.junit.Test;
 
@@ -27,29 +27,29 @@ import static org.junit.Assert.fail;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public class WikiFragmentUnitTest {
+public class WikiUtilsUnitTest {
 
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkSummaryValid() {
-        assertFalse(WikiFragment.isValidSummary("xyz", null));
-        assertFalse(WikiFragment.isValidSummary(null, null));
-        assertFalse(WikiFragment.isValidSummary(null, "abcdefghijklmnopqrstuvwxyz1234567890"));
-        assertFalse(WikiFragment.isValidSummary("xyz", ""));
-        assertFalse(WikiFragment.isValidSummary("xyz", "xyz may refer to:"));
-        assertFalse(WikiFragment.isValidSummary("xyz", "xyz may refer to: "));
-        assertTrue(WikiFragment.isValidSummary("xyz", "abcdefghijklmnopqrstuvwxyz1234567890"));
+        assertFalse(WikiUtils.isValidSummary("xyz", null));
+        assertFalse(WikiUtils.isValidSummary(null, null));
+        assertFalse(WikiUtils.isValidSummary(null, "abcdefghijklmnopqrstuvwxyz1234567890"));
+        assertFalse(WikiUtils.isValidSummary("xyz", ""));
+        assertFalse(WikiUtils.isValidSummary("xyz", "xyz may refer to:"));
+        assertFalse(WikiUtils.isValidSummary("xyz", "xyz may refer to: "));
+        assertTrue(WikiUtils.isValidSummary("xyz", "abcdefghijklmnopqrstuvwxyz1234567890"));
     }
 
 
     @SuppressWarnings("ConstantConditions")
     @Test
     public void checkWikiLabel() {
-        assertFalse(WikiFragment.generateWikiLabel("computer keyboard").contains("\\s"));
-        assertFalse(WikiFragment.generateWikiLabel("computer keyboard").equals("Computer_keyboard"));
+        assertFalse(WikiUtils.generateWikiLabel("computer keyboard").contains("\\s"));
+        assertFalse(WikiUtils.generateWikiLabel("computer keyboard").equals("Computer_keyboard"));
 
         try {
-            WikiFragment.generateWikiLabel(null);
+            WikiUtils.generateWikiLabel(null);
             fail();
         } catch (IllegalArgumentException e) {
             //Success

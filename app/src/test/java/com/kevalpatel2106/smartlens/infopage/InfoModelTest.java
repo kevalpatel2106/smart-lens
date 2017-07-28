@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.wikipage;
+package com.kevalpatel2106.smartlens.infopage;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
 /**
  * Created by Keval on 25-Jul-17.
  */
-public class WikiPageTest {
+public class InfoModelTest {
     private static final String MOCK_LABEL = "mock_label";
     private static final String MOCK_IMAGE_URL = "mock_image_url";
     private static final String MOCK_SUMMARY = "mock_summary";
@@ -32,12 +32,12 @@ public class WikiPageTest {
     @SuppressWarnings("ConstantConditions")
     @Test
     public void getSummaryMessage() throws Exception {
-        WikiPage wikiPage = new WikiPage(MOCK_LABEL);
-        wikiPage.setSummaryMessage(MOCK_SUMMARY);
-        assertEquals(wikiPage.getSummaryMessage(), MOCK_SUMMARY);
+        InfoModel infoModel = new InfoModel(MOCK_LABEL);
+        infoModel.setInfo(MOCK_SUMMARY);
+        assertEquals(infoModel.getInfo(), MOCK_SUMMARY);
 
         try {
-            wikiPage.setSummaryMessage(null);
+            infoModel.setInfo(null);
             fail();
         } catch (IllegalArgumentException e) {
             //Pass
@@ -46,12 +46,12 @@ public class WikiPageTest {
 
     @Test
     public void checkImageUrl() throws Exception {
-        WikiPage wikiPage = new WikiPage(MOCK_LABEL);
-        wikiPage.setImageUrl(MOCK_IMAGE_URL);
-        assertEquals(wikiPage.getImageUrl(), MOCK_IMAGE_URL);
+        InfoModel infoModel = new InfoModel(MOCK_LABEL);
+        infoModel.setImageUrl(MOCK_IMAGE_URL);
+        assertEquals(infoModel.getImageUrl(), MOCK_IMAGE_URL);
 
         try {
-            wikiPage.setImageUrl(null);
+            infoModel.setImageUrl(null);
             fail();
         } catch (IllegalArgumentException e) {
             //Pass
@@ -62,13 +62,13 @@ public class WikiPageTest {
     @Test
     public void checkLLabel() throws Exception {
         try {
-            new WikiPage(null);
+            new InfoModel(null);
             fail();
         } catch (IllegalArgumentException e) {
             //Pass
         }
 
-        WikiPage wikiPage = new WikiPage(MOCK_LABEL);
-        assertEquals(wikiPage.getLabel(), MOCK_LABEL);
+        InfoModel infoModel = new InfoModel(MOCK_LABEL);
+        assertEquals(infoModel.getLabel(), MOCK_LABEL);
     }
 }
