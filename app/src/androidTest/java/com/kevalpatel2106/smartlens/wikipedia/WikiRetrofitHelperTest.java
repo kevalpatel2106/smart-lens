@@ -40,6 +40,11 @@ public class WikiRetrofitHelperTest extends BaseTestClass {
         }
 
         @Override
+        public void onRecomandedLoaded(InfoModel[] recommended) {
+            //Do nothing
+        }
+
+        @Override
         public void onError(String message) {
             //Do nothing
         }
