@@ -19,8 +19,6 @@ package com.kevalpatel2106.smartlens;
 import android.app.Application;
 import android.os.StrictMode;
 
-import com.facebook.stetho.Stetho;
-
 import timber.log.Timber;
 
 /**
@@ -44,7 +42,7 @@ public class MyApplication extends Application {
                 .build());
 
         //Init shetho
-        Stetho.initializeWithDefaults(this);
+//        Stetho.initializeWithDefaults(this);
 
         //Enable timber
         Timber.plant(new Timber.DebugTree() {
