@@ -17,7 +17,6 @@
 package com.kevalpatel2106.smartlens.testUtils;
 
 import android.app.Activity;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
@@ -26,10 +25,6 @@ import android.support.test.uiautomator.UiDevice;
 import android.view.WindowManager;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
-
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static android.support.test.InstrumentationRegistry.getTargetContext;
 
 /**
  * Created by Keval on 10-Apr-17.
@@ -37,26 +32,26 @@ import static android.support.test.InstrumentationRegistry.getTargetContext;
 
 public abstract class BaseTestClass {
 
-    /**
-     * Gran all the runtime permissions.
-     * Update it when you add new permission in manifest.
-     */
-    @BeforeClass
-    public static void grantAllRuntimePermission() {
-        // In M+, trying to call a number will trigger a runtime dialog. Make sure
-        // the permission is granted before running this test.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.CAMERA");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.SYSTEM_ALERT_WINDOW");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.WRITE_EXTERNAL_STORAGE");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.WRITE_SETTINGS");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.ACCESS_COARSE_LOCATION");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.ACCESS_FINE_LOCATION");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.SEND_SMS");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.READ_CONTACTS");
-            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.PROCESS_OUTGOING_CALLS");
-        }
-    }
+//    /**
+//     * Gran all the runtime permissions.
+//     * Update it when you add new permission in manifest.
+//     */
+//    @BeforeClass
+//    public static void grantAllRuntimePermission() {
+//        // In M+, trying to call a number will trigger a runtime dialog. Make sure
+//        // the permission is granted before running this test.
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.CAMERA");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.SYSTEM_ALERT_WINDOW");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.WRITE_EXTERNAL_STORAGE");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.WRITE_SETTINGS");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.ACCESS_COARSE_LOCATION");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.ACCESS_FINE_LOCATION");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.SEND_SMS");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.READ_CONTACTS");
+//            getInstrumentation().getUiAutomation().executeShellCommand("pm grant " + getTargetContext().getPackageName() + " android.permission.PROCESS_OUTGOING_CALLS");
+//        }
+//    }
 
     public abstract Activity getActivity();
 

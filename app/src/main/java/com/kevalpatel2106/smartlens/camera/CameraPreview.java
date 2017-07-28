@@ -90,6 +90,31 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
+    /**
+     * Get the valid picture sizes based on the supported picture sizes.
+     *
+     * @param pictureSizes  List of {@link Camera.Size} supported picture size by the hardware camera.
+     * @param cameraQuality Quality of the camera supplied.
+     * @return Supported image.
+     */
+    @NonNull
+    static Camera.Size getValidPictureSize(@NonNull List<Camera.Size> pictureSizes,
+                                           @CameraResolution.SupportedResolution int cameraQuality) {
+        if (pictureSizes.isEmpty())
+            throw new IllegalArgumentException("Picture sizes cannot be null.");
+
+        switch (cameraQuality) {
+            case CameraResolution.HIGH_RESOLUTION:
+                return pictureSizes.get(0);   //Highest res
+            case CameraResolution.MEDIUM_RESOLUTION:
+                return pictureSizes.get(pictureSizes.size() / 2);     //Resolution at the middle
+            case CameraResolution.LOW_RESOLUTION:
+                return pictureSizes.get(pictureSizes.size() - 1);       //Lowest res
+            default:
+                throw new IllegalArgumentException("Invalid camera resolution.");
+        }
+    }
+
     Camera getCamera() {
         return mCamera;
     }
@@ -227,32 +252,6 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
         //Take the picture.
         mCamera.takePicture(null, null, mPictureCallback);
     }
-
-    /**
-     * Get the valid picture sizes based on the supported picture sizes.
-     *
-     * @param pictureSizes  List of {@link Camera.Size} supported picture size by the hardware camera.
-     * @param cameraQuality Quality of the camera supplied.
-     * @return Supported image.
-     */
-    @NonNull
-    Camera.Size getValidPictureSize(@NonNull List<Camera.Size> pictureSizes,
-                                    @CameraResolution.SupportedResolution int cameraQuality) {
-        if (pictureSizes.isEmpty())
-            throw new IllegalArgumentException("Picture sizes cannot be null.");
-
-        switch (cameraQuality) {
-            case CameraResolution.HIGH_RESOLUTION:
-                return pictureSizes.get(0);   //Highest res
-            case CameraResolution.MEDIUM_RESOLUTION:
-                return pictureSizes.get(pictureSizes.size() / 2);     //Resolution at the middle
-            case CameraResolution.LOW_RESOLUTION:
-                return pictureSizes.get(pictureSizes.size() - 1);       //Lowest res
-            default:
-                throw new IllegalArgumentException("Invalid camera resolution.");
-        }
-    }
-
 
     /**
      * Get the valid preview sizes based on the supported preview sizes.
