@@ -171,25 +171,6 @@ public class CameraPreviewTest extends BaseTestClass {
     }
 
     @Test
-    public void checkPreviewSize() throws Exception {
-        launchCameraPreview(mMockCallbacks, new CameraConfig());
-
-        List<Camera.Size> previewSizes = mCameraPreview.getCamera()
-                .getParameters()
-                .getSupportedPreviewSizes();
-
-        //Check for empty supported picture sizes
-        try {
-            previewSizes.clear();
-            mCameraPreview.getValidPreviewSize(previewSizes);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //Pass
-        }
-    }
-
-    @SuppressLint("WrongConstant")
-    @Test
     public void checkFlashMode() throws Exception {
         launchCameraPreview(mMockCallbacks, new CameraConfig());
 
