@@ -19,7 +19,6 @@ package com.kevalpatel2106.smartlens.base;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.kevalpatel2106.smartlens.BuildConfig;
 import com.kevalpatel2106.smartlens.utils.FileUtils;
 
@@ -87,10 +86,6 @@ public abstract class BaseRetrofitBuilder {
                 .addInterceptor(loggingInterceptor)
                 .addInterceptor(new CacheInterceptor(isCacheEnable, cacheTimeSeconds))
                 .cache(new Cache(FileUtils.getCacheDir(context), CacheInterceptor.CACHE_SIZE));
-
-        //Enable shetho
-        if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
-            okHttpClientBuilder.addNetworkInterceptor(new StethoInterceptor());
 
         return okHttpClientBuilder.build();
     }
