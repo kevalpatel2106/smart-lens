@@ -94,7 +94,7 @@ public class CameraPreviewTest extends BaseTestClass {
         });
 
         //Wait for the camera to start
-        Delay.startDelay(2800);
+        Delay.startDelay(5000);
         Espresso.onView(ViewMatchers.withId(R.id.toolbar)).perform(ViewActions.closeSoftKeyboard());
         Delay.stopDelay();
     }
@@ -170,6 +170,25 @@ public class CameraPreviewTest extends BaseTestClass {
         }
     }
 
+    @Test
+    public void checkPreviewSize() throws Exception {
+        launchCameraPreview(mMockCallbacks, new CameraConfig());
+
+        List<Camera.Size> previewSizes = mCameraPreview.getCamera()
+                .getParameters()
+                .getSupportedPreviewSizes();
+
+        //Check for empty supported picture sizes
+        try {
+            previewSizes.clear();
+            mCameraPreview.getValidPreviewSize(previewSizes);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
+    }
+
+    @SuppressLint("WrongConstant")
     @Test
     public void checkFlashMode() throws Exception {
         launchCameraPreview(mMockCallbacks, new CameraConfig());
