@@ -155,9 +155,12 @@ dependencies {
     implementation(butterKnifeLib.butterKnife, excludeGrp)
     annotationProcessor butterKnifeLib.annotationProcessor
 
-    //GSON
+    //Other
     implementation(otherLib.gson, excludeGrp)
     implementation(otherLib.glide, excludeGrp)
+    implementation(otherLib.timber, excludeGrp)
+    debugImplementation(otherLib.shetho, excludeGrp)
+    debugImplementation(otherLib.shethoOkhttp, excludeGrp)
 
     //Retrofit
     implementation retrofitLib.retrofit

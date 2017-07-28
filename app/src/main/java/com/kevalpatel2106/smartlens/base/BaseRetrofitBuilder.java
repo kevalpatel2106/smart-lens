@@ -19,6 +19,7 @@ package com.kevalpatel2106.smartlens.base;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.kevalpatel2106.smartlens.BuildConfig;
 import com.kevalpatel2106.smartlens.utils.FileUtils;
 
@@ -78,14 +79,20 @@ public abstract class BaseRetrofitBuilder {
     private OkHttpClient buildHttpClient(@NonNull Context context,
                                          boolean isCacheEnable,
                                          int cacheTimeSeconds) {
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(BuildConfig.DEBUG ?
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
-        return new OkHttpClient.Builder()
-                .addInterceptor(interceptor)
+
+        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
                 .addInterceptor(new CacheInterceptor(isCacheEnable, cacheTimeSeconds))
-                .cache(new Cache(FileUtils.getCacheDir(context), CacheInterceptor.CACHE_SIZE))
-                .build();
+                .cache(new Cache(FileUtils.getCacheDir(context), CacheInterceptor.CACHE_SIZE));
+
+        //Enable shetho
+        if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("debug"))
+            okHttpClientBuilder.addNetworkInterceptor(new StethoInterceptor());
+
+        return okHttpClientBuilder.build();
     }
 
     /**

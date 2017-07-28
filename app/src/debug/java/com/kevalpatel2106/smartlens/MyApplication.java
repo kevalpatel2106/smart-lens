@@ -19,6 +19,10 @@ package com.kevalpatel2106.smartlens;
 import android.app.Application;
 import android.os.StrictMode;
 
+import com.facebook.stetho.Stetho;
+
+import timber.log.Timber;
+
 /**
  * Created by Keval on 17-Mar-17.
  */
@@ -28,15 +32,28 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-        }
+
+        //Enable strict mode
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build());
+
+        //Init shetho
+        Stetho.initializeWithDefaults(this);
+
+        //Enable timber
+        Timber.plant(new Timber.DebugTree() {
+            @Override
+            protected String createStackElementTag(StackTraceElement element) {
+                return super.createStackElementTag(element)
+                        + ":" + element.getMethodName()
+                        + " ->L" + element.getLineNumber();
+            }
+        });
     }
 }

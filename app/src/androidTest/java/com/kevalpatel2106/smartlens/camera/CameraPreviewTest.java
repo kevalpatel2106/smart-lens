@@ -25,11 +25,9 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.kevalpatel2106.smartlens.TestActivity;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
@@ -52,9 +50,6 @@ import static org.junit.Assert.fail;
 public class CameraPreviewTest extends BaseTestClass {
     @Rule
     public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA);
-    @Rule
-    public ActivityTestRule<TestActivity> mActivityTestRule = new ActivityTestRule<>(TestActivity.class);
-
     private CameraCallbacks mMockCallbacks = new CameraCallbacks() {
         @Override
         public void onImageCapture(@NonNull byte[] imageCaptured) {
@@ -90,11 +85,12 @@ public class CameraPreviewTest extends BaseTestClass {
     @Test
     public void canClose() throws Exception {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            CameraPreview cameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
+            mCameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     mMockCallbacks);
+            mCameraPreview.startCamera(new CameraConfig());
             try {
-                cameraPreview.stopPreviewAndReleaseCamera();
-                assertFalse(cameraPreview.isCameraOpen());
+                mCameraPreview.stopPreviewAndReleaseCamera();
+                assertFalse(mCameraPreview.isCameraOpen());
             } catch (Exception e) {
                 fail("Cannot close the camera.");
             }
@@ -107,6 +103,7 @@ public class CameraPreviewTest extends BaseTestClass {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             mCameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     mMockCallbacks);
+            mCameraPreview.startCamera(new CameraConfig());
             List<Camera.Size> pictureSizes = mCameraPreview.getCamera()
                     .getParameters()
                     .getSupportedPictureSizes();
@@ -147,6 +144,7 @@ public class CameraPreviewTest extends BaseTestClass {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             mCameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     mMockCallbacks);
+            mCameraPreview.startCamera(new CameraConfig());
             List<Camera.Size> previewSizes = mCameraPreview.getCamera()
                     .getParameters()
                     .getSupportedPreviewSizes();
@@ -168,6 +166,7 @@ public class CameraPreviewTest extends BaseTestClass {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             mCameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     mMockCallbacks);
+            mCameraPreview.startCamera(new CameraConfig());
             Camera.Parameters parameters = mCameraPreview.getCamera().getParameters();
 
             if (parameters.getSupportedFlashModes() == null)
@@ -185,6 +184,7 @@ public class CameraPreviewTest extends BaseTestClass {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             mCameraPreview = new CameraPreview(InstrumentationRegistry.getTargetContext(),
                     mMockCallbacks);
+            mCameraPreview.startCamera(new CameraConfig());
             Camera.Parameters parameters = mCameraPreview.getCamera().getParameters();
 
             if (parameters.getSupportedFocusModes() == null)
@@ -198,6 +198,6 @@ public class CameraPreviewTest extends BaseTestClass {
 
     @Override
     public Activity getActivity() {
-        return mActivityTestRule.getActivity();
+        return null;
     }
 }
