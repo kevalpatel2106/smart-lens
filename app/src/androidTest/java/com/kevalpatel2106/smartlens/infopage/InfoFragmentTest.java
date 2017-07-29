@@ -147,7 +147,7 @@ public class InfoFragmentTest extends BaseTestClass {
         RxBus.getDefault().post(generateMockLabelsEvent());
 
         //Wait for mock api
-        Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
+        Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
 
         //Check if there are text?
         onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
