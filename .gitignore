@@ -8,3 +8,4 @@
 /captures
 .externalNativeBuild
 /misc/keystore.properties
+/app/src/main/assets/tensorflow/

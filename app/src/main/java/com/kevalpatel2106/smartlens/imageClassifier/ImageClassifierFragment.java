@@ -42,10 +42,9 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
+import com.kevalpatel2106.smartlens.tensorflow.TensorFlowImageClassifire;
 import com.kevalpatel2106.smartlens.utils.rxBus.Event;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
-import com.kevalpatel2106.tensorflow.Classifier;
-import com.kevalpatel2106.tensorflow.TensorFlowImageClassifier;
 
 import org.reactivestreams.Subscription;
 
@@ -73,7 +72,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     FrameLayout mContainer;
 
     CameraPreview mCameraPreview;
-    TensorFlowImageClassifier mImageClassifier;
+    TensorFlowImageClassifire mImageClassifier;
     private Disposable mTakePicDisposable;
 
     public ImageClassifierFragment() {
@@ -98,7 +97,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mImageClassifier = new TensorFlowImageClassifier(getActivity());
+        mImageClassifier = new TensorFlowImageClassifire(getActivity());
 
         //Add the camera preview.
         mCameraPreview = new CameraPreview(getActivity(), this);
@@ -173,7 +172,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     public void onImageCapture(@NonNull byte[] imageCaptured) {
 
         //Process the image using Tf.
-        Flowable<List<Classifier.Recognition>> flowable = Flowable.create(e -> {
+        Flowable<List<Recognition>> flowable = Flowable.create(e -> {
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageCaptured, 0, imageCaptured.length);
             e.onNext(mImageClassifier.recognizeImage(bitmap));
             e.onComplete();

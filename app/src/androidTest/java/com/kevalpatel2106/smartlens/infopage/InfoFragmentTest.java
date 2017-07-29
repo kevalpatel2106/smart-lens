@@ -24,6 +24,7 @@ import android.support.test.espresso.assertion.ViewAssertions;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
+import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.testUtils.CustomMatchers;
 import com.kevalpatel2106.smartlens.testUtils.Delay;
@@ -32,7 +33,6 @@ import com.kevalpatel2106.smartlens.testUtils.TestConfig;
 import com.kevalpatel2106.smartlens.utils.rxBus.Event;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 import com.kevalpatel2106.smartlens.wikipedia.WikiRetrofitHelper;
-import com.kevalpatel2106.tensorflow.Classifier;
 
 import org.junit.After;
 import org.junit.Before;
@@ -271,8 +271,8 @@ public class InfoFragmentTest extends BaseTestClass {
 
     @NonNull
     private Event generateMockLabelsEvent() {
-        List<Classifier.Recognition> recognitions = new ArrayList<>();
-        Classifier.Recognition mockRecognition = new Classifier.Recognition("1", MOCK_LABEL,
+        List<Recognition> recognitions = new ArrayList<>();
+        Recognition mockRecognition = new Recognition("1", MOCK_LABEL,
                 0.56f, null);
         recognitions.add(mockRecognition);
         return new Event(new ImageClassifiedEvent(recognitions));

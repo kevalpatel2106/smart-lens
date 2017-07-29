@@ -18,8 +18,6 @@ package com.kevalpatel2106.smartlens.imageClassifier;
 
 import android.support.annotation.NonNull;
 
-import com.kevalpatel2106.tensorflow.Classifier;
-
 import java.util.List;
 
 /**
@@ -30,11 +28,11 @@ import java.util.List;
 
 public class ImageClassifiedEvent {
 
-    private List<Classifier.Recognition> mRecognitions;
+    private List<Recognition> mRecognitions;
 
     private long timeStamp;
 
-    public ImageClassifiedEvent(@NonNull List<Classifier.Recognition> recognitions) {
+    public ImageClassifiedEvent(@NonNull List<Recognition> recognitions) {
         //noinspection ConstantConditions
         if (recognitions == null)
             throw new IllegalArgumentException("Cannot initialize with null.");
@@ -43,7 +41,7 @@ public class ImageClassifiedEvent {
         this.timeStamp = System.currentTimeMillis();
     }
 
-    public List<Classifier.Recognition> getRecognitions() {
+    public List<Recognition> getRecognitions() {
         return mRecognitions;
     }
 

@@ -133,7 +133,8 @@ tasks.withType(Test) {
 }
 
 dependencies {
-    implementation project(':tensorflow-android-inference')
+    implementation files('libs/libandroid_tensorflow_inference_java.jar')
+
     implementation ide.kotlin
     implementation ide.constrainlayout
 

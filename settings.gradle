@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-include ':app', ':tensorflow-android-inference'
+include ':app'

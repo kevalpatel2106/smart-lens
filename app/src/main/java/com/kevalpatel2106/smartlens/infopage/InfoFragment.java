@@ -30,10 +30,9 @@ import com.kevalpatel2106.smartlens.base.BaseFragment;
 import com.kevalpatel2106.smartlens.base.BaseImageView;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
+import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
-import com.kevalpatel2106.smartlens.wikipedia.WikiCallbacks;
 import com.kevalpatel2106.smartlens.wikipedia.WikiRetrofitHelper;
-import com.kevalpatel2106.tensorflow.Classifier;
 
 import java.util.List;
 
@@ -43,7 +42,7 @@ import timber.log.Timber;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InfoFragment extends BaseFragment implements WikiCallbacks {
+public class InfoFragment extends BaseFragment implements InfoCallbacks {
     @SuppressWarnings("unused")
     private static final String TAG = "InfoFragment";
 
@@ -79,7 +78,7 @@ public class InfoFragment extends BaseFragment implements WikiCallbacks {
         //Register image classifier.
         RxBus.getDefault().register(new Class[]{ImageClassifiedEvent.class})
                 .filter(event -> {
-                    List<Classifier.Recognition> recognitions =
+                    List<Recognition> recognitions =
                             ((ImageClassifiedEvent) event.getObject()).getRecognitions();
                     return recognitions != null && !recognitions.isEmpty();
                 })

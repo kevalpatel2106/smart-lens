@@ -19,6 +19,7 @@ package com.kevalpatel2106.smartlens.wikipedia;
 import android.content.Context;
 
 import com.kevalpatel2106.smartlens.base.BaseRetrofitBuilder;
+import com.kevalpatel2106.smartlens.infopage.InfoCallbacks;
 import com.kevalpatel2106.smartlens.infopage.InfoModel;
 import com.kevalpatel2106.smartlens.utils.Utils;
 
@@ -39,15 +40,15 @@ import timber.log.Timber;
 
 public class WikiRetrofitHelper extends BaseRetrofitBuilder {
     public static String BASE_WIKI_URL = "https://en.wikipedia.org/w/";
-    private final WikiCallbacks mWikiCallbacks;
+    private final InfoCallbacks mInfoCallbacks;
 
-    public WikiRetrofitHelper(@NonNull Context context, @NonNull WikiCallbacks wikiCallbacks) {
+    public WikiRetrofitHelper(@NonNull Context context, @NonNull InfoCallbacks infoCallbacks) {
         super(context);
 
-        if (wikiCallbacks == null)
+        if (infoCallbacks == null)
             throw new IllegalArgumentException("WikiCallback cannot be null.");
 
-        mWikiCallbacks = wikiCallbacks;
+        mInfoCallbacks = infoCallbacks;
     }
 
     @NonNull
@@ -92,7 +93,7 @@ public class WikiRetrofitHelper extends BaseRetrofitBuilder {
                         //TODO Handle no result found
                     }
                 }, throwable -> {
-                    mWikiCallbacks.onError(BaseRetrofitBuilder.getErrorMessage(throwable));
+                    mInfoCallbacks.onError(BaseRetrofitBuilder.getErrorMessage(throwable));
                     Timber.d("accept: " + BaseRetrofitBuilder.getErrorMessage(throwable));
                 });
     }
@@ -116,10 +117,10 @@ public class WikiRetrofitHelper extends BaseRetrofitBuilder {
                             Timber.d("getWikiImage: " + imageUrl);
 
                             if (!imageUrl.isEmpty()) infoModel.setImageUrl(imageUrl);
-                            mWikiCallbacks.onSuccess(infoModel);
+                            mInfoCallbacks.onSuccess(infoModel);
                         },
                         throwable -> {
-                            mWikiCallbacks.onSuccess(infoModel);
+                            mInfoCallbacks.onSuccess(infoModel);
                             Timber.d("accept: " + BaseRetrofitBuilder.getErrorMessage(throwable));
                         });
     }

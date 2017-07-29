@@ -16,8 +16,6 @@
 
 package com.kevalpatel2106.smartlens.imageClassifier;
 
-import com.kevalpatel2106.tensorflow.Classifier;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -45,9 +43,9 @@ public class ImageClassifiedEventTest {
 
     @Test
     public void getTimeStamp() throws Exception {
-        Classifier.Recognition mockRecognition = new Classifier.Recognition("1",
+        OnImageClassified.Recognition mockRecognition = new OnImageClassified.Recognition("1",
                 "mock", 1.0f, null);
-        ArrayList<Classifier.Recognition> mockList = new ArrayList<>(1);
+        ArrayList<OnImageClassified.Recognition> mockList = new ArrayList<>(1);
         mockList.add(mockRecognition);
         ImageClassifiedEvent classifiedEvent = new ImageClassifiedEvent(mockList);
         assertTrue(System.currentTimeMillis() - classifiedEvent.getTimeStamp() < 100);

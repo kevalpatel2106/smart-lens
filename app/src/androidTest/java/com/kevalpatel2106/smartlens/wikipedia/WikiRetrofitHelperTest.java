@@ -19,6 +19,7 @@ package com.kevalpatel2106.smartlens.wikipedia;
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
 
+import com.kevalpatel2106.smartlens.infopage.InfoCallbacks;
 import com.kevalpatel2106.smartlens.infopage.InfoModel;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
@@ -33,7 +34,7 @@ import static org.junit.Assert.fail;
  */
 public class WikiRetrofitHelperTest extends BaseTestClass {
     private WikiRetrofitHelper mWikiRetrofitHelper;
-    private WikiCallbacks mWikiCallbacks = new WikiCallbacks() {
+    private InfoCallbacks mInfoCallbacks = new InfoCallbacks() {
         @Override
         public void onSuccess(InfoModel infoModel) {
             //Do nothing
@@ -53,13 +54,13 @@ public class WikiRetrofitHelperTest extends BaseTestClass {
     @Before
     public void setUp() {
         mWikiRetrofitHelper = new WikiRetrofitHelper(InstrumentationRegistry.getTargetContext(),
-                mWikiCallbacks);
+                mInfoCallbacks);
     }
 
     @Test
     public void canInit() throws Exception {
         try {
-            new WikiRetrofitHelper(null, mWikiCallbacks);
+            new WikiRetrofitHelper(null, mInfoCallbacks);
             new WikiRetrofitHelper(InstrumentationRegistry.getTargetContext(), null);
             fail();
         } catch (IllegalArgumentException e) {
