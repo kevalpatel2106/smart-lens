@@ -46,7 +46,7 @@ import static org.junit.Assert.fail;
 /**
  * Created by Keval on 20-Jul-17.
  */
-public class ImageOnImageClassifiedFragmentTest extends BaseTestClass {
+public class ImageClassificationFragmentTest extends BaseTestClass {
 
     @Rule
     public FragmentTestRule<ImageClassifierFragment> mCameraFragmentTestRule =
