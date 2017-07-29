@@ -91,6 +91,23 @@ public class CameraPreviewTest extends BaseTestClass {
         }
     }
 
+    @SuppressLint("WrongConstant")
+    @Test
+    public void checkFocusMode() throws Exception {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            launchCameraPreview(mMockCallbacks, new CameraConfig());
+
+            Camera.Parameters parameters = mCameraPreview.getCamera().getParameters();
+
+            if (parameters.getSupportedFocusModes() == null)
+                assertEquals(CameraPreview.getFocusMode(parameters), null);
+            else if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
+                assertEquals(CameraPreview.getFocusMode(parameters), Camera.Parameters.FOCUS_MODE_AUTO);
+            else
+                assertEquals(CameraPreview.getFocusMode(parameters), null);
+        });
+    }
+
     @SuppressWarnings("ConstantConditions")
     @Test
     public void canInitiate() throws Exception {
