@@ -14,42 +14,39 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.utils;
+package com.kevalpatel2106.smartlens.imageClassifier;
 
 import android.app.Activity;
-import android.support.test.InstrumentationRegistry;
+import android.graphics.RectF;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Keval on 22-Jul-17.
+ * Created by Keval Patel on 29/07/17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
 @RunWith(AndroidJUnit4.class)
-public class UserSessionManagerTest extends BaseTestClass {
-    private UserSessionManager mUserSessionManager;
+public class RecognitionTest extends BaseTestClass {
 
-    @Before
-    public void init() {
-        mUserSessionManager = new UserSessionManager(InstrumentationRegistry.getTargetContext());
-    }
-
-    @SuppressWarnings("ConstantConditions")
     @Test
-    public void canInitiate() throws Exception {
-        assertNotNull(mUserSessionManager);
+    public void canInitiate() {
+        String mockId = "1";
+        String mockTitle = "Computer";
+        float mockConfidence = 96.45f;
+        RectF rectF = new RectF();
 
-        try {
-            new UserSessionManager(null);
-        } catch (RuntimeException e) {
-            //Success
-        }
+        Recognition recognition = new Recognition(mockId, mockTitle, mockConfidence, rectF);
+        assertEquals(recognition.getId(), mockId);
+        assertEquals(recognition.getTitle(), mockTitle);
+        assertEquals(recognition.getConfidence(), mockConfidence, 0f);
+        assertEquals(recognition.getLocation(), rectF);
     }
 
     @Override

@@ -16,7 +16,6 @@
 
 package com.kevalpatel2106.smartlens.imageClassifier;
 
-import android.annotation.SuppressLint;
 import android.graphics.RectF;
 
 /**
@@ -40,7 +39,7 @@ public class Recognition {
     /**
      * A sortable score for how good the recognition is relative to others. Higher should be better.
      */
-    private final Float confidence;
+    private final float confidence;
 
     /**
      * Optional location within the source image for the location of the recognized object.
@@ -48,7 +47,7 @@ public class Recognition {
     private final RectF location;
 
     public Recognition(
-            final String id, final String title, final Float confidence, final RectF location) {
+            final String id, final String title, final float confidence, final RectF location) {
         this.id = id;
         this.title = title;
         this.confidence = confidence;
@@ -63,34 +62,11 @@ public class Recognition {
         return title;
     }
 
-    public Float getConfidence() {
+    public float getConfidence() {
         return confidence;
     }
 
     public RectF getLocation() {
         return new RectF(location);
-    }
-
-    @SuppressLint("DefaultLocale")
-    @Override
-    public String toString() {
-        String resultString = "";
-        if (id != null) {
-            resultString += "[" + id + "] ";
-        }
-
-        if (title != null) {
-            resultString += title + " ";
-        }
-
-        if (confidence != null) {
-            resultString += String.format("(%.1f%%) ", confidence * 100.0f);
-        }
-
-        if (location != null) {
-            resultString += location + " ";
-        }
-
-        return resultString.trim();
     }
 }
