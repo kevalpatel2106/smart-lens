@@ -43,9 +43,8 @@ public class ImageClassifiedEventTest {
 
     @Test
     public void getTimeStamp() throws Exception {
-        OnImageClassified.Recognition mockRecognition = new OnImageClassified.Recognition("1",
-                "mock", 1.0f, null);
-        ArrayList<OnImageClassified.Recognition> mockList = new ArrayList<>(1);
+        Recognition mockRecognition = new Recognition("1", "mock", 1.0f, null);
+        ArrayList<Recognition> mockList = new ArrayList<>(1);
         mockList.add(mockRecognition);
         ImageClassifiedEvent classifiedEvent = new ImageClassifiedEvent(mockList);
         assertTrue(System.currentTimeMillis() - classifiedEvent.getTimeStamp() < 100);
