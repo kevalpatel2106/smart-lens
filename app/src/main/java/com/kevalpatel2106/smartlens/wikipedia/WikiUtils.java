@@ -17,6 +17,10 @@
 package com.kevalpatel2106.smartlens.wikipedia;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by Keval on 28-Jul-17.
@@ -64,9 +68,21 @@ class WikiUtils {
      * @return True if the summary is valid.
      */
     @SuppressWarnings("ConstantConditions")
-    static boolean isValidSummary(@NonNull String label, @NonNull String summary) {
+    static boolean isValidSummary(@NonNull String label, @Nullable String summary) {
         if (label == null || summary == null) return false;
         int thresholdLength = (label + " may refer to: ").length();
         return summary.length() > thresholdLength;
+    }
+
+    @Nullable
+    static String getSummaryFromJson(String responseStr) throws JSONException {
+        if (responseStr == null) return null;
+        JSONObject pagesObj = new JSONObject(responseStr)
+                .getJSONObject("query")
+                .getJSONObject("pages");
+        return pagesObj
+                .getJSONObject(pagesObj.names().getString(0))
+                .getString("extract");
+
     }
 }

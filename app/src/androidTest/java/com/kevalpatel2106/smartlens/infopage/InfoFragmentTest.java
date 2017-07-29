@@ -32,7 +32,7 @@ import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
 import com.kevalpatel2106.smartlens.testUtils.TestConfig;
 import com.kevalpatel2106.smartlens.utils.rxBus.Event;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
-import com.kevalpatel2106.smartlens.wikipedia.WikiRetrofitHelper;
+import com.kevalpatel2106.smartlens.wikipedia.WikiHelper;
 
 import org.junit.After;
 import org.junit.Before;
@@ -107,7 +107,7 @@ public class InfoFragmentTest extends BaseTestClass {
 
     @Test
     public void checkRealApiResponse() throws Exception {
-        WikiRetrofitHelper.BASE_WIKI_URL = "https://en.wikipedia.org/w/";
+        WikiHelper.BASE_WIKI_URL = "https://en.wikipedia.org/w/";
         //Wait for the rx bus to get register after view creation
         Delay.startDelay(1000);
         onView(withId(R.id.wiki_page_tv));
@@ -119,6 +119,7 @@ public class InfoFragmentTest extends BaseTestClass {
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
 
         //Check if there are text?
+        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
         Delay.stopDelay();
@@ -149,6 +150,7 @@ public class InfoFragmentTest extends BaseTestClass {
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
         //Check if there are text?
+        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
 
@@ -181,6 +183,7 @@ public class InfoFragmentTest extends BaseTestClass {
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
         //Check if there are text?
+        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
 
@@ -210,6 +213,7 @@ public class InfoFragmentTest extends BaseTestClass {
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
         //Check if there are text?
+        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
 
@@ -239,6 +243,7 @@ public class InfoFragmentTest extends BaseTestClass {
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
         //Check if there are text?
+        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
 
@@ -255,7 +260,7 @@ public class InfoFragmentTest extends BaseTestClass {
         try {
             MockWebServer mockWebServer = new MockWebServer();
             mockWebServer.start();
-            WikiRetrofitHelper.BASE_WIKI_URL = mockWebServer.url("/").toString();
+            WikiHelper.BASE_WIKI_URL = mockWebServer.url("/").toString();
             return mockWebServer;
         } catch (IOException e) {
             e.printStackTrace();
@@ -266,7 +271,6 @@ public class InfoFragmentTest extends BaseTestClass {
 
     private String getStringFromFile(Context context, int filename) {
         return getStringFromInputStream(context.getResources().openRawResource(filename));
-
     }
 
     @NonNull

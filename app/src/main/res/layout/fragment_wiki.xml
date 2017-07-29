@@ -14,23 +14,48 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.kevalpatel2106.smartlens.infopage.InfoFragment">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.kevalpatel2106.smartlens.infopage.InfoFragment">
 
-    <com.kevalpatel2106.smartlens.base.BaseImageView
-        android:id="@+id/wiki_page_iv"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:background="@color/colorPrimaryDark"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <com.kevalpatel2106.smartlens.base.BaseTextView
-        android:id="@+id/wiki_page_tv"
-        style="@style/Base.TextAppearance.AppCompat.Medium"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_below="@id/wiki_page_iv"/>
-</RelativeLayout>
+        <com.kevalpatel2106.smartlens.base.BaseImageView
+            android:id="@+id/wiki_page_iv"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@color/colorPrimaryDark"/>
+
+        <com.kevalpatel2106.smartlens.base.BaseTextView
+            android:id="@+id/wiki_page_title_tv"
+            style="@style/Base.TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"/>
+
+        <com.kevalpatel2106.smartlens.base.BaseTextView
+            android:id="@+id/wiki_page_tv"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"/>
+
+        <com.kevalpatel2106.smartlens.base.BaseTextView
+            android:id="@+id/suggestions_heading"
+            style="@style/Base.TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/suggestions_heading"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recommended_items_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>

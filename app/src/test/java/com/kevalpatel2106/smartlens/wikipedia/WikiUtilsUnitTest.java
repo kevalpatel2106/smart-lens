@@ -18,6 +18,7 @@ package com.kevalpatel2106.smartlens.wikipedia;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -41,6 +42,16 @@ public class WikiUtilsUnitTest {
         assertTrue(WikiUtils.isValidSummary("xyz", "abcdefghijklmnopqrstuvwxyz1234567890"));
     }
 
+    @Test
+    public void checkPossibleLabel() throws Exception {
+        String[] strings = WikiUtils.generatePossibleWikiLabel("Computer keyboard");
+        assertEquals(strings.length, 2);
+        assertEquals(strings[0], "Computer");
+        assertEquals(strings[1], "keyboard");
+
+        strings = WikiUtils.generatePossibleWikiLabel("Computer");
+        assertEquals(strings.length, 0);
+    }
 
     @SuppressWarnings("ConstantConditions")
     @Test

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.base;
+package com.kevalpatel2106.smartlens.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.kevalpatel2106.smartlens.BuildConfig;
-import com.kevalpatel2106.smartlens.utils.FileUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -42,16 +41,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public abstract class BaseRetrofitBuilder {
+public final class RetrofitHelper {
     public static final String GENERALIZE_ERROR = "Something went wrong.";
     public static final String INTERNET_NOT_AVAILABLE_ERROR = "Internet is not available. Please try again.";
 
     protected final Context mContext;
 
-    public BaseRetrofitBuilder(@NonNull Context context) {
+    public RetrofitHelper(@NonNull Context context) {
         //noinspection ConstantConditions
-        if (context == null)
-            throw new IllegalArgumentException("Cannot be null.");
+        if (context == null) throw new IllegalArgumentException("Cannot be null.");
 
         mContext = context;
     }
@@ -95,21 +93,21 @@ public abstract class BaseRetrofitBuilder {
      *
      * @param isCacheEnable    True if you want to cache the request for 30 seconds.
      * @param cacheTimeSeconds Cache expiration time in seconds
+     * @param baseUrl          Base url
      * @return {@link Retrofit.Builder}
      */
     @SuppressWarnings("SameParameterValue")
-    protected Retrofit getRetrofitBuilder(boolean isCacheEnable,
-                                          int cacheTimeSeconds) {
+    public Retrofit getRetrofitBuilder(@NonNull String baseUrl,
+                                       boolean isCacheEnable,
+                                       int cacheTimeSeconds) {
         //Building retrofit
         return new Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(getBaseUrl())
+                .baseUrl(baseUrl)
                 .client(buildHttpClient(mContext, isCacheEnable, cacheTimeSeconds))
                 .build();
     }
-
-    protected abstract String getBaseUrl();
 
     private class CacheInterceptor implements Interceptor {
         static final int CACHE_SIZE = 5242880;          //5 MB //Cache size.

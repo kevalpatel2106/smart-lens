@@ -23,55 +23,41 @@ import com.kevalpatel2106.smartlens.infopage.InfoCallbacks;
 import com.kevalpatel2106.smartlens.infopage.InfoModel;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 28-Jul-17.
  */
-public class WikiRetrofitHelperTest extends BaseTestClass {
-    private WikiRetrofitHelper mWikiRetrofitHelper;
+public class WikiHelperTest extends BaseTestClass {
     private InfoCallbacks mInfoCallbacks = new InfoCallbacks() {
         @Override
         public void onSuccess(InfoModel infoModel) {
-            //Do nothing
+
         }
 
         @Override
-        public void onRecommendedLoaded(InfoModel[] recommended) {
-            //Do nothing
+        public void onRecommendedLoaded(InfoModel recommended) {
+
         }
 
         @Override
         public void onError(String message) {
-            //Do nothing
+
         }
     };
 
-    @Before
-    public void setUp() {
-        mWikiRetrofitHelper = new WikiRetrofitHelper(InstrumentationRegistry.getTargetContext(),
-                mInfoCallbacks);
-    }
 
     @Test
     public void canInit() throws Exception {
         try {
-            new WikiRetrofitHelper(null, mInfoCallbacks);
-            new WikiRetrofitHelper(InstrumentationRegistry.getTargetContext(), null);
+            new WikiHelper(null, mInfoCallbacks);
+            new WikiHelper(InstrumentationRegistry.getTargetContext(), null);
             fail();
         } catch (IllegalArgumentException e) {
             //Success
         }
-    }
-
-    @Test
-    public void getBaseUrl() throws Exception {
-        assertNotNull(mWikiRetrofitHelper.getBaseUrl());
-//        assertTrue(mWikiRetrofitHelper.getBaseUrl().contains("wikipedia"));
     }
 
     @Override

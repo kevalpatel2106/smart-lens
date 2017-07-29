@@ -26,7 +26,7 @@ public interface InfoCallbacks {
 
     void onSuccess(@NonNull InfoModel infoModel);
 
-    void onRecommendedLoaded(@NonNull InfoModel[] recommended);
+    void onRecommendedLoaded(@NonNull InfoModel recommended);
 
     void onError(@NonNull String message);
 }

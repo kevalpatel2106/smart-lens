@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +35,9 @@ import com.kevalpatel2106.smartlens.base.BaseTextView;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
 import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
-import com.kevalpatel2106.smartlens.wikipedia.WikiRetrofitHelper;
+import com.kevalpatel2106.smartlens.wikipedia.WikiHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -49,11 +52,17 @@ public class InfoFragment extends BaseFragment implements InfoCallbacks {
 
     @BindView(R.id.wiki_page_iv)
     BaseImageView mWikiImage;
-
+    @BindView(R.id.wiki_page_title_tv)
+    BaseTextView mLabelHeadingTv;
     @BindView(R.id.wiki_page_tv)
-    BaseTextView mWikiTextView;
-
-    WikiRetrofitHelper mWikiRetrofitHelper;
+    BaseTextView mSummaryTv;
+    @BindView(R.id.suggestions_heading)
+    BaseTextView mSuggestionHeading;
+    @BindView(R.id.recommended_items_list)
+    RecyclerView mRecyclerView;
+    WikiHelper mWikiRetrofitHelper;
+    private RecommendedItemAdapter mAdapter;
+    private ArrayList<InfoModel> mInfoModels;
 
     public InfoFragment() {
         // Required empty public constructor
@@ -67,7 +76,7 @@ public class InfoFragment extends BaseFragment implements InfoCallbacks {
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        mWikiRetrofitHelper = new WikiRetrofitHelper(mContext, this);
+        mWikiRetrofitHelper = new WikiHelper(mContext, this);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_wiki, container, false);
     }
@@ -84,24 +93,49 @@ public class InfoFragment extends BaseFragment implements InfoCallbacks {
                     return recognitions != null && !recognitions.isEmpty();
                 })
                 .doOnSubscribe(this::addSubscription)
-                .doOnNext(event -> mWikiRetrofitHelper.getWikiPageDetail(
-                        ((ImageClassifiedEvent) event.getObject()).getRecognitions().get(0).getTitle()))
+                .doOnNext(event -> mWikiRetrofitHelper.getLabelDetail(
+                        ((ImageClassifiedEvent) event.getObject()).getRecognitions()))
                 .subscribe();
+
+        mInfoModels = new ArrayList<>();
+        mAdapter = new RecommendedItemAdapter(mContext, mInfoModels);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,
+                LinearLayoutManager.HORIZONTAL, false));
+        mRecyclerView.setAdapter(mAdapter);
     }
 
 
     @Override
     public void onSuccess(@NonNull InfoModel infoModel) {
-        mWikiTextView.setText(infoModel.getInfo());
+        hideSuggestion();
 
+        //Set the info
+        mLabelHeadingTv.setText(infoModel.getLabel());
+        mSummaryTv.setText(infoModel.getInfo());
         Glide.with(this)
                 .load(infoModel.getImageUrl())
                 .into(mWikiImage);
     }
 
     @Override
-    public void onRecommendedLoaded(@NonNull InfoModel[] recommended) {
+    public void onRecommendedLoaded(InfoModel recommended) {
+        Timber.d(recommended.getLabel());
 
+        if (mInfoModels.isEmpty()) {
+            mSuggestionHeading.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
+
+        mInfoModels.add(recommended);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void hideSuggestion() {
+        mSuggestionHeading.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.GONE);
+
+        mInfoModels.clear();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
