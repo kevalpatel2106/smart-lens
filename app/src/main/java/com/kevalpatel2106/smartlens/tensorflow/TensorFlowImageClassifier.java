@@ -37,9 +37,9 @@ import java.util.List;
 /**
  * A classifier specialized to label images using TensorFlow.
  */
-public class TensorFlowImageClassifire implements OnImageClassified {
+public class TensorFlowImageClassifier implements OnImageClassified {
 
-    private static final String TAG = TensorFlowImageClassifire.class.getSimpleName();
+    private static final String TAG = TensorFlowImageClassifier.class.getSimpleName();
 
     // These are the settings for the original v1 Inception model. If you want to
     // use a model that's been produced from the TensorFlow for Poets codelab,
@@ -92,7 +92,7 @@ public class TensorFlowImageClassifire implements OnImageClassified {
      *
      * @param context The context from which to get the asset manager to be used to load assets.
      */
-    public TensorFlowImageClassifire(Context context) {
+    public TensorFlowImageClassifier(Context context) {
         this(context.getAssets(),
                 MODEL_FILE,
                 LABEL_FILE,
@@ -118,7 +118,7 @@ public class TensorFlowImageClassifire implements OnImageClassified {
      * @param outputName    The label of the output node.
      */
     @SuppressWarnings("WeakerAccess")
-    public TensorFlowImageClassifire(AssetManager assetManager,
+    public TensorFlowImageClassifier(AssetManager assetManager,
                                      String modelFilename,
                                      String labelFilename,
                                      int numClasses,
@@ -189,8 +189,8 @@ public class TensorFlowImageClassifire implements OnImageClassified {
     @Override
     public List<Recognition> recognizeImage(Bitmap bitmap) {
         bitmap = Bitmap.createScaledBitmap(bitmap,
-                TensorFlowImageClassifire.INPUT_SIZE,
-                TensorFlowImageClassifire.INPUT_SIZE,
+                TensorFlowImageClassifier.INPUT_SIZE,
+                TensorFlowImageClassifier.INPUT_SIZE,
                 false);
         bitmap.getPixels(mBmpPixelValues,
                 0, bitmap.getWidth(),

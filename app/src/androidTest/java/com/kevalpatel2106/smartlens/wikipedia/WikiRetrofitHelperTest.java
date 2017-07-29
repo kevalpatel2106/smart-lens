@@ -41,7 +41,7 @@ public class WikiRetrofitHelperTest extends BaseTestClass {
         }
 
         @Override
-        public void onRecomandedLoaded(InfoModel[] recommended) {
+        public void onRecommendedLoaded(InfoModel[] recommended) {
             //Do nothing
         }
 

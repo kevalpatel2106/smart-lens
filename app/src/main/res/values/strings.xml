@@ -26,4 +26,5 @@
     <string name="image_classifier_frag_error_camera_open">Error opening the camera.</string>
     <string name="image_classifier_frag_error_no_front_camera">Your device doesn\'t have front camera.</string>
     <string name="image_classifier_frag_error_save_image">Cannot save the captured image.</string>
+    <string name="image_classifier_frag_error_image_detection_failed">Image detection failed.</string>
 </resources>

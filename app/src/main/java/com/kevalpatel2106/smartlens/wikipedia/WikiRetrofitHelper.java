@@ -67,6 +67,11 @@ public class WikiRetrofitHelper extends BaseRetrofitBuilder {
                 .create(WikiService.class);
     }
 
+    /**
+     * Get the wiki page detail.
+     *
+     * @param label Label string
+     */
     public void getWikiPageDetail(@NonNull final String label) {
         //Convert first character to cap.
         final String wikiLabel = WikiUtils.generateWikiLabel(label);
@@ -98,7 +103,44 @@ public class WikiRetrofitHelper extends BaseRetrofitBuilder {
                 });
     }
 
-    void getWikiImage(@NonNull InfoModel infoModel) {
+    /**
+     * Get the wiki image.
+     *
+     * @param infoModel {@link InfoModel}
+     */
+    private void getWikiImage(@NonNull InfoModel infoModel) {
+        Observable<ResponseBody> observable = getApiService()
+                .getImage("json", "query", "pageimages", "original",
+                        infoModel.getLabel());
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(responseBody -> {
+                            String responseStr = Utils.getStringFromStream(responseBody.byteStream());
+                            JSONObject pagesObj = new JSONObject(responseStr)
+                                    .getJSONObject("query")
+                                    .getJSONObject("pages");
+                            String imageUrl = pagesObj
+                                    .getJSONObject(pagesObj.names().getString(0))
+                                    .getJSONObject("thumbnail")
+                                    .getString("original");
+
+                            Timber.d("getWikiImage: " + imageUrl);
+
+                            if (!imageUrl.isEmpty()) infoModel.setImageUrl(imageUrl);
+                            mInfoCallbacks.onSuccess(infoModel);
+                        },
+                        throwable -> {
+                            mInfoCallbacks.onSuccess(infoModel);
+                            Timber.d("accept: " + BaseRetrofitBuilder.getErrorMessage(throwable));
+                        });
+    }
+
+    /**
+     * Get the wiki image.
+     *
+     * @param infoModel {@link InfoModel}
+     */
+    private void getRecommandedItems(@NonNull InfoModel infoModel) {
         Observable<ResponseBody> observable = getApiService()
                 .getImage("json", "query", "pageimages", "original",
                         infoModel.getLabel());

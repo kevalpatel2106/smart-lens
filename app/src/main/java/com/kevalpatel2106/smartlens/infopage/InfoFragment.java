@@ -18,6 +18,7 @@ package com.kevalpatel2106.smartlens.infopage;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -90,7 +91,7 @@ public class InfoFragment extends BaseFragment implements InfoCallbacks {
 
 
     @Override
-    public void onSuccess(InfoModel infoModel) {
+    public void onSuccess(@NonNull InfoModel infoModel) {
         mWikiTextView.setText(infoModel.getInfo());
 
         Glide.with(this)
@@ -99,12 +100,12 @@ public class InfoFragment extends BaseFragment implements InfoCallbacks {
     }
 
     @Override
-    public void onRecomandedLoaded(InfoModel[] recommended) {
+    public void onRecommendedLoaded(@NonNull InfoModel[] recommended) {
 
     }
 
     @Override
-    public void onError(String message) {
+    public void onError(@NonNull String message) {
         Timber.i(message);
     }
 }

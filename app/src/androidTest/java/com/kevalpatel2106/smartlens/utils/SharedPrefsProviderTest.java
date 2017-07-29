@@ -51,7 +51,9 @@ public final class SharedPrefsProviderTest extends BaseTestClass {
                 Context.MODE_PRIVATE);
 
         //Clear the preference.
-        mSharedPrefsProvider.removePreferences(TEST_KEY);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
     @SuppressWarnings("ConstantConditions")

@@ -16,58 +16,64 @@
 
 package com.kevalpatel2106.smartlens.tensorflow;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
+import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Keval on 21-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
-public class TensorFlowImageClassifireTest {
-    private TensorFlowImageClassifire mTensorFlowImageClassifier;
+public class TensorFlowImageClassifierTest extends BaseTestClass {
+    private TensorFlowImageClassifier mTensorFlowImageClassifier;
 
-//    @Before
-//    public void init() {
-//        System.gc();
-//        mTensorFlowImageClassifier = new TensorFlowImageClassifire(InstrumentationRegistry.getTargetContext());
-//    }
-//
-//    @Test
-//    public void canRecognizeImage() throws Exception {
-//        validateImageRecognition(com.kevalpatel2106.smartlens.test.R.drawable.keyboard, "keyboard");
-//        validateImageRecognition(com.kevalpatel2106.smartlens.test.R.drawable.laptop, "laptop");
-//
-//        //Check if can close?
-//        mTensorFlowImageClassifier.close();
-//        assertNull(mTensorFlowImageClassifier.mTensorFlowInferenceInterface);
-//    }
+    @Before
+    public void init() {
+        System.gc();
+        mTensorFlowImageClassifier = new TensorFlowImageClassifier(InstrumentationRegistry.getTargetContext());
+    }
+
+    @Test
+    public void canRecognizeImage() throws Exception {
+        validateImageRecognition(com.kevalpatel2106.smartlens.R.drawable.keyboard, "keyboard");
+        validateImageRecognition(com.kevalpatel2106.smartlens.R.drawable.laptop, "laptop");
+
+        //Check if can close?
+        mTensorFlowImageClassifier.close();
+        assertNull(mTensorFlowImageClassifier.mTensorFlowInferenceInterface);
+    }
 
     private void validateImageRecognition(int imageRes, String correctLabel) {
         //Generate mock image
-        Bitmap mockImage = BitmapFactory
-                .decodeResource(InstrumentationRegistry.getTargetContext().getResources(), imageRes);
+        Bitmap mockImage = BitmapFactory.decodeResource(InstrumentationRegistry
+                .getTargetContext()
+                .getResources(), imageRes);
         assertNotNull("Test image not found. Did you set correctly?", mockImage);
 
         // Classify image
-        List<Recognition> lables = mTensorFlowImageClassifier.recognizeImage(mockImage);
+        List<Recognition> labels = mTensorFlowImageClassifier.recognizeImage(mockImage);
 
         //Validate cases
-        assertNotNull(lables);
-        assertTrue(!lables.isEmpty());
+        assertNotNull(labels);
+        assertTrue(!labels.isEmpty());
 
         boolean isMatched = false;
-        for (Recognition recognition : lables) {
+        for (Recognition recognition : labels) {
             if (recognition.getTitle().contains(correctLabel)) {
                 isMatched = true;
                 break;
@@ -76,5 +82,10 @@ public class TensorFlowImageClassifireTest {
         assertTrue(isMatched);
         //noinspection UnusedAssignment
         mockImage = null;
+    }
+
+    @Override
+    public Activity getActivity() {
+        return null;
     }
 }

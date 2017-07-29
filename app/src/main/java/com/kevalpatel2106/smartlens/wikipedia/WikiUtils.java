@@ -39,8 +39,7 @@ class WikiUtils {
         label = Character.toUpperCase(label.charAt(0)) + label.substring(1).toLowerCase();
 
         //Replace space with _.
-        label = label.replace("\\s", "_");
-        return label;
+        return label.replace("\\s", "_");
     }
 
     /**
@@ -51,15 +50,10 @@ class WikiUtils {
      * @return Converted label.
      */
     @SuppressWarnings("ConstantConditions")
-    static String generatePossibleWikiLabel(@NonNull String label) {
+    static String[] generatePossibleWikiLabel(@NonNull String label) {
         if (label == null) throw new IllegalArgumentException("Cannot be null.");
-
-        //Convert first character to caps
-        label = Character.toUpperCase(label.charAt(0)) + label.substring(1).toLowerCase();
-
-        //Replace space with _.
-        label = label.replace("\\s", "_");
-        return label;
+        String[] labels = label.split("\\s");
+        return labels.length == 1 ? new String[0] : labels;
     }
 
     /**

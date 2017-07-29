@@ -42,7 +42,7 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
-import com.kevalpatel2106.smartlens.tensorflow.TensorFlowImageClassifire;
+import com.kevalpatel2106.smartlens.tensorflow.TensorFlowImageClassifier;
 import com.kevalpatel2106.smartlens.utils.rxBus.Event;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 
@@ -58,6 +58,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,7 +73,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     FrameLayout mContainer;
 
     CameraPreview mCameraPreview;
-    TensorFlowImageClassifire mImageClassifier;
+    TensorFlowImageClassifier mImageClassifier;
     private Disposable mTakePicDisposable;
 
     public ImageClassifierFragment() {
@@ -97,7 +98,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mImageClassifier = new TensorFlowImageClassifire(getActivity());
+        mImageClassifier = new TensorFlowImageClassifier(getActivity());
 
         //Add the camera preview.
         mCameraPreview = new CameraPreview(getActivity(), this);
@@ -124,7 +125,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     .filter(l -> mCameraPreview != null && mCameraPreview.isSafeToTakePicture())
                     .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
                     .doOnNext(aLong -> mCameraPreview.takePicture())
-                    .doOnError(throwable -> Snackbar.make(mContainer, "Image detection failed.", Toast.LENGTH_LONG).show())
+                    .doOnError(throwable -> Snackbar.make(mContainer,
+                            R.string.image_classifier_frag_error_image_detection_failed,
+                            Toast.LENGTH_LONG).show())
                     .subscribe();
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
@@ -183,12 +186,10 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(subscription -> subscriptions[0] = subscription)
                 .doOnError(t -> {
-                    Log.e(TAG, "onImageCapture: " + t.getMessage());
+                    Timber.e(t.getMessage());
                     subscriptions[0].cancel();
                 })
-                .doOnComplete(() -> {
-                    subscriptions[0].cancel();
-                })
+                .doOnComplete(() -> subscriptions[0].cancel())
                 .subscribe(labels -> {
                     if (!labels.isEmpty()) {
                         Log.d(TAG, "onImageCapture: " + labels.get(0).getTitle());
