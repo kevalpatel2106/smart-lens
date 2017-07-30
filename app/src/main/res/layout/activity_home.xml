@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<android.support.design.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -24,24 +24,21 @@
     android:layout_height="match_parent"
     tools:context=".Dashboard">
 
-    <FrameLayout
-        android:id="@+id/dashboard_camera_container"
+    <!--Bottom navigation view-->
+    <android.support.design.widget.BottomNavigationView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/navigation"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="?actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="start"
+        app:menu="@menu/dashboard_navigation_items"/>
 
-    <!--Bottom sheet-->
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/bottom_sheet"
+    <!--Container of the camera-->
+    <FrameLayout
+        android:id="@+id/dashboard_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_orange_light"
-        android:clipToPadding="true"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
-
-        <FrameLayout
-            android:id="@+id/dashboard_bottom_sheet_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Hello World!"/>
-    </android.support.v4.widget.NestedScrollView>
-</android.support.design.widget.CoordinatorLayout>
+        android:layout_above="@id/navigation"/>
+</RelativeLayout>

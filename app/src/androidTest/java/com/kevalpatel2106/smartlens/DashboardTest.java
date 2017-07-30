@@ -24,7 +24,6 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.app.Fragment;
 
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
-import com.kevalpatel2106.smartlens.infopage.InfoFragment;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.After;
@@ -32,6 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -45,23 +45,19 @@ public class DashboardTest extends BaseTestClass {
     public ActivityTestRule<Dashboard> mDashboardActivityTestRule = new ActivityTestRule<>(Dashboard.class);
 
     @Test
-    public void checkCameraFragmentLoaded() throws Exception {
+    public void checkImageClassifierFragmentLoaded() throws Exception {
         Thread.sleep(1000);
         Fragment fragment = mDashboardActivityTestRule
                 .getActivity()
                 .getSupportFragmentManager()
-                .findFragmentById(R.id.dashboard_camera_container);
+                .findFragmentById(R.id.dashboard_container);
         assertTrue(fragment instanceof ImageClassifierFragment);
     }
 
     @Test
-    public void checkWikiFragmentLoaded() throws Exception {
-        Thread.sleep(1000);
-        Fragment fragment = mDashboardActivityTestRule
-                .getActivity()
-                .getSupportFragmentManager()
-                .findFragmentById(R.id.dashboard_bottom_sheet_container);
-        assertTrue(fragment instanceof InfoFragment);
+    public void checkDefaultTabSelection() throws Exception {
+        assertEquals(mDashboardActivityTestRule.getActivity().mBottomNavigationView.getSelectedItemId(),
+                R.id.action_image_recognition);
     }
 
     @After

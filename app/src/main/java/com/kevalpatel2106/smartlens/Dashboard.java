@@ -17,72 +17,61 @@
 package com.kevalpatel2106.smartlens;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.widget.NestedScrollView;
-import android.view.View;
+import android.support.design.widget.BottomNavigationView;
 import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.base.BaseActivity;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
-import com.kevalpatel2106.smartlens.infopage.InfoFragment;
 
 import butterknife.BindView;
 
 public class Dashboard extends BaseActivity {
 
-    @BindView(R.id.bottom_sheet)
-    NestedScrollView mNestedScrollView;
+    @BindView(R.id.navigation)
+    BottomNavigationView mBottomNavigationView;
 
-    ImageClassifierFragment mCameraFragment;
-    InfoFragment mInfoFragment;
+    ImageClassifierFragment mImageClassifierFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        mCameraFragment = ImageClassifierFragment.getNewInstance();
-        mInfoFragment = InfoFragment.getNewInstance();
-
-        //First check if the camera available?
-        if (CameraUtils.isCameraAvailable(this)) {
-            //Set the camera fragment.
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.dashboard_camera_container, mCameraFragment)
-                    .commit();
-        } else {
+        if (!CameraUtils.isCameraAvailable(this)) {
             Toast.makeText(this,
                     R.string.dashboard_error_no_camera_found,
                     Toast.LENGTH_LONG).show();
             finish();
+            return;
         }
 
+        mImageClassifierFragment = ImageClassifierFragment.getNewInstance();
 
-        setBottomSheet();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    private void setBottomSheet() {
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(mNestedScrollView);
-        bottomSheetBehavior.setPeekHeight(100);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
+        //By default object recognition is selected.
+        mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_image_recognition:
+                    //Set the camera fragment.
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.dashboard_container, mImageClassifierFragment)
+                            .commit();
+                    break;
+                case R.id.action_ocr:
+                    //Set the camera fragment.
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.dashboard_container, mImageClassifierFragment)
+                            .commit();
+                    break;
+                case R.id.action_qr_scanner:
+                    //Set the camera fragment.
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.dashboard_container, mImageClassifierFragment)
+                            .commit();
+                    break;
             }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
+            return false;
         });
-
-        //Set the wiki fragment.
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.dashboard_bottom_sheet_container, mInfoFragment)
-                .commit();
+        mBottomNavigationView.setSelectedItemId(R.id.action_image_recognition);
     }
 }
