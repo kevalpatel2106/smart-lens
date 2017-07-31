@@ -9,8 +9,8 @@ env:
         - ANDROID_BUILD_TOOLS=25.0.3
         - ADB_INSTALL_TIMEOUT=10    #Time out to 10 mins
     matrix:
-        - COMPONENT=test-min EMULATOR_API=21 EMULATOR_ABI=armeabi-v7a
-        - COMPONENT=text-max EMULATOR_API=26 EMULATOR_ABI=
+        - COMPONENT=test-min EMULATOR_API=android-21 EMULATOR_ABI=armeabi-v7a
+        - COMPONENT=text-max EMULATOR_API=android-26 EMULATOR_ABI=
         - COMPONENT=build
 
 before_cache:
@@ -35,7 +35,8 @@ android:
         - extra-android-m2repository
 
         #system images
-        - sys-img-armeabi-v7a-android-$EMULATOR_API
+        - sys-img-armeabi-v7a-android-21
+        - sys-img-android-26
 
 licenses:
     - 'android-sdk-preview-license-52d11cd2'

@@ -11,7 +11,7 @@ if [ "$COMPONENT" == "text-min" ] || [ "$COMPONENT" == "text-max" ]; then
     echo "Starting AVD for component $COMPONENT"
 
     #Create AVD
-    echo no | android create avd --force --name test$EMULATOR_API --target android-$EMULATOR_API --abi $EMULATOR_ABI  -d "Nexus 6"
+    echo no | android create avd --force --name test$EMULATOR_API --target $EMULATOR_API --abi $EMULATOR_ABI  -d "Nexus 6"
 
     #Modify AVD
     sed -i -e 's/hw.ramSize=512/hw.ramSize=1024/g' ${HOME}/.android/avd/test$EMULATOR_API.avd/config.ini #Increase the RAM to 1024
