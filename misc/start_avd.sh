@@ -18,6 +18,10 @@ if [ "$COMPONENT" == "instrumentation" ]; then
     sed -i -e 's/vm.heapSize=48/vm.heapSize=192/g' ${HOME}/.android/avd/test.avd/config.ini #Increase the heap size to 192MB
     cat ${HOME}/.android/avd/test.avd/config.ini
 
+    #Start AVD
+    emulator -avd test -no-skin -no-audio -no-window &
+    android-wait-for-emulator
+
     #Display list of current devices
     adb devices
 
@@ -28,7 +32,7 @@ if [ "$COMPONENT" == "instrumentation" ]; then
 
     #Unlock the device
     adb shell input keyevent 82 &
-    android-wait-for-emulator
+    exit 0
 fi
 
 exit 0
