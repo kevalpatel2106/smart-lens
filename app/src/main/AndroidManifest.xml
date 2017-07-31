@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
           package="com.kevalpatel2106.smartlens">
@@ -27,6 +26,8 @@
         android:name="android.hardware.camera"
         android:required="true"/>
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="false"
@@ -37,12 +38,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1"/>
 
-        <!--splash screen-->
+        <!-- splash screen -->
         <activity
             android:name=".SplashScreen"
             android:noHistory="true"
@@ -56,7 +56,7 @@
             </intent-filter>
         </activity>
 
-        <!--Home screen-->
+        <!-- Home screen -->
         <activity
             android:name=".Dashboard"
             android:label="@string/title_home_activity"
@@ -64,6 +64,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionbar.NoBackground"
             tools:ignore="UnusedAttribute"/>
+
+        <service android:name=".tensorflow.ModelDownloadService"/>
     </application>
 
 </manifest>

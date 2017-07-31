@@ -27,8 +27,8 @@ import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -62,9 +62,6 @@ public class TensorFlowImageClassifier implements OnImageClassified {
     private static final String INPUT_NAME = "input:0";
     private static final String OUTPUT_NAME = "output:0";
 
-    private static final String MODEL_FILE = "file:///android_asset/tensorflow/tensorflow_inception_graph.pb";
-    private static final String LABEL_FILE = "file:///android_asset/tensorflow/imagenet_comp_graph_label_strings.txt";
-
 
     // Only return this many results with at least this confidence.
     private static final int MAX_RESULTS = 3;
@@ -94,8 +91,8 @@ public class TensorFlowImageClassifier implements OnImageClassified {
      */
     public TensorFlowImageClassifier(Context context) {
         this(context.getAssets(),
-                MODEL_FILE,
-                LABEL_FILE,
+                TensorflowUtils.getImageGraph(context).getAbsolutePath(),
+                TensorflowUtils.getImageLabels(context).getAbsolutePath(),
                 NUM_CLASSES,
                 INPUT_SIZE,
                 IMAGE_MEAN,
@@ -108,8 +105,8 @@ public class TensorFlowImageClassifier implements OnImageClassified {
      * Initializes a native TensorFlow session for classifying images.
      *
      * @param assetManager  The asset manager to be used to load assets.
-     * @param modelFilename The filepath of the model GraphDef protocol buffer.
-     * @param labelFilename The filepath of label file for classes.
+     * @param modelFilePath The filepath of the model GraphDef protocol buffer.
+     * @param labelFilePath The filepath of label file for classes.
      * @param numClasses    The number of classes output by the model.
      * @param inputSize     The input size. A square image of inputSize x inputSize is assumed.
      * @param imageMean     The assumed mean of the image values.
@@ -119,8 +116,8 @@ public class TensorFlowImageClassifier implements OnImageClassified {
      */
     @SuppressWarnings("WeakerAccess")
     public TensorFlowImageClassifier(AssetManager assetManager,
-                                     String modelFilename,
-                                     String labelFilename,
+                                     String modelFilePath,
+                                     String labelFilePath,
                                      int numClasses,
                                      int inputSize,
                                      int imageMean,
@@ -131,9 +128,7 @@ public class TensorFlowImageClassifier implements OnImageClassified {
         this.outputName = outputName;
 
         // Read the label names into memory.
-        String actualFilename = labelFilename.split("file:///android_asset/")[1];
-
-        this.labels = readLabels(assetManager, actualFilename);
+        this.labels = readLabels(labelFilePath);
         Log.i(TAG, "Read " + labels.size() + ", " + numClasses + " specified");
 
         this.inputSize = inputSize;
@@ -147,21 +142,20 @@ public class TensorFlowImageClassifier implements OnImageClassified {
         this.mBmpPixelValues = new int[inputSize * inputSize];
 
         //Initialize TF
-        mTensorFlowInferenceInterface = new TensorFlowInferenceInterface(assetManager, modelFilename);
+        mTensorFlowInferenceInterface = new TensorFlowInferenceInterface(assetManager, modelFilePath);
     }
 
     /**
      * Read the labels from {@link #LABEL_FILE}.
      *
-     * @param assetManager The asset manager to be used to load assets.
-     * @param filename     Name of the label file. (By default it is {@link #LABEL_FILE}.)
+     * @param labelFiles     Name of the label file. (By default it is {@link #LABEL_FILE}.)
      * @return Array list of label names.
      */
-    private ArrayList<String> readLabels(AssetManager assetManager, String filename) {
+    private ArrayList<String> readLabels(String labelFiles) {
         ArrayList<String> result = new ArrayList<>();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(assetManager.open(filename)));
+            br = new BufferedReader(new FileReader(labelFiles));
             String line;
             while ((line = br.readLine()) != null) {
                 result.add(line);
@@ -169,7 +163,7 @@ public class TensorFlowImageClassifier implements OnImageClassified {
             br.close();
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new IllegalStateException("Cannot read labels from " + filename);
+            throw new IllegalStateException("Cannot read labels from " + labelFiles);
         } finally {
             try {
                 if (br != null) br.close();

@@ -18,14 +18,18 @@ package com.kevalpatel2106.smartlens.imageClassifier;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +46,11 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
+import com.kevalpatel2106.smartlens.tensorflow.DownloadProgressEvent;
+import com.kevalpatel2106.smartlens.tensorflow.ModelDownloadService;
 import com.kevalpatel2106.smartlens.tensorflow.TensorFlowImageClassifier;
+import com.kevalpatel2106.smartlens.tensorflow.TensorflowUtils;
+import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 
 import org.reactivestreams.Subscription;
 
@@ -70,6 +78,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     @BindView(R.id.camera_preview_container)
     FrameLayout mContainer;
 
+    ProgressDialog mProgressDialog;
     CameraPreview mCameraPreview;
     TensorFlowImageClassifier mImageClassifier;
     private Disposable mTakePicDisposable;
@@ -89,15 +98,33 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
+        //Create the download progressbar
+        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog.setMessage("Downloading data...");
+        mProgressDialog.setCancelable(false);
+
+        RxBus.getDefault().register(DownloadProgressEvent.class)
+                .doOnSubscribe(this::addSubscription)
+                .doOnNext(event -> {
+                    DownloadProgressEvent downloadProgressEvent =
+                            (DownloadProgressEvent) event.getObject();
+                    mProgressDialog.setMessage("Downloading data...(" +
+                            downloadProgressEvent.getPercent() + "%)");
+
+                    if (downloadProgressEvent.isDownloading() && !mProgressDialog.isShowing()) {
+                        mProgressDialog.show();
+                    } else if (!downloadProgressEvent.isDownloading() && mProgressDialog.isShowing()) {
+                        mProgressDialog.dismiss();
+                    }
+                })
+                .subscribe();
+
         return inflater.inflate(R.layout.fragment_camera, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mImageClassifier = new TensorFlowImageClassifier(getActivity());
-
         //Add the camera preview.
         mCameraPreview = new CameraPreview(getActivity(), this);
         mContainer.removeAllViews();
@@ -107,9 +134,22 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     @Override
     public void onStart() {
         super.onStart();
+        safeStartImageRecognition();
+    }
 
-        //Start the camera.
-        if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {
+    /**
+     * Start the image recognition if
+     * <li>Camera permission is granted</li>
+     * <li>Tensorflow models are downloaded</li>
+     */
+    private void safeStartImageRecognition() {
+        if (!TensorflowUtils.isModelsDownloaded(mContext)) {    //Check if the tensorflow models are there
+            downloadDataDialog();
+        } else if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {//Start the camera.
+            //Initiate the tensorflow classifier.
+            if (mImageClassifier == null)
+                mImageClassifier = new TensorFlowImageClassifier(getActivity());
+
             //Start the camera.
             mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
                     .setCameraResolution(CameraResolution.LOW_RESOLUTION)
@@ -120,7 +160,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
             Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .filter(l -> mCameraPreview != null && mCameraPreview.isSafeToTakePicture())
+                    .filter(l -> mCameraPreview != null
+                            && mCameraPreview.isSafeToTakePicture()
+                            && mImageClassifier != null)
                     .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
                     .doOnNext(aLong -> mCameraPreview.takePicture())
                     .doOnError(throwable -> Snackbar.make(mContainer,
@@ -150,10 +192,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
 
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //Start the camera.
-                    mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
-                            .setCameraResolution(CameraResolution.LOW_RESOLUTION)
-                            .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
-                            .build());
+                    safeStartImageRecognition();
                 } else {
                     //Permission not granted. Explain dialog.
                     Snackbar.make(mContainer, R.string.camera_frag_permission_denied_statement,
@@ -191,7 +230,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 .subscribe(labels -> {
                     if (!labels.isEmpty()) {
                         Log.d(TAG, "onImageCapture: " + labels.get(0).getTitle());
-
+                        //TODO Send the info fragment
                     }
                 });
     }
@@ -218,5 +257,27 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 break;
         }
         if (mTakePicDisposable != null) mTakePicDisposable.dispose();
+    }
+
+    /**
+     * Confirmation dialog to download the tensorflow models.
+     */
+    private void downloadDataDialog() {
+        new AlertDialog.Builder(mContext)
+                .setMessage(R.string.image_classifire_frag_additional_download_explain)
+                .setPositiveButton(R.string.image_classifire_frag_btn_download, (dialogInterface, i) -> {
+                    mProgressDialog.show();
+
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+                        mContext.startService(new Intent(mContext, ModelDownloadService.class));
+                    } else {
+                        mContext.startForegroundService(new Intent(mContext, ModelDownloadService.class));
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
+                    //TODO switch to error view
+                })
+                .setCancelable(false)
+                .show();
     }
 }
