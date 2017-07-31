@@ -33,7 +33,7 @@ import com.kevalpatel2106.smartlens.R;
  * This class makes heavy use of the {@link NotificationCompat.Builder} helper
  * class to create notifications in a backward-compatible way.
  */
-class ModelDownloadingNotification {
+class TFModelDownloadingNotification {
     /**
      * The unique identifier for this type of notification.
      */
@@ -45,8 +45,14 @@ class ModelDownloadingNotification {
      *
      * @see #cancel(Context)
      */
+    static void notify(final Context context, int progress, boolean isIndeterminant) {
+        final NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm != null)
+            nm.notify(NOTIFICATION_TAG, getNotification(context, progress, isIndeterminant));
+    }
+
     @SuppressWarnings("deprecation")
-    static Notification notify(final Context context, int progress, boolean isIndeterminant) {
+    static Notification getNotification(Context context, int progress, boolean isIndeterminant) {
         final Resources res = context.getResources();
         final Bitmap picture = BitmapFactory.decodeResource(res, R.drawable.ic_stat_model_downloading);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)

@@ -72,4 +72,8 @@ public class BaseFragment extends Fragment {
         super.onDestroy();
         mCompositeDisposable.dispose();
     }
+
+    protected void finish() {
+        if (mContext instanceof AppCompatActivity) ((AppCompatActivity) mContext).finish();
+    }
 }

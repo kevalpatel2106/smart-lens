@@ -20,21 +20,33 @@ package com.kevalpatel2106.smartlens.tensorflow;
  * Created by Keval on 31-Jul-17.
  */
 
-public final class DownloadProgressEvent {
+public final class TFDownloadProgressEvent {
     private boolean isDownloading;
 
     private int percent;
 
-    DownloadProgressEvent(boolean isDownloading, int percent) {
+    private String errorMsg;
+
+    TFDownloadProgressEvent(boolean isDownloading, int percent) {
         this.isDownloading = isDownloading;
         this.percent = percent;
     }
 
+    TFDownloadProgressEvent(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
     public int getPercent() {
-        return percent;
+        if (percent < 0) return 0;
+        else if (percent > 100) return 100;
+        else return percent;
     }
 
     public boolean isDownloading() {
         return isDownloading;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
     }
 }

@@ -37,9 +37,9 @@ import java.util.List;
 /**
  * A classifier specialized to label images using TensorFlow.
  */
-public class TensorFlowImageClassifier implements OnImageClassified {
+public class TFImageClassifier implements OnImageClassified {
 
-    private static final String TAG = TensorFlowImageClassifier.class.getSimpleName();
+    private static final String TAG = TFImageClassifier.class.getSimpleName();
 
     // These are the settings for the original v1 Inception model. If you want to
     // use a model that's been produced from the TensorFlow for Poets codelab,
@@ -89,10 +89,10 @@ public class TensorFlowImageClassifier implements OnImageClassified {
      *
      * @param context The context from which to get the asset manager to be used to load assets.
      */
-    public TensorFlowImageClassifier(Context context) {
+    public TFImageClassifier(Context context) {
         this(context.getAssets(),
-                TensorflowUtils.getImageGraph(context).getAbsolutePath(),
-                TensorflowUtils.getImageLabels(context).getAbsolutePath(),
+                TFUtils.getImageGraph(context).getAbsolutePath(),
+                TFUtils.getImageLabels(context).getAbsolutePath(),
                 NUM_CLASSES,
                 INPUT_SIZE,
                 IMAGE_MEAN,
@@ -115,15 +115,15 @@ public class TensorFlowImageClassifier implements OnImageClassified {
      * @param outputName    The label of the output node.
      */
     @SuppressWarnings("WeakerAccess")
-    public TensorFlowImageClassifier(AssetManager assetManager,
-                                     String modelFilePath,
-                                     String labelFilePath,
-                                     int numClasses,
-                                     int inputSize,
-                                     int imageMean,
-                                     float imageStd,
-                                     String inputName,
-                                     String outputName) {
+    public TFImageClassifier(AssetManager assetManager,
+                             String modelFilePath,
+                             String labelFilePath,
+                             int numClasses,
+                             int inputSize,
+                             int imageMean,
+                             float imageStd,
+                             String inputName,
+                             String outputName) {
         this.inputName = inputName;
         this.outputName = outputName;
 
@@ -146,9 +146,9 @@ public class TensorFlowImageClassifier implements OnImageClassified {
     }
 
     /**
-     * Read the labels from {@link #LABEL_FILE}.
+     * Read the labels from {@link TFUtils#getImageLabels(Context)}.
      *
-     * @param labelFiles     Name of the label file. (By default it is {@link #LABEL_FILE}.)
+     * @param labelFiles     Name of the label file. (By default it is {@link TFUtils#getImageLabels(Context)}.)
      * @return Array list of label names.
      */
     private ArrayList<String> readLabels(String labelFiles) {
@@ -183,8 +183,8 @@ public class TensorFlowImageClassifier implements OnImageClassified {
     @Override
     public List<Recognition> recognizeImage(Bitmap bitmap) {
         bitmap = Bitmap.createScaledBitmap(bitmap,
-                TensorFlowImageClassifier.INPUT_SIZE,
-                TensorFlowImageClassifier.INPUT_SIZE,
+                TFImageClassifier.INPUT_SIZE,
+                TFImageClassifier.INPUT_SIZE,
                 false);
         bitmap.getPixels(mBmpPixelValues,
                 0, bitmap.getWidth(),

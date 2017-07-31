@@ -46,10 +46,10 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
-import com.kevalpatel2106.smartlens.tensorflow.DownloadProgressEvent;
-import com.kevalpatel2106.smartlens.tensorflow.ModelDownloadService;
-import com.kevalpatel2106.smartlens.tensorflow.TensorFlowImageClassifier;
-import com.kevalpatel2106.smartlens.tensorflow.TensorflowUtils;
+import com.kevalpatel2106.smartlens.tensorflow.TFDownloadProgressEvent;
+import com.kevalpatel2106.smartlens.tensorflow.TFImageClassifier;
+import com.kevalpatel2106.smartlens.tensorflow.TFModelDownloadService;
+import com.kevalpatel2106.smartlens.tensorflow.TFUtils;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 
 import org.reactivestreams.Subscription;
@@ -80,7 +80,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
 
     ProgressDialog mProgressDialog;
     CameraPreview mCameraPreview;
-    TensorFlowImageClassifier mImageClassifier;
+    TFImageClassifier mImageClassifier;
     private Disposable mTakePicDisposable;
 
     public ImageClassifierFragment() {
@@ -100,26 +100,56 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                              Bundle savedInstanceState) {
         //Create the download progressbar
         mProgressDialog = new ProgressDialog(mContext);
-        mProgressDialog.setMessage("Downloading data...");
+        mProgressDialog.setMessage(getString(R.string.image_classifire_download_progressbar_message));
         mProgressDialog.setCancelable(false);
 
-        RxBus.getDefault().register(DownloadProgressEvent.class)
-                .doOnSubscribe(this::addSubscription)
-                .doOnNext(event -> {
-                    DownloadProgressEvent downloadProgressEvent =
-                            (DownloadProgressEvent) event.getObject();
-                    mProgressDialog.setMessage("Downloading data...(" +
-                            downloadProgressEvent.getPercent() + "%)");
-
-                    if (downloadProgressEvent.isDownloading() && !mProgressDialog.isShowing()) {
-                        mProgressDialog.show();
-                    } else if (!downloadProgressEvent.isDownloading() && mProgressDialog.isShowing()) {
-                        mProgressDialog.dismiss();
-                    }
-                })
-                .subscribe();
+        registerModelDownloadProgressListener();
 
         return inflater.inflate(R.layout.fragment_camera, container, false);
+    }
+
+    /**
+     * Register the bus to receive the download progress. This will update the download progress.
+     */
+    private void registerModelDownloadProgressListener() {
+        RxBus.getDefault().register(TFDownloadProgressEvent.class)
+                .doOnSubscribe(this::addSubscription)
+                .doOnNext(event -> {
+                    TFDownloadProgressEvent TFDownloadProgressEvent =
+                            (TFDownloadProgressEvent) event.getObject();
+
+                    if (TFDownloadProgressEvent.getErrorMsg() == null) {
+                        //Error occurred while downloading
+                        mProgressDialog.cancel();
+
+                        new AlertDialog.Builder(mContext)
+                                .setMessage(TFDownloadProgressEvent.getErrorMsg())
+                                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                                    //Kill the activity.
+                                    finish();
+                                })
+                                .setCancelable(false)
+                                .show();
+                    } else if (TFDownloadProgressEvent.isDownloading() && !mProgressDialog.isShowing()) {
+                        //Progress updated
+                        //Display the progress percentage
+                        mProgressDialog.setMessage(getString(R.string.image_classifire_download_progressbar_message)
+                                + "(" + TFDownloadProgressEvent.getPercent() + "%)");
+                        mProgressDialog.show();
+                    } else if (!TFDownloadProgressEvent.isDownloading() && mProgressDialog.isShowing()) {
+                        //Download complete
+                        mProgressDialog.dismiss();
+
+                        //Initiate the recognizer
+                        safeStartImageRecognition();
+                    }
+                })
+                .doOnDispose(() -> {
+                    //Hide the progressbar
+                    if (mProgressDialog != null && mProgressDialog.isShowing())
+                        mProgressDialog.cancel();
+                })
+                .subscribe();
     }
 
     @Override
@@ -143,12 +173,12 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
      * <li>Tensorflow models are downloaded</li>
      */
     private void safeStartImageRecognition() {
-        if (!TensorflowUtils.isModelsDownloaded(mContext)) {    //Check if the tensorflow models are there
+        if (!TFUtils.isModelsDownloaded(mContext)) {    //Check if the tensorflow models are there
             downloadDataDialog();
         } else if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {//Start the camera.
             //Initiate the tensorflow classifier.
             if (mImageClassifier == null)
-                mImageClassifier = new TensorFlowImageClassifier(getActivity());
+                mImageClassifier = new TFImageClassifier(getActivity());
 
             //Start the camera.
             mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
@@ -269,14 +299,12 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     mProgressDialog.show();
 
                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
-                        mContext.startService(new Intent(mContext, ModelDownloadService.class));
+                        mContext.startService(new Intent(mContext, TFModelDownloadService.class));
                     } else {
-                        mContext.startForegroundService(new Intent(mContext, ModelDownloadService.class));
+                        mContext.startForegroundService(new Intent(mContext, TFModelDownloadService.class));
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
-                    //TODO switch to error view
-                })
+                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> finish())
                 .setCancelable(false)
                 .show();
     }

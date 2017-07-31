@@ -26,8 +26,7 @@ import java.io.File;
 /**
  * Created by Keval on 31-Jul-17.
  */
-
-public class TensorflowUtils {
+public final class TFUtils {
     private static final String TF_CACHE_DIRECTORY = "tensorflow";
 
     static File getImageGraph(@Nullable Context context) {

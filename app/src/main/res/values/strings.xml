@@ -46,4 +46,6 @@
     <string name="image_classifire_frag_additional_download_explain">Image recognition requires additional 60MB to download. Do you want to download now?</string>
     <string name="image_classifire_frag_btn_download">Download</string>
     <string name="model_downloading_notification_title">Downloading image recognition models</string>
+    <string name="image_classifire_download_progressbar_message">Downloading data...</string>
+    <string name="model_download_service_error_download">Cannot download. Please try again.</string>
 </resources>

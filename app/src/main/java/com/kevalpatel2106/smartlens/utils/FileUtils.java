@@ -19,6 +19,12 @@ package com.kevalpatel2106.smartlens.utils;
 import android.content.Context;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import io.reactivex.annotations.NonNull;
 
@@ -45,4 +51,32 @@ public class FileUtils {
     public static File getCacheDir(@NonNull Context context) {
         return context.getExternalCacheDir() != null ? context.getExternalCacheDir() : context.getCacheDir();
     }
+
+    public static boolean copyFile(@NonNull File destFile,
+                                   @NonNull File srcFile) {
+        try {
+            // download the file
+            InputStream input = new FileInputStream(srcFile);
+            OutputStream output = new FileOutputStream(destFile);
+
+            byte data[] = new byte[4096];
+            int count;
+            while ((count = input.read(data)) != -1) output.write(data, 0, count);
+
+            output.flush();
+            output.close();
+            input.close();
+
+            //noinspection ResultOfMethodCallIgnored
+            srcFile.delete();
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

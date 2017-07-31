@@ -39,13 +39,13 @@ import static org.junit.Assert.assertTrue;
  * Created by Keval on 21-Jul-17.
  */
 @RunWith(AndroidJUnit4.class)
-public class TensorFlowImageClassifierTest extends BaseTestClass {
-    private TensorFlowImageClassifier mTensorFlowImageClassifier;
+public class TFImageClassifierTest extends BaseTestClass {
+    private TFImageClassifier mTFImageClassifier;
 
     @Before
     public void init() {
         System.gc();
-        mTensorFlowImageClassifier = new TensorFlowImageClassifier(InstrumentationRegistry.getTargetContext());
+        mTFImageClassifier = new TFImageClassifier(InstrumentationRegistry.getTargetContext());
     }
 
     @Test
@@ -54,8 +54,8 @@ public class TensorFlowImageClassifierTest extends BaseTestClass {
         validateImageRecognition(com.kevalpatel2106.smartlens.R.drawable.laptop, "laptop");
 
         //Check if can close?
-        mTensorFlowImageClassifier.close();
-        assertNull(mTensorFlowImageClassifier.mTensorFlowInferenceInterface);
+        mTFImageClassifier.close();
+        assertNull(mTFImageClassifier.mTensorFlowInferenceInterface);
     }
 
     private void validateImageRecognition(int imageRes, String correctLabel) {
@@ -66,7 +66,7 @@ public class TensorFlowImageClassifierTest extends BaseTestClass {
         assertNotNull("Test image not found. Did you set correctly?", mockImage);
 
         // Classify image
-        List<Recognition> labels = mTensorFlowImageClassifier.recognizeImage(mockImage);
+        List<Recognition> labels = mTFImageClassifier.recognizeImage(mockImage);
 
         //Validate cases
         assertNotNull(labels);

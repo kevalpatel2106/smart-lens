@@ -65,7 +65,7 @@
             android:theme="@style/AppTheme.NoActionbar.NoBackground"
             tools:ignore="UnusedAttribute"/>
 
-        <service android:name=".tensorflow.ModelDownloadService"/>
+        <service android:name=".tensorflow.TFModelDownloadService"/>
     </application>
 
 </manifest>
