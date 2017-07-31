@@ -6,10 +6,6 @@ dist: precise
 env:
     global:
         - ADB_INSTALL_TIMEOUT=10    #Time out to 10 mins
-    matrix:
-        - COMPONENT=test-min EMULATOR_API=android-21 EMULATOR_ABI=armeabi-v7a
-        - COMPONENT=text-max EMULATOR_API=android-26 EMULATOR_ABI=
-        - COMPONENT=build
 
 before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
