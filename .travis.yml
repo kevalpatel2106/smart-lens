@@ -67,7 +67,8 @@ script:
     - bash ./misc/ci_script.sh
 
 after_success:
-    - bash <(curl -s https://codecov.io/bash)
+    - chmod +x ./misc/ci_after_success.sh
+    - bash ./misc/ci_after_success.sh
 
 after_failure:
     - cat $TRAVIS_BUILD_DIR/app/build/outputs/lint-results-debug.xml

@@ -3,7 +3,7 @@
 set -e
 
 if [ "$COMPONENT" == "unit" ]; then
-    ./gradlew testReleaseUnitTest jacocoTestReport mergeAndroidReports --continue --stacktrace
+    ./gradlew test
 elif [ "$COMPONENT" == "instrumentation" ]; then
     ./gradlew connectedAndroidTest jacocoTestReport mergeAndroidReports --continue --stacktrace
 elif [ "$COMPONENT" == "build" ]; then
