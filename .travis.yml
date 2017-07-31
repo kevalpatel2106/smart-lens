@@ -5,25 +5,38 @@ dist: precise
 
 env:
     global:
+        - ANDROID_API=26
+        - EMULATOR_API=21
+        - ANDROID_BUILD_TOOLS=25.0.3
         - ADB_INSTALL_TIMEOUT=10    #Time out to 10 mins
+    matrix:
+        - COMPONENT=unit
+        - COMPONENT=instrumentation
+        - COMPONENT=build
 
 before_cache:
-    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+    -rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+    -rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+    directories:
+        -$HOME/.gradle/caches/
+        -$HOME/.gradle/wrapper/
 
 android:
     update_sdk: true
     components:
         - platform-tools
         - tools
-        - build-tools-25.0.3
-        - android-26
+        - build-tools-$ANDROID_BUILD_TOOLS
+        - android-$ANDROID_API
 
         # Additional components
         - extra-google-m2repository
         - extra-android-m2repository
 
         #system images
-        - sys-img-armeabi-v7a-android-21
+        - sys-img-armeabi-v7a-android-$EMULATOR_API
 
 licenses:
     - 'android-sdk-preview-license-52d11cd2'
@@ -46,21 +59,12 @@ before_script:
     - android list device
 
     # Create emulator with 1G RAM
-    - chmod +x ./misc/set_emulator_prop.sh
-    - bash ./misc/set_emulator_prop.sh
-
-    # Start emulator
-    - emulator -avd test -no-skin -no-audio -no-window &
-    - android-wait-for-emulator
-
-    - adb devices   #Display list of
-    - adb shell settings put global window_animation_scale 0.0 
-    - adb shell settings put global transition_animation_scale 0.0
-    - adb shell settings put global animator_duration_scale 0.0
-    - adb shell input keyevent 82 &
+    - chmod +x ./misc/start_avd.sh
+    - bash ./misc/start_avd.sh
 
 script:
-    - ./gradlew connectedAndroidTest test jacocoTestReport mergeAndroidReports --continue --stacktrace
+    - chmod +x ./misc/ci_script.sh
+    - bash ./misc/ci_script.sh
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)

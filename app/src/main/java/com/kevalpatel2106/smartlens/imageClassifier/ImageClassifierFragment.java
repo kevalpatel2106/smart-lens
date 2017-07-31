@@ -43,8 +43,6 @@ import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
 import com.kevalpatel2106.smartlens.tensorflow.TensorFlowImageClassifier;
-import com.kevalpatel2106.smartlens.utils.rxBus.Event;
-import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 
 import org.reactivestreams.Subscription;
 
@@ -193,8 +191,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 .subscribe(labels -> {
                     if (!labels.isEmpty()) {
                         Log.d(TAG, "onImageCapture: " + labels.get(0).getTitle());
-                        ImageClassifiedEvent imageClassifiedEvent = new ImageClassifiedEvent(labels);
-                        RxBus.getDefault().post(new Event(imageClassifiedEvent));
+
                     }
                 });
     }
