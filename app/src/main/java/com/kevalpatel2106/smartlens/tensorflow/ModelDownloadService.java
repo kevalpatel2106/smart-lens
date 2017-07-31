@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.imageClassifier;
+package com.kevalpatel2106.smartlens.tensorflow;
 
 import android.app.IntentService;
 import android.content.Intent;
