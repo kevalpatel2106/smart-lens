@@ -6,16 +6,16 @@ set -e
 # we can get a small performance improvement by continuing the build, and only blocking and
 # waiting for the emulator when we absolutely need it.
 
-if [ "$COMPONENT" == "instrumentation" ]; then
+if [ "$COMPONENT" == "text-min" ] || [ "$COMPONENT" == "text-max" ]; then
     #Creates and starts an emulator.
     echo "Starting AVD for component $COMPONENT"
 
     #Create AVD
-    echo no | android create avd --force --name test --target android-21 --abi armeabi-v7a  -d "Nexus 6"
+    echo no | android create avd --force --name test$EMULATOR_API --target android-$EMULATOR_API --abi $EMULATOR_ABI  -d "Nexus 6"
 
     #Modify AVD
-    sed -i -e 's/hw.ramSize=512/hw.ramSize=1024/g' ${HOME}/.android/avd/test.avd/config.ini #Increase the RAM to 1024
-    sed -i -e 's/vm.heapSize=48/vm.heapSize=192/g' ${HOME}/.android/avd/test.avd/config.ini #Increase the heap size to 192MB
+    sed -i -e 's/hw.ramSize=512/hw.ramSize=1024/g' ${HOME}/.android/avd/test$EMULATOR_API.avd/config.ini #Increase the RAM to 1024
+    sed -i -e 's/vm.heapSize=48/vm.heapSize=192/g' ${HOME}/.android/avd/test$EMULATOR_API.avd/config.ini #Increase the heap size to 192MB
     cat ${HOME}/.android/avd/test.avd/config.ini
 
     #Start AVD

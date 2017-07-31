@@ -2,6 +2,6 @@
 
 set -e
 
-if [ "$COMPONENT" == "instrumentation" ]; then
+if [ "$COMPONENT" == "text-max" ]; then
     bash <(curl -s https://codecov.io/bash)
 fi

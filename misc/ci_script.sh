@@ -2,10 +2,10 @@
 
 set -e
 
-if [ "$COMPONENT" == "unit" ]; then
-    ./gradlew test
-elif [ "$COMPONENT" == "instrumentation" ]; then
-    ./gradlew connectedAndroidTest jacocoTestReport mergeAndroidReports --continue --stacktrace
+if [ "$COMPONENT" == "text-max" ]; then
+    ./gradlew connectedAndroidTest test jacocoTestReport mergeAndroidReports --continue --stacktrace
+elif [ "$COMPONENT" == "text-min" ]; then
+    ./gradlew connectedAndroidTest test --stacktrace
 elif [ "$COMPONENT" == "build" ]; then
     ./gradlew assembleRelease --stacktrace
 else
