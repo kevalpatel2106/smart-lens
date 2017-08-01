@@ -33,6 +33,10 @@
         android:layout_height="?actionBarSize"
         android:layout_alignParentBottom="true"
         android:layout_gravity="start"
+        app:elevation="4dp"
+        app:itemBackground="@color/colorPrimary"
+        app:itemIconTint="@color/bottombar_color"
+        app:itemTextColor="@color/bottombar_color"
         app:menu="@menu/dashboard_navigation_items"/>
 
     <!--Container of the camera-->

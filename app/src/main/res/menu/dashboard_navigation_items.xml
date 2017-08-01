@@ -19,14 +19,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_image_recognition"
-        android:icon="@mipmap/ic_launcher"
-        android:title="Object Recognition"/>
+        android:icon="@drawable/ic_stat_model_downloading"
+        android:title="Object Scanner"/>
     <item
         android:id="@+id/action_ocr"
-        android:icon="@mipmap/ic_launcher"
-        android:title="Text"/>
+        android:icon="@drawable/ic_stat_model_downloading"
+        android:title="Text Scanner"/>
     <item
         android:id="@+id/action_qr_scanner"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_stat_model_downloading"
         android:title="QR Scanner"/>
 </menu>

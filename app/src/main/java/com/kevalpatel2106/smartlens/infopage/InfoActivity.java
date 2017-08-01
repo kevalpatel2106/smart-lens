@@ -17,19 +17,19 @@
 package com.kevalpatel2106.smartlens.infopage;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.kevalpatel2106.smartlens.R;
-import com.kevalpatel2106.smartlens.base.BaseFragment;
+import com.kevalpatel2106.smartlens.base.BaseActivity;
 import com.kevalpatel2106.smartlens.base.BaseImageView;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
@@ -46,9 +46,9 @@ import timber.log.Timber;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InfoFragment extends BaseFragment implements InfoCallbacks {
+public class InfoActivity extends BaseActivity implements InfoCallbacks {
     @SuppressWarnings("unused")
-    private static final String TAG = "InfoFragment";
+    private static final String TAG = "InfoActivity";
 
     @BindView(R.id.wiki_page_iv)
     BaseImageView mWikiImage;
@@ -64,26 +64,21 @@ public class InfoFragment extends BaseFragment implements InfoCallbacks {
     private RecommendedItemAdapter mAdapter;
     private ArrayList<InfoModel> mInfoModels;
 
-    public InfoFragment() {
+    public InfoActivity() {
         // Required empty public constructor
     }
 
-    public static InfoFragment getNewInstance() {
-        return new InfoFragment();
+    public static void launch(@NonNull Context context) {
+        Intent launchIntent = new Intent(context, InfoActivity.class);
+        context.startActivity(launchIntent);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-        mWikiRetrofitHelper = new WikiHelper(mContext, this);
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_wiki, container, false);
-    }
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_info);
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        mWikiRetrofitHelper = new WikiHelper(this, this);
 
         //Register image classifier.
         RxBus.getDefault().register(new Class[]{ImageClassifiedEvent.class})
@@ -98,8 +93,8 @@ public class InfoFragment extends BaseFragment implements InfoCallbacks {
                 .subscribe();
 
         mInfoModels = new ArrayList<>();
-        mAdapter = new RecommendedItemAdapter(mContext, mInfoModels);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,
+        mAdapter = new RecommendedItemAdapter(this, mInfoModels);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL, false));
         mRecyclerView.setAdapter(mAdapter);
     }

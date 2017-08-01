@@ -74,6 +74,6 @@ public class BaseFragment extends Fragment {
     }
 
     protected void finish() {
-        if (mContext instanceof AppCompatActivity) ((AppCompatActivity) mContext).finish();
+        getActivity().finish();
     }
 }

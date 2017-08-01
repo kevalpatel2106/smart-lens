@@ -36,7 +36,7 @@ public class Dashboard extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_dashboard);
 
         if (!CameraUtils.isCameraAvailable(this)) {
             Toast.makeText(this,
@@ -69,8 +69,10 @@ public class Dashboard extends BaseActivity {
                             .replace(R.id.dashboard_container, mImageClassifierFragment)
                             .commit();
                     break;
+                default:
+                    throw new IllegalStateException("This bottom bar tab is invalid.");
             }
-            return false;
+            return true;
         });
         mBottomNavigationView.setSelectedItemId(R.id.action_image_recognition);
     }

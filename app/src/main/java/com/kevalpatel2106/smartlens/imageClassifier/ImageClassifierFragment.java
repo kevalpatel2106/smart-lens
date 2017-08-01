@@ -39,6 +39,7 @@ import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
+import com.kevalpatel2106.smartlens.base.BaseTextView;
 import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
 import com.kevalpatel2106.smartlens.camera.CameraConfig;
 import com.kevalpatel2106.smartlens.camera.CameraError;
@@ -71,12 +72,14 @@ import timber.log.Timber;
  */
 public final class ImageClassifierFragment extends BaseFragment implements CameraCallbacks {
     private static final String TAG = "ImageClassifierFragment";
-    private static final long FIRST_CAPTURE_DELAY = 4000L;
-    private static final long INTERVAL_DELAY = 2000L;
+    private static final long FIRST_CAPTURE_DELAY = 4000L;  //4 seconds
+    private static final long INTERVAL_DELAY = 2000L;   //2 seconds
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
     FrameLayout mContainer;
+    @BindView(R.id.recognition_tv)
+    BaseTextView mClassifiedTv;
 
     ProgressDialog mProgressDialog;
     CameraPreview mCameraPreview;
@@ -105,7 +108,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
 
         registerModelDownloadProgressListener();
 
-        return inflater.inflate(R.layout.fragment_camera, container, false);
+        return inflater.inflate(R.layout.fragment_image_classifire, container, false);
     }
 
     /**
@@ -118,7 +121,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     TFDownloadProgressEvent TFDownloadProgressEvent =
                             (TFDownloadProgressEvent) event.getObject();
 
-                    if (TFDownloadProgressEvent.getErrorMsg() == null) {
+                    if (TFDownloadProgressEvent.getErrorMsg() != null) {
                         //Error occurred while downloading
                         mProgressDialog.cancel();
 
@@ -155,6 +158,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mClassifiedTv.setVisibility(View.GONE);
+
         //Add the camera preview.
         mCameraPreview = new CameraPreview(getActivity(), this);
         mContainer.removeAllViews();
@@ -260,6 +266,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 .subscribe(labels -> {
                     if (!labels.isEmpty()) {
                         Log.d(TAG, "onImageCapture: " + labels.get(0).getTitle());
+                        mClassifiedTv.setVisibility(View.VISIBLE);
+                        mClassifiedTv.setText(labels.get(0).getTitle());
+
                         //TODO Send the info fragment
                     }
                 });

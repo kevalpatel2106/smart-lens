@@ -19,6 +19,7 @@ package com.kevalpatel2106.smartlens.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -56,9 +57,15 @@ public final class UtilsTest extends BaseTestClass {
                 + "/IMG" + System.currentTimeMillis() + ".png");
 
         //Check the output png
-        assertFalse(Utils.saveImageFromFile(mockBmp,
-                mockSaveFile,
-                CameraImageFormat.FORMAT_PNG));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            assertTrue(Utils.saveImageFromFile(mockBmp,
+                    mockSaveFile,
+                    CameraImageFormat.FORMAT_PNG));
+        } else {
+            assertFalse(Utils.saveImageFromFile(mockBmp,
+                    mockSaveFile,
+                    CameraImageFormat.FORMAT_PNG));
+        }
 
         //Create mock file with cache directory. Cache file has always write permission.
         mockSaveFile = new File(FileUtils.getCacheDir(InstrumentationRegistry.getTargetContext())

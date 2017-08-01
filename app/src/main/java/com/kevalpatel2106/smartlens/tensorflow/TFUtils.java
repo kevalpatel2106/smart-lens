@@ -29,7 +29,7 @@ import java.io.File;
 public final class TFUtils {
     private static final String TF_CACHE_DIRECTORY = "tensorflow";
 
-    static File getImageGraph(@Nullable Context context) {
+    public static File getImageGraph(@Nullable Context context) {
         File dir = new File(FileUtils.getCacheDir(context).getAbsolutePath() + "/"
                 + TF_CACHE_DIRECTORY);
         if (!dir.exists()) dir.mkdir();
@@ -38,7 +38,7 @@ public final class TFUtils {
                 + "tensorflow_inception_graph.pb");
     }
 
-    static File getImageLabels(@Nullable Context context) {
+    public static File getImageLabels(@Nullable Context context) {
         File dir = new File(FileUtils.getCacheDir(context).getAbsolutePath() + "/"
                 + TF_CACHE_DIRECTORY);
         if (!dir.exists()) dir.mkdir();

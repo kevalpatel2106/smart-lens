@@ -65,6 +65,15 @@
             android:theme="@style/AppTheme.NoActionbar.NoBackground"
             tools:ignore="UnusedAttribute"/>
 
+        <!-- Info screen -->
+        <activity
+            android:name=".infopage.InfoActivity"
+            android:label="@string/title_home_activity"
+            android:resizeableActivity="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionbar"
+            tools:ignore="UnusedAttribute"/>
+
         <service android:name=".tensorflow.TFModelDownloadService"/>
     </application>
 

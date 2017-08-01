@@ -31,7 +31,22 @@ import android.os.PowerManager;
 import android.support.test.runner.AndroidJUnitRunner;
 import android.util.Log;
 
+import com.kevalpatel2106.smartlens.tensorflow.TFUtils;
+import com.kevalpatel2106.smartlens.utils.FileUtils;
+
+import org.junit.Assert;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
+
+import timber.log.Timber;
 
 /**
  * Tests can fail for other reasons than code, it´ because of the animations and espresso sync and
@@ -48,12 +63,13 @@ import java.lang.reflect.Method;
  */
 public final class CustomTestRunner extends AndroidJUnitRunner {
     private static final String TAG = "CustomTestRunner";
+    private static final String TENSORFLOW_GRAPH_URL = "https://github.com/kevalpatel2106/smart-lens/blob/master/tf_models/tensorflow_inception_graph.pb?raw=true";
+    private static final String TENSORFLOW_LABEL_URL = "https://raw.githubusercontent.com/kevalpatel2106/smart-lens/master/tf_models/imagenet_comp_graph_label_strings.txt";
 
     @Override
     public void onStart() {
+        Context app = CustomTestRunner.this.getTargetContext().getApplicationContext();
         runOnMainSync(() -> {
-            Context app = CustomTestRunner.this.getTargetContext().getApplicationContext();
-
             CustomTestRunner.this.disableAnimations(app);
 
             String name = CustomTestRunner.class.getSimpleName();
@@ -61,7 +77,55 @@ public final class CustomTestRunner extends AndroidJUnitRunner {
             keepScreenAwake(app, name);
         });
 
+        if (!TFUtils.isModelsDownloaded(app)) {
+            try {
+                if (download(TENSORFLOW_GRAPH_URL, app, TFUtils.getImageGraph(app))) {
+                    download(TENSORFLOW_LABEL_URL, app, TFUtils.getImageLabels(app));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Assert.fail("Cannot download the tensorflow models.");
+            }
+        }
+
         super.onStart();
+    }
+
+    private boolean download(String urlToDownload, Context context, File file) throws IOException {
+
+        //Create temp file.
+        File tempFile = new File(FileUtils.getCacheDir(context)
+                + "/" + file.getName());
+        tempFile.createNewFile();
+
+        //Create URL
+        URL url = new URL(urlToDownload);
+        URLConnection connection = url.openConnection();
+        connection.connect();
+        // this will be useful so that you can show a typical 0-100% progress bar
+        int fileLength = connection.getContentLength();
+
+        // download the file
+        InputStream input = new BufferedInputStream(connection.getInputStream());
+        OutputStream output = new FileOutputStream(tempFile);
+
+        byte data[] = new byte[2048];
+        long total = 0;
+        int count;
+        while ((count = input.read(data)) != -1) {
+            total += count;
+            output.write(data, 0, count);
+
+            // publishing the progress....
+            int percent = (int) (total * 100 / fileLength);
+            Timber.d(percent + "%");
+        }
+        output.flush();
+        output.close();
+        input.close();
+
+        //Copy the file to the main url
+        return FileUtils.copyFile(file, tempFile);
     }
 
 
@@ -70,6 +134,7 @@ public final class CustomTestRunner extends AndroidJUnitRunner {
         super.finish(resultCode, results);
         enableAnimations(getContext());
     }
+
     @SuppressLint("WakelockTimeout")
     private void keepScreenAwake(Context app, String name) {
         PowerManager power = (PowerManager) app.getSystemService(Context.POWER_SERVICE);

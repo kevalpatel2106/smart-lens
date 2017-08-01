@@ -16,11 +16,20 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorPrimaryText">#383838</color>
-    <color name="colorSecondaryText">#9d9d9d</color>
+    <!--Shades of primary-->
+    <color name="colorPrimary">#08314D</color>
+    <color name="colorPrimaryDark">#071E2E</color>
+    <color name="colorPrimaryLight">#0c4a73</color>
+
+    <!--Shades of accent-->
+    <color name="colorAccent">#3B929D</color>
+    <color name="colorAccentLight">#46abb9</color>
+    <color name="colorAccentLighter">#6bbcc7</color>
+
+    <!--text colors-->
+    <color name="colorPrimaryText">#FFFFFF</color>
+    <color name="colorSecondaryText">#D9D9D9</color>
+
 
     <color name="divider">#B6B6B6</color>
 </resources>

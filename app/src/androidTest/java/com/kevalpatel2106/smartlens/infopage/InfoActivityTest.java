@@ -21,6 +21,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.assertion.ViewAssertions;
+import android.support.test.rule.ActivityTestRule;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
@@ -28,7 +29,6 @@ import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.testUtils.CustomMatchers;
 import com.kevalpatel2106.smartlens.testUtils.Delay;
-import com.kevalpatel2106.smartlens.testUtils.FragmentTestRule;
 import com.kevalpatel2106.smartlens.testUtils.TestConfig;
 import com.kevalpatel2106.smartlens.utils.rxBus.Event;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
@@ -52,7 +52,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -60,14 +59,14 @@ import static org.junit.Assert.fail;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public class InfoFragmentTest extends BaseTestClass {
+public class InfoActivityTest extends BaseTestClass {
     @SuppressWarnings("unused")
-    private static final String TAG = "InfoFragmentTest";
+    private static final String TAG = "InfoActivityTest";
     private static final String MOCK_LABEL = "electric locomotive";
 
     @Rule
-    public FragmentTestRule<InfoFragment> mWikiFragmentFragmentTestRule =
-            new FragmentTestRule<>(InfoFragment.class);
+    public ActivityTestRule<InfoActivity> mWikiFragmentFragmentTestRule =
+            new ActivityTestRule<>(InfoActivity.class);
 
     private static String getStringFromInputStream(InputStream is) {
         BufferedReader br = null;
@@ -97,12 +96,6 @@ public class InfoFragmentTest extends BaseTestClass {
     @Before
     public void init() {
         mWikiFragmentFragmentTestRule.launchActivity(null);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Test
-    public void checkNewInstance() throws Exception {
-        assertTrue(InfoFragment.getNewInstance() instanceof InfoFragment);
     }
 
     @Test
