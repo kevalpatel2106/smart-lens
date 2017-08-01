@@ -28,6 +28,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <!--Point image-->
+    <com.kevalpatel2106.smartlens.base.BaseImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_plus"
+        android:tint="?colorAccent"/>
+
     <!--Textview to display the object recognised.-->
     <com.kevalpatel2106.smartlens.base.BaseTextView
         android:id="@+id/recognition_tv"
@@ -35,9 +43,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="?colorAccent"
+        android:background="@drawable/bg_accent_with_ripple"
         android:padding="10dp"
         android:textAlignment="center"
         android:textColor="@color/colorPrimaryText"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        tools:ignore="UnusedAttribute"/>
 </RelativeLayout>

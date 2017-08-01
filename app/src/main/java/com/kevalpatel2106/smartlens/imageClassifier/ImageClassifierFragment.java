@@ -19,11 +19,9 @@ package com.kevalpatel2106.smartlens.imageClassifier;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -47,18 +45,19 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
+import com.kevalpatel2106.smartlens.infopage.InfoActivity;
 import com.kevalpatel2106.smartlens.tensorflow.TFDownloadProgressEvent;
 import com.kevalpatel2106.smartlens.tensorflow.TFImageClassifier;
-import com.kevalpatel2106.smartlens.tensorflow.TFModelDownloadService;
-import com.kevalpatel2106.smartlens.tensorflow.TFUtils;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 
 import org.reactivestreams.Subscription;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -81,9 +80,12 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     @BindView(R.id.recognition_tv)
     BaseTextView mClassifiedTv;
 
+    List<Recognition> mLastRecognition;
+
     ProgressDialog mProgressDialog;
     CameraPreview mCameraPreview;
     TFImageClassifier mImageClassifier;
+    boolean isTakePictureWorking = false;
     private Disposable mTakePicDisposable;
 
     public ImageClassifierFragment() {
@@ -101,6 +103,10 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
+        //Initiate the tensorflow classifier.
+        mImageClassifier = new TFImageClassifier(getActivity());
+        mLastRecognition = new ArrayList<>();
+
         //Create the download progressbar
         mProgressDialog = new ProgressDialog(mContext);
         mProgressDialog.setMessage(getString(R.string.image_classifire_download_progressbar_message));
@@ -109,6 +115,24 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
         registerModelDownloadProgressListener();
 
         return inflater.inflate(R.layout.fragment_image_classifire, container, false);
+    }
+
+    /**
+     * Open the {@link com.kevalpatel2106.smartlens.infopage.InfoActivity} if there are any last
+     * recognized items.
+     */
+    @OnClick(R.id.recognition_tv)
+    void openInfoScreen() {
+        //If there are no labels.
+        if (mLastRecognition.isEmpty()) return;
+
+        //Stop the image recognition and taking pictures.
+        stopImageRecognition();
+
+        //Open the labels.
+        ArrayList<String> labels = new ArrayList<>(mLastRecognition.size());
+        for (Recognition recognition : mLastRecognition) labels.add(recognition.getTitle());
+        InfoActivity.launch(getActivity(), labels, null);
     }
 
     /**
@@ -179,13 +203,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
      * <li>Tensorflow models are downloaded</li>
      */
     private void safeStartImageRecognition() {
-        if (!TFUtils.isModelsDownloaded(mContext)) {    //Check if the tensorflow models are there
+        if (!mImageClassifier.isModelDownloaded()) {    //Check if the tensorflow models are there
             downloadDataDialog();
         } else if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {//Start the camera.
-            //Initiate the tensorflow classifier.
-            if (mImageClassifier == null)
-                mImageClassifier = new TFImageClassifier(getActivity());
-
             //Start the camera.
             mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
                     .setCameraResolution(CameraResolution.LOW_RESOLUTION)
@@ -198,7 +218,8 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .filter(l -> mCameraPreview != null
                             && mCameraPreview.isSafeToTakePicture()
-                            && mImageClassifier != null)
+                            && mImageClassifier != null
+                            && isVisible())
                     .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
                     .doOnNext(aLong -> mCameraPreview.takePicture())
                     .doOnError(throwable -> Snackbar.make(mContainer,
@@ -210,14 +231,17 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
         }
     }
 
+    private void stopImageRecognition() {
+        if (mTakePicDisposable != null) mTakePicDisposable.dispose();
+    }
+
     @Override
     public void onStop() {
         super.onStop();
-
         //Stop and release the camera
         if (mCameraPreview != null) {
             mCameraPreview.stopPreviewAndReleaseCamera();
-            if (mTakePicDisposable != null) mTakePicDisposable.dispose();
+            stopImageRecognition();
         }
     }
 
@@ -269,7 +293,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                         mClassifiedTv.setVisibility(View.VISIBLE);
                         mClassifiedTv.setText(labels.get(0).getTitle());
 
-                        //TODO Send the info fragment
+                        //Load as the last recognition
+                        mLastRecognition.clear();
+                        mLastRecognition.addAll(labels);
                     }
                 });
     }
@@ -295,7 +321,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                         .show();
                 break;
         }
-        if (mTakePicDisposable != null) mTakePicDisposable.dispose();
+        stopImageRecognition();
     }
 
     /**
@@ -307,11 +333,8 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 .setPositiveButton(R.string.image_classifire_frag_btn_download, (dialogInterface, i) -> {
                     mProgressDialog.show();
 
-                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
-                        mContext.startService(new Intent(mContext, TFModelDownloadService.class));
-                    } else {
-                        mContext.startForegroundService(new Intent(mContext, TFModelDownloadService.class));
-                    }
+                    //Start downloading message.
+                    mImageClassifier.downloadModels();
                 })
                 .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> finish())
                 .setCancelable(false)

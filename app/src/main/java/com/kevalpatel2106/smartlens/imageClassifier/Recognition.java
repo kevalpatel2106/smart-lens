@@ -18,13 +18,15 @@ package com.kevalpatel2106.smartlens.imageClassifier;
 
 import android.graphics.RectF;
 
+import java.io.Serializable;
+
 /**
  * Created by Keval Patel on 29/07/17.
  *
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class Recognition {
+public final class Recognition implements Serializable {
     /**
      * A unique identifier for what has been recognized. Specific to the class, not the instance of
      * the object.

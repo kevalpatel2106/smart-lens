@@ -48,4 +48,7 @@
     <string name="model_downloading_notification_title">Downloading image recognition models</string>
     <string name="image_classifire_download_progressbar_message">Downloading data...</string>
     <string name="model_download_service_error_download">Cannot download. Please try again.</string>
+    <string name="info_activity_error_label">No labels found.</string>
+    <string name="info_activity_transition_name">info_transition</string>
+    <string name="wiki_helper_no_info_found">No info found.</string>
 </resources>

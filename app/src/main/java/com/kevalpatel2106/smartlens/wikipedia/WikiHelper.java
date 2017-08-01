@@ -19,7 +19,7 @@ package com.kevalpatel2106.smartlens.wikipedia;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
+import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.infopage.BaseInfoHelper;
 import com.kevalpatel2106.smartlens.infopage.InfoCallbacks;
 import com.kevalpatel2106.smartlens.infopage.InfoModel;
@@ -55,11 +55,12 @@ public class WikiHelper extends BaseInfoHelper {
     }
 
     @Override
-    public void getLabelDetail(@NonNull List<Recognition> recognitions) {
+    public void getLabelDetail(@NonNull List<String> labels) {
         //Convert first character to cap.
-        final String wikiLabel = WikiUtils.generateWikiLabel(recognitions.get(position).getTitle());
+        final String wikiLabel = labels.get(position);
         Observable<ResponseBody> observable = getApiService()
-                .getInfo("json", "query", "extracts", "", "", wikiLabel);
+                .getInfo("json", "query", "extracts", "", "",
+                        WikiUtils.generateWikiLabel(wikiLabel));
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(responseBody -> {
@@ -74,12 +75,18 @@ public class WikiHelper extends BaseInfoHelper {
                         getWikiImage(infoModel);
 
                         //Load the recognition
-                        getRecommandedItems(recognitions);
+                        getRecommendedItems(labels, wikiLabel);
                     } else {
 
                         // Try to get the next label
                         position++;
-                        if (position < recognitions.size() - 1) getLabelDetail(recognitions);
+                        if (position < labels.size() - 1) {
+                            //Get the info about the next possible item
+                            getLabelDetail(labels);
+                        } else {
+                            //None of the label has info.
+                            mCallbacks.onError(mContext.getString(R.string.wiki_helper_no_info_found));
+                        }
                     }
                 }, throwable -> {
                     mCallbacks.onError(RetrofitHelper.getErrorMessage(throwable));
@@ -128,20 +135,24 @@ public class WikiHelper extends BaseInfoHelper {
     /**
      * Get the wiki image.
      *
-     * @param recognitions {@link InfoModel}
+     * @param labels {@link InfoModel}
      */
     @Override
-    public void getRecommandedItems(@NonNull List<Recognition> recognitions) {
-        ArrayList<String> labels = new ArrayList<>();
-        for (int i = 0; i < recognitions.size(); i++) {
-            Recognition recognition = recognitions.get(i);
-            if (i != 0) labels.add(recognition.getTitle());
-            Collections.addAll(labels, WikiUtils.generatePossibleWikiLabel(recognition.getTitle()));
-        }
+    public void getRecommendedItems(@NonNull List<String> labels,
+                                    @NonNull String mainLabel) {
 
+        ArrayList<String> recommendedLabel = new ArrayList<>();
         for (String label : labels) {
+            if (!mainLabel.equalsIgnoreCase(label)) recommendedLabel.add(label);
+            Collections.addAll(recommendedLabel, WikiUtils.generatePossibleWikiLabel(label));
+        }
+        for (String label : recommendedLabel) {
             Observable<ResponseBody> observable = getApiService()
-                    .getImage("json", "query", "pageimages", "original", label);
+                    .getImage("json",
+                            "query",
+                            "pageimages",
+                            "original",
+                            WikiUtils.generateWikiLabel(label));
             observable.observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(responseBody -> {

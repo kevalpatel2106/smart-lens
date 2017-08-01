@@ -33,7 +33,7 @@ import com.kevalpatel2106.smartlens.R;
  * This class makes heavy use of the {@link NotificationCompat.Builder} helper
  * class to create notifications in a backward-compatible way.
  */
-class TFModelDownloadingNotification {
+final class TFModelDownloadingNotification {
     /**
      * The unique identifier for this type of notification.
      */

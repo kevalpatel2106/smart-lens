@@ -14,48 +14,95 @@
   ~ limitations under the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.kevalpatel2106.smartlens.infopage.InfoActivity">
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-    <LinearLayout
+            <com.kevalpatel2106.smartlens.base.BaseImageView
+                android:id="@+id/wiki_page_iv"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@color/colorPrimaryDark"
+                android:transitionName="@string/info_activity_transition_name"
+                tools:ignore="UnusedAttribute"/>
+
+            <com.kevalpatel2106.smartlens.base.BaseImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@color/black_40"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="4dp"
+                android:theme="@style/ToolbarColoredBackArrow"
+                app:layout_collapseMode="pin"
+                app:subtitleTextColor="@color/colorPrimaryText"
+                app:titleTextColor="@color/colorPrimaryText"
+                tools:ignore="Overdraw,UnusedAttribute"/>
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.kevalpatel2106.smartlens.base.BaseImageView
-            android:id="@+id/wiki_page_iv"
+        <ViewFlipper
+            android:id="@+id/root_flipper"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@color/colorPrimaryDark"/>
+            android:layout_height="match_parent">
 
-        <com.kevalpatel2106.smartlens.base.BaseTextView
-            android:id="@+id/wiki_page_title_tv"
-            style="@style/Base.TextAppearance.AppCompat.Large"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"/>
+            <!--0. Login-->
+            <include layout="@layout/layout_loading"/>
 
-        <com.kevalpatel2106.smartlens.base.BaseTextView
-            android:id="@+id/wiki_page_tv"
-            style="@style/Base.TextAppearance.AppCompat.Medium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"/>
+            <!--1. Info layout-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <com.kevalpatel2106.smartlens.base.BaseTextView
-            android:id="@+id/suggestions_heading"
-            style="@style/Base.TextAppearance.AppCompat.Large"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="@string/suggestions_heading"/>
+                <com.kevalpatel2106.smartlens.base.BaseTextView
+                    android:id="@+id/wiki_page_tv"
+                    style="@style/Base.TextAppearance.AppCompat.Medium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recommended_items_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-</ScrollView>
+                <com.kevalpatel2106.smartlens.base.BaseTextView
+                    android:id="@+id/suggestions_heading"
+                    style="@style/Base.TextAppearance.AppCompat.Large"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/suggestions_heading"
+                    android:textColor="@color/colorSecondaryText"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recommended_items_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <!--2. Error-->
+            <include layout="@layout/layout_error"/>
+        </ViewFlipper>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>

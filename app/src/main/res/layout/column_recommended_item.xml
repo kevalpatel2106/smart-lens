@@ -18,6 +18,8 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/row_root"
     android:layout_width="150dp"
     android:layout_height="match_parent"
     app:cardBackgroundColor="@android:color/white"
@@ -34,7 +36,10 @@
         <com.kevalpatel2106.smartlens.base.BaseImageView
             android:id="@+id/wiki_image_view"
             android:layout_width="140dp"
-            android:layout_height="140dp"/>
+            android:layout_height="140dp"
+            android:scaleType="centerCrop"
+            android:transitionName="@string/info_activity_transition_name"
+            tools:ignore="UnusedAttribute"/>
 
         <com.kevalpatel2106.smartlens.base.BaseTextView
             android:id="@+id/wiki_text_view"

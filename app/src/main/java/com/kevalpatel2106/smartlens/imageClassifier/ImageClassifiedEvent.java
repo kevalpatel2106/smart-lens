@@ -26,7 +26,7 @@ import java.util.List;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class ImageClassifiedEvent {
+public final class ImageClassifiedEvent {
 
     private List<Recognition> mRecognitions;
 

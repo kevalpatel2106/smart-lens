@@ -22,6 +22,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:textColorPrimary">@color/colorPrimaryText</item>
+        <item name="android:textColorSecondary">@color/colorSecondaryText</item>
+
+        <item name="actionMenuTextColor">@color/colorPrimaryText</item>
     </style>
 
     <!-- Base application theme with no background. -->
@@ -50,5 +55,9 @@
     <!--Override in v19-->
     <style name="AppTheme.Translucent.NoBackground">
         <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="ToolbarColoredBackArrow" parent="AppTheme">
+        <item name="android:textColorSecondary">@color/colorPrimaryText</item>
     </style>
 </resources>

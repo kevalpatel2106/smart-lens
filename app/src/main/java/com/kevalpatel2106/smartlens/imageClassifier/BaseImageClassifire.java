@@ -26,8 +26,12 @@ import java.util.List;
  *
  * @author 'https://github.com/androidthings/sample-tensorflow-imageclassifier/blob/master/app/src/main/java/com/example/androidthings/imageclassifier/classifier/Classifier.java'
  */
-public interface OnImageClassified {
+public interface BaseImageClassifire {
     List<Recognition> recognizeImage(Bitmap bitmap);
 
     void close();
+
+    void downloadModels();
+
+    boolean isModelDownloaded();
 }

@@ -17,16 +17,18 @@
 package com.kevalpatel2106.smartlens.tensorflow;
 
 import android.content.Context;
-import android.content.res.AssetManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.util.Log;
 
-import com.kevalpatel2106.smartlens.imageClassifier.OnImageClassified;
+import com.kevalpatel2106.smartlens.imageClassifier.BaseImageClassifire;
 import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ import java.util.List;
 /**
  * A classifier specialized to label images using TensorFlow.
  */
-public class TFImageClassifier implements OnImageClassified {
+public final class TFImageClassifier implements BaseImageClassifire {
 
     private static final String TAG = TFImageClassifier.class.getSimpleName();
 
@@ -83,6 +85,7 @@ public class TFImageClassifier implements OnImageClassified {
         // Intentionally reversed to put high confidence at the head of the queue.
         return Float.compare(rhs.getConfidence(), lhs.getConfidence());
     };
+    private Context mContext;
 
     /**
      * Initializes a native TensorFlow session for classifying images.
@@ -90,10 +93,7 @@ public class TFImageClassifier implements OnImageClassified {
      * @param context The context from which to get the asset manager to be used to load assets.
      */
     public TFImageClassifier(Context context) {
-        this(context.getAssets(),
-                TFUtils.getImageGraph(context).getAbsolutePath(),
-                TFUtils.getImageLabels(context).getAbsolutePath(),
-                NUM_CLASSES,
+        this(context, NUM_CLASSES,
                 INPUT_SIZE,
                 IMAGE_MEAN,
                 IMAGE_STD,
@@ -104,31 +104,33 @@ public class TFImageClassifier implements OnImageClassified {
     /**
      * Initializes a native TensorFlow session for classifying images.
      *
-     * @param assetManager  The asset manager to be used to load assets.
-     * @param modelFilePath The filepath of the model GraphDef protocol buffer.
-     * @param labelFilePath The filepath of label file for classes.
-     * @param numClasses    The number of classes output by the model.
-     * @param inputSize     The input size. A square image of inputSize x inputSize is assumed.
-     * @param imageMean     The assumed mean of the image values.
-     * @param imageStd      The assumed std of the image values.
-     * @param inputName     The label of the image input node.
-     * @param outputName    The label of the output node.
+     * @param context    The context.
+     * @param numClasses The number of classes output by the model.
+     * @param inputSize  The input size. A square image of inputSize x inputSize is assumed.
+     * @param imageMean  The assumed mean of the image values.
+     * @param imageStd   The assumed std of the image values.
+     * @param inputName  The label of the image input node.
+     * @param outputName The label of the output node.
      */
     @SuppressWarnings("WeakerAccess")
-    public TFImageClassifier(AssetManager assetManager,
-                             String modelFilePath,
-                             String labelFilePath,
-                             int numClasses,
-                             int inputSize,
-                             int imageMean,
-                             float imageStd,
-                             String inputName,
-                             String outputName) {
+    private TFImageClassifier(Context context,
+                              int numClasses,
+                              int inputSize,
+                              int imageMean,
+                              float imageStd,
+                              String inputName,
+                              String outputName) {
+        mContext = context;
+
+        //Check if the models downloaded?
+        if (!isModelDownloaded())
+            throw new RuntimeException("Models are not downloaded yet. Download them first.");
+
         this.inputName = inputName;
         this.outputName = outputName;
 
         // Read the label names into memory.
-        this.labels = readLabels(labelFilePath);
+        this.labels = readLabels(TFUtils.getImageLabels(mContext));
         Log.i(TAG, "Read " + labels.size() + ", " + numClasses + " specified");
 
         this.inputSize = inputSize;
@@ -142,20 +144,21 @@ public class TFImageClassifier implements OnImageClassified {
         this.mBmpPixelValues = new int[inputSize * inputSize];
 
         //Initialize TF
-        mTensorFlowInferenceInterface = new TensorFlowInferenceInterface(assetManager, modelFilePath);
+        mTensorFlowInferenceInterface = new TensorFlowInferenceInterface(context.getAssets(),
+                TFUtils.getImageGraph(mContext).getAbsolutePath());
     }
 
     /**
      * Read the labels from {@link TFUtils#getImageLabels(Context)}.
      *
-     * @param labelFiles     Name of the label file. (By default it is {@link TFUtils#getImageLabels(Context)}.)
+     * @param labelFile Name of the label file. (By default it is {@link TFUtils#getImageLabels(Context)}.)
      * @return Array list of label names.
      */
-    private ArrayList<String> readLabels(String labelFiles) {
+    private ArrayList<String> readLabels(File labelFile) {
         ArrayList<String> result = new ArrayList<>();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(labelFiles));
+            br = new BufferedReader(new FileReader(labelFile));
             String line;
             while ((line = br.readLine()) != null) {
                 result.add(line);
@@ -163,7 +166,7 @@ public class TFImageClassifier implements OnImageClassified {
             br.close();
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new IllegalStateException("Cannot read labels from " + labelFiles);
+            throw new IllegalStateException("Cannot read labels from " + labelFile);
         } finally {
             try {
                 if (br != null) br.close();
@@ -236,5 +239,19 @@ public class TFImageClassifier implements OnImageClassified {
     public void close() {
         mTensorFlowInferenceInterface.close();
         mTensorFlowInferenceInterface = null;
+    }
+
+    @Override
+    public void downloadModels() {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+            mContext.startService(new Intent(mContext, TFModelDownloadService.class));
+        } else {
+            mContext.startForegroundService(new Intent(mContext, TFModelDownloadService.class));
+        }
+    }
+
+    @Override
+    public boolean isModelDownloaded() {
+        return TFUtils.isModelsDownloaded(mContext);
     }
 }

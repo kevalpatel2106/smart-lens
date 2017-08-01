@@ -18,6 +18,7 @@ package com.kevalpatel2106.smartlens.infopage;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseImageView;
 import com.kevalpatel2106.smartlens.base.BaseRecyclerViewAdapter;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
+import com.kevalpatel2106.smartlens.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -58,7 +60,10 @@ class RecommendedItemAdapter extends BaseRecyclerViewAdapter<RecommendedItemAdap
             Glide.with(mContext)
                     .load(infoModel.getImageUrl())
                     .into(holder.mInfoImageView);
-            holder.mInfoTextView.setText(infoModel.getLabel());
+            holder.mInfoTextView.setText(Utils.getCamelCaseText(infoModel.getLabel()));
+
+            holder.mRootView.setOnClickListener(view -> InfoActivity.launch((AppCompatActivity) mContext,
+                    infoModel.getLabel(), holder.mInfoImageView));
         }
     }
 
@@ -69,11 +74,12 @@ class RecommendedItemAdapter extends BaseRecyclerViewAdapter<RecommendedItemAdap
     }
 
     class RecommendedViewHolder extends RecyclerView.ViewHolder {
-
         @BindView(R.id.wiki_image_view)
         BaseImageView mInfoImageView;
         @BindView(R.id.wiki_text_view)
         BaseTextView mInfoTextView;
+        @BindView(R.id.row_root)
+        View mRootView;
 
         RecommendedViewHolder(View itemView) {
             super(itemView);

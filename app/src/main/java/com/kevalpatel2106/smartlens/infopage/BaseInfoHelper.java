@@ -19,8 +19,6 @@ package com.kevalpatel2106.smartlens.infopage;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
-
 import java.util.List;
 
 /**
@@ -41,7 +39,8 @@ public abstract class BaseInfoHelper {
 
     }
 
-    public abstract void getLabelDetail(@NonNull List<Recognition> recognitions);
+    public abstract void getLabelDetail(@NonNull List<String> recognitions);
 
-    public abstract void getRecommandedItems(@NonNull List<Recognition> recognitions);
+    public abstract void getRecommendedItems(@NonNull List<String> recognitions,
+                                             @NonNull String mainLabel);
 }

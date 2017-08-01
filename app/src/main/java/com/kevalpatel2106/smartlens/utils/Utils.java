@@ -23,6 +23,8 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -120,8 +122,8 @@ public class Utils {
      * @return True if the file saved successfully.
      */
     public static boolean saveImageFromFile(@NonNull Bitmap bitmap,
-                                     @NonNull File fileToSave,
-                                     @CameraImageFormat.SupportedImageFormat int imageFormat) {
+                                            @NonNull File fileToSave,
+                                            @CameraImageFormat.SupportedImageFormat int imageFormat) {
         FileOutputStream out = null;
         boolean isSuccess;
 
@@ -159,5 +161,25 @@ public class Utils {
             }
         }
         return isSuccess;
+    }
+
+    /**
+     * Convert the given text to caps word.
+     *
+     * @param text Text to convert. (e.g. computer keyboard)
+     * @return Word caps text (e.g. Computer Keyboard)
+     */
+    public static String getCamelCaseText(@Nullable String text) {
+        if (text == null) return null;
+
+        String[] words = text.split("\\s");
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].length() > 1) {
+                words[i] = Character.toUpperCase(words[i].charAt(0)) + words[i].substring(1).toLowerCase();
+            } else {
+                words[i] = words[i].toUpperCase();
+            }
+        }
+        return TextUtils.join(" ", words);
     }
 }

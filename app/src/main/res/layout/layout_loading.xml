@@ -15,24 +15,9 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <!--Shades of primary-->
-    <color name="colorPrimary">#08314D</color>
-    <color name="colorPrimaryDark">#071E2E</color>
-    <color name="colorPrimaryLight">#0c4a73</color>
-
-    <!--Shades of accent-->
-    <color name="colorAccentDark">#317881</color>
-    <color name="colorAccent">#3B929D</color>
-    <color name="colorAccentLight">#6bbcc7</color>
-
-    <!--text colors-->
-    <color name="colorPrimaryText">#FFFFFF</color>
-    <color name="colorSecondaryText">#212121</color>
-
-    <color name="black_40">#44000000</color>
-
-    <color name="divider">#B6B6B6</color>
-    <color name="colorGray">#444444</color>
-</resources>
-
+<ProgressBar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="70dp"
+    android:layout_height="70dp"
+    android:layout_centerInParent="true"
+    android:layout_gravity="center"/>

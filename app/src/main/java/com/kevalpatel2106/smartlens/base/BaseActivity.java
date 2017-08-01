@@ -110,7 +110,7 @@ public class BaseActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             //Hide the keyboard if any view is currently in focus.
             if (getCurrentFocus() != null) Utils.hideKeyboard(getCurrentFocus());
-            finish();
+            supportFinishAfterTransition();
             return false;
         } else {
             return super.onOptionsItemSelected(item);

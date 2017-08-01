@@ -43,7 +43,7 @@ public class InfoModel {
 
     public void setInfo(@NonNull String info) {
         //noinspection ConstantConditions
-        if (info == null) throw new IllegalArgumentException("Summary cannot be null.");
+        if (info == null) throw new IllegalArgumentException("Info cannot be null.");
 
         this.info = info;
     }

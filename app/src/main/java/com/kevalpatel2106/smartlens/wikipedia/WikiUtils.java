@@ -70,6 +70,11 @@ class WikiUtils {
     @SuppressWarnings("ConstantConditions")
     static boolean isValidSummary(@NonNull String label, @Nullable String summary) {
         if (label == null || summary == null) return false;
+
+        //Redirection/Page moved or renamed.
+        if (summary.contains("From a page move:")) return false;
+
+        //Other page suggestions.
         int thresholdLength = (label + " may refer to: ").length();
         return summary.length() > thresholdLength;
     }

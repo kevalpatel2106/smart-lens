@@ -18,20 +18,16 @@ package com.kevalpatel2106.smartlens.infopage;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.rule.ActivityTestRule;
 
 import com.kevalpatel2106.smartlens.R;
-import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifiedEvent;
-import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.testUtils.CustomMatchers;
 import com.kevalpatel2106.smartlens.testUtils.Delay;
 import com.kevalpatel2106.smartlens.testUtils.TestConfig;
-import com.kevalpatel2106.smartlens.utils.rxBus.Event;
-import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 import com.kevalpatel2106.smartlens.wikipedia.WikiHelper;
 
 import org.junit.After;
@@ -44,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -52,6 +47,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -60,13 +56,15 @@ import static org.junit.Assert.fail;
  * @author 'https://github.com/kevalpatel2106'
  */
 public class InfoActivityTest extends BaseTestClass {
+
     @SuppressWarnings("unused")
     private static final String TAG = "InfoActivityTest";
     private static final String MOCK_LABEL = "electric locomotive";
-
+    private static int ERROR_VIEW = 2;
+    private static int INFO_VIEW = 1;
     @Rule
     public ActivityTestRule<InfoActivity> mWikiFragmentFragmentTestRule =
-            new ActivityTestRule<>(InfoActivity.class);
+            new ActivityTestRule<>(InfoActivity.class, false, false);
 
     private static String getStringFromInputStream(InputStream is) {
         BufferedReader br = null;
@@ -95,7 +93,12 @@ public class InfoActivityTest extends BaseTestClass {
 
     @Before
     public void init() {
-        mWikiFragmentFragmentTestRule.launchActivity(null);
+        ArrayList<String> labels = new ArrayList<>();
+        labels.add(MOCK_LABEL);
+
+        Intent i = new Intent();
+        i.putExtra(InfoActivity.ARA_RECOGNITION_LIST, labels);
+        mWikiFragmentFragmentTestRule.launchActivity(i);
     }
 
     @Test
@@ -105,14 +108,12 @@ public class InfoActivityTest extends BaseTestClass {
         Delay.startDelay(1000);
         onView(withId(R.id.wiki_page_tv));
 
-        //Publish it with RxBus
-        RxBus.getDefault().post(generateMockLabelsEvent());
-
         //Wait for the api call
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
 
         //Check if there are text?
-        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
+        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+                INFO_VIEW);
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
         Delay.stopDelay();
@@ -132,18 +133,12 @@ public class InfoActivityTest extends BaseTestClass {
                 .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
                         com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
 
-        //Wait for the rx bus to get register after view creation
-        Delay.startDelay(1000);
-        onView(withId(R.id.wiki_page_tv));
-
-        //Publish it with RxBus
-        RxBus.getDefault().post(generateMockLabelsEvent());
-
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
 
         //Check if there are text?
-        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
+        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+                INFO_VIEW);
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
 
@@ -165,20 +160,12 @@ public class InfoActivityTest extends BaseTestClass {
                 .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
                         com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
 
-        //Wait for the rx bus to get register after view creation
-        Delay.startDelay(1000);
-        onView(withId(R.id.wiki_page_tv));
-
-        //Publish it with RxBus
-        RxBus.getDefault().post(generateMockLabelsEvent());
-
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
-        //Check if there are text?
-        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
-        onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
-        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
+        //Check if is error?
+        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+                ERROR_VIEW);
 
         Delay.stopDelay();
         mockWebServer.shutdown();
@@ -195,20 +182,12 @@ public class InfoActivityTest extends BaseTestClass {
                 .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
                         com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
 
-        //Wait for the rx bus to get register after view creation
-        Delay.startDelay(1000);
-        onView(withId(R.id.wiki_page_tv));
-
-        //Publish it with RxBus
-        RxBus.getDefault().post(generateMockLabelsEvent());
-
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
-        //Check if there are text?
-        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
-        onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(not(CustomMatchers.hasText())));
-        onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
+        //Check if error occurred?
+        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+                ERROR_VIEW);
 
         Delay.stopDelay();
         mockWebServer.shutdown();
@@ -225,18 +204,12 @@ public class InfoActivityTest extends BaseTestClass {
         //Fail response for the image api.
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
-        //Wait for the rx bus to get register after view creation
-        Delay.startDelay(1000);
-        onView(withId(R.id.wiki_page_tv));
-
-        //Publish it with RxBus
-        RxBus.getDefault().post(generateMockLabelsEvent());
-
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
 
         //Check if there are text?
-        onView(withId(R.id.wiki_page_title_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
+        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+                INFO_VIEW);
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));
 
@@ -264,15 +237,6 @@ public class InfoActivityTest extends BaseTestClass {
 
     private String getStringFromFile(Context context, int filename) {
         return getStringFromInputStream(context.getResources().openRawResource(filename));
-    }
-
-    @NonNull
-    private Event generateMockLabelsEvent() {
-        List<Recognition> recognitions = new ArrayList<>();
-        Recognition mockRecognition = new Recognition("1", MOCK_LABEL,
-                0.56f, null);
-        recognitions.add(mockRecognition);
-        return new Event(new ImageClassifiedEvent(recognitions));
     }
 
     @After

@@ -68,31 +68,51 @@ public final class CustomTestRunner extends AndroidJUnitRunner {
 
     @Override
     public void onStart() {
-        Context app = CustomTestRunner.this.getTargetContext().getApplicationContext();
+        Context context = CustomTestRunner.this.getTargetContext().getApplicationContext();
         runOnMainSync(() -> {
-            CustomTestRunner.this.disableAnimations(app);
-
-            String name = CustomTestRunner.class.getSimpleName();
-            unlockScreen(app, name);
-            keepScreenAwake(app, name);
+            disableAnimations(context);
+            unlockScreen(context, CustomTestRunner.class.getSimpleName());
+            keepScreenAwake(context, CustomTestRunner.class.getSimpleName());
         });
 
-        if (!TFUtils.isModelsDownloaded(app)) {
+        //Download models.
+        downloadTfModelsIfNot(context);
+        super.onStart();
+    }
+
+    /**
+     * This will download the tensorflow models if the models are not already present before each test.
+     *
+     * @param context Instance of the application.
+     */
+    private void downloadTfModelsIfNot(Context context) {
+        //Check if the TF models are available?
+        if (!TFUtils.isModelsDownloaded(context)) {
             try {
-                if (download(TENSORFLOW_GRAPH_URL, app, TFUtils.getImageGraph(app))) {
-                    download(TENSORFLOW_LABEL_URL, app, TFUtils.getImageLabels(app));
+                //If TF models are not available,
+                //Download TF graph
+                if (download(TENSORFLOW_GRAPH_URL, context, TFUtils.getImageGraph(context))) {
+                    //Download TF label
+                    download(TENSORFLOW_LABEL_URL, context, TFUtils.getImageLabels(context));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 Assert.fail("Cannot download the tensorflow models.");
             }
         }
-
-        super.onStart();
     }
 
+    /**
+     * Download file and print the download percentage.
+     *
+     * @param urlToDownload Url to download.
+     * @param context       Instance of the caller.
+     * @param file          File where download will store.
+     * @return True if the download is successful.
+     * @throws IOException if socket timeout or file write fails.
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private boolean download(String urlToDownload, Context context, File file) throws IOException {
-
         //Create temp file.
         File tempFile = new File(FileUtils.getCacheDir(context)
                 + "/" + file.getName());
@@ -132,24 +152,43 @@ public final class CustomTestRunner extends AndroidJUnitRunner {
     @Override
     public void finish(int resultCode, Bundle results) {
         super.finish(resultCode, results);
+
+        //Re-enable all the animations.
         enableAnimations(getContext());
     }
 
+    /**
+     * Acquire the wakelock to keep the screen awake.
+     *
+     * @param context Instance of the app.
+     * @param name    Name of the wakelock. (Tag)
+     */
     @SuppressLint("WakelockTimeout")
-    private void keepScreenAwake(Context app, String name) {
-        PowerManager power = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
+    private void keepScreenAwake(Context context, String name) {
+        PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         //noinspection ConstantConditions
         power.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, name)
                 .acquire();
     }
 
-    @SuppressWarnings("ConstantConditions")
-    private void unlockScreen(Context app, String name) {
-        KeyguardManager keyguard = (KeyguardManager) app.getSystemService(Context.KEYGUARD_SERVICE);
+    /**
+     * Unlock the screen.
+     *
+     * @param context Instance of the app.
+     * @param name    Name of the keyguard. (Tag)
+     */
+    @SuppressWarnings({"ConstantConditions", "deprecation"})
+    private void unlockScreen(Context context, String name) {
+        KeyguardManager keyguard = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
         keyguard.newKeyguardLock(name).disableKeyguard();
     }
 
+    /**
+     * Disable all animations by applying 0 scale to {@link #setSystemAnimationsScale(float)}.
+     *
+     * @param context Instance of the caller.
+     */
     private void disableAnimations(Context context) {
         int permStatus = context.checkCallingOrSelfPermission(Manifest.permission.SET_ANIMATION_SCALE);
         if (permStatus == PackageManager.PERMISSION_GRANTED) {
@@ -157,6 +196,11 @@ public final class CustomTestRunner extends AndroidJUnitRunner {
         }
     }
 
+    /**
+     * Enable all animations by applying 1 scale to {@link #setSystemAnimationsScale(float)}.
+     *
+     * @param context Instance of the caller.
+     */
     private void enableAnimations(Context context) {
         int permStatus = context.checkCallingOrSelfPermission(Manifest.permission.SET_ANIMATION_SCALE);
         if (permStatus == PackageManager.PERMISSION_GRANTED) {
@@ -164,6 +208,11 @@ public final class CustomTestRunner extends AndroidJUnitRunner {
         }
     }
 
+    /**
+     * Set the system animation scale.
+     *
+     * @param animationScale Scale.
+     */
     private void setSystemAnimationsScale(float animationScale) {
         try {
             Class<?> windowManagerStubClazz = Class.forName("android.view.IWindowManager$Stub");

@@ -25,6 +25,8 @@
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     android:elevation="4dp"
-    app:subtitleTextColor="@color/colorSecondaryText"
+    android:theme="@style/ToolbarColoredBackArrow"
+    app:layout_collapseMode="pin"
+    app:subtitleTextColor="@color/colorPrimaryText"
     app:titleTextColor="@color/colorPrimaryText"
     tools:ignore="Overdraw,UnusedAttribute"/>
