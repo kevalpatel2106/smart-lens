@@ -28,16 +28,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
+import com.kevalpatel2106.smartlens.camera.AutoFitTextureView;
+import com.kevalpatel2106.smartlens.camera.Camera2Api;
 import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
 import com.kevalpatel2106.smartlens.camera.CameraConfig;
 import com.kevalpatel2106.smartlens.camera.CameraError;
-import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
@@ -69,10 +69,10 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
-    FrameLayout mContainer;
+    AutoFitTextureView mAutoFitTextureView;
     @BindView(R.id.recognition_tv)
     BaseTextView mScannedInfoTv;
-    CameraPreview mCameraPreview;
+    Camera2Api mCamera2Api;
     private BarcodeScanner mBarcodeScanner;
     private Disposable mTakePicDisposable;
 
@@ -111,9 +111,7 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
         mScannedInfoTv.setVisibility(View.GONE);
 
         //Add the camera preview.
-        mCameraPreview = new CameraPreview(getActivity(), this);
-        mContainer.removeAllViews();
-        mContainer.addView(mCameraPreview);
+        mCamera2Api = new Camera2Api(getActivity(), mAutoFitTextureView, this);
     }
 
     @Override
@@ -130,7 +128,7 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     private void safeStartBarcodeScanner() {
         if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {//Start the camera.
             //Start the camera.
-            mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
+            mCamera2Api.startCamera(new CameraConfig().getBuilder(mContext)
                     .setCameraResolution(CameraResolution.LOW_RESOLUTION)
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
@@ -139,13 +137,12 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
             Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .filter(l -> mCameraPreview != null
-                            && mCameraPreview.isSafeToTakePicture()
+                    .filter(l -> mCamera2Api != null
                             && mBarcodeScanner.isSafeToStart()
                             && isVisible())
                     .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
-                    .doOnNext(aLong -> mCameraPreview.takePicture())
-                    .doOnError(throwable -> Snackbar.make(mContainer,
+                    .doOnNext(aLong -> mCamera2Api.takePicture())
+                    .doOnError(throwable -> Snackbar.make(mAutoFitTextureView,
                             R.string.image_classifier_frag_error_image_detection_failed,
                             Toast.LENGTH_LONG).show())
                     .subscribe();
@@ -155,9 +152,7 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     }
 
     private void stopBarcodeScanner() {
-        if (mCameraPreview != null) {
-            mCameraPreview.stopPreviewAndReleaseCamera();
-        }
+        if (mCamera2Api != null) mCamera2Api.closeCamera();
         if (mTakePicDisposable != null) mTakePicDisposable.dispose();
     }
 
@@ -176,7 +171,7 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
                     safeStartBarcodeScanner();
                 } else {
                     //Permission not granted. Explain dialog.
-                    Snackbar.make(mContainer, R.string.camera_frag_permission_denied_statement,
+                    Snackbar.make(mAutoFitTextureView, R.string.camera_frag_permission_denied_statement,
                             Snackbar.LENGTH_INDEFINITE)
                             .setAction(R.string.camera_frag_btn_grant_access,
                                     view -> requestPermissions(new String[]{Manifest.permission.CAMERA},
@@ -225,16 +220,16 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
                 break;
             case CameraError.ERROR_DOES_NOT_HAVE_FRONT_CAMERA:
-                Snackbar.make(mContainer, R.string.image_classifier_frag_error_no_front_camera, Snackbar.LENGTH_LONG)
+                Snackbar.make(mAutoFitTextureView, R.string.image_classifier_frag_error_no_front_camera, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
             case CameraError.ERROR_IMAGE_WRITE_FAILED:
-                Snackbar.make(mContainer, R.string.image_classifier_frag_error_save_image, Snackbar.LENGTH_LONG)
+                Snackbar.make(mAutoFitTextureView, R.string.image_classifier_frag_error_save_image, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
             case CameraError.ERROR_CAMERA_OPEN_FAILED:
             default:
-                Snackbar.make(mContainer, R.string.image_classifier_frag_error_camera_open, Snackbar.LENGTH_LONG)
+                Snackbar.make(mAutoFitTextureView, R.string.image_classifier_frag_error_camera_open, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
                 break;

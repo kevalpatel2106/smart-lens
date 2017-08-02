@@ -310,6 +310,7 @@ public class Camera2Api {
      * Take the picture.
      */
     public void takePicture() {
+        Timber.e(System.currentTimeMillis() + " Start");
         if (mCameraDevice == null) {
             mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
             return;
@@ -382,6 +383,7 @@ public class Camera2Api {
                     Timber.e("Capture failed.");
                 }
             }, mBackgroundHandler);
+            Timber.e(System.currentTimeMillis() + " End");
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }

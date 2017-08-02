@@ -19,8 +19,8 @@ package com.kevalpatel2106.smartlens.camera;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
-import android.media.ImageReader;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
@@ -58,9 +58,10 @@ public class CameraPreviewTest extends BaseTestClass {
     public ActivityTestRule<TestActivity> mActivityTestRule = new ActivityTestRule<>(TestActivity.class);
 
     private CameraCallbacks mMockCallbacks = new CameraCallbacks() {
+
         @Override
-        public void onImageCapture(@NonNull ImageReader imageCaptured) {
-            //Do nothing
+        public void onImageCapture(@NonNull Bitmap bitmap) {
+
         }
 
         @Override
