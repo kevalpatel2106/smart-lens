@@ -23,7 +23,6 @@ import android.graphics.Point;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -43,8 +42,6 @@ import java.util.List;
 
 @SuppressLint("ViewConstructor")
 public final class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.ErrorCallback {
-    private static final String TAG = "CameraPreview";
-
     private final Context mContext;
 
     private SurfaceHolder mHolder;          //Surface holder for that surface view.
@@ -58,7 +55,6 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
     //Create the picture callback.
     private Camera.PictureCallback mPictureCallback = (byte[] bytes, Camera camera) -> {
-        Log.d(TAG, "image captured: " + System.currentTimeMillis());
         mCameraCallbacks.onImageCapture(bytes);
 
         isSafeToTakePicture = true;

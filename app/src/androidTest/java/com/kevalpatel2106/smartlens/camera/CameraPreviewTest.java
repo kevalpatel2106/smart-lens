@@ -101,8 +101,10 @@ public class CameraPreviewTest extends BaseTestClass {
 
             if (parameters.getSupportedFocusModes() == null)
                 assertEquals(CameraPreview.getFocusMode(parameters), null);
-            else if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
-                assertEquals(CameraPreview.getFocusMode(parameters), Camera.Parameters.FOCUS_MODE_AUTO);
+            else if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE))
+                assertEquals(CameraPreview.getFocusMode(parameters), Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            else if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
+                assertEquals(CameraPreview.getFocusMode(parameters), Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             else
                 assertEquals(CameraPreview.getFocusMode(parameters), null);
         });

@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.utils;
+package com.kevalpatel2106.smartlens.imageProcessors.objectRecognition;
+
+import android.graphics.Bitmap;
+
+import java.util.List;
 
 /**
- * Created by Keval on 19-Jul-17.
- * Unit tests for {@link Utils}.
+ * Created by Keval Patel on 19/04/17.
+ * Generic interface for interacting with different recognition engines.
+ *
+ * @author 'https://github.com/androidthings/sample-tensorflow-imageclassifier/blob/master/app/src/main/java/com/example/androidthings/imageclassifier/classifier/Classifier.java'
  */
-public final class UtilsTest {
+public interface BaseImageClassifire {
+    List<Recognition> recognizeImage(Bitmap bitmap);
 
+    void close();
 
+    void downloadModels();
+
+    boolean isModelDownloaded();
 }

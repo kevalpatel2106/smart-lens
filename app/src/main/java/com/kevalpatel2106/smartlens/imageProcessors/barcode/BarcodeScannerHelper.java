@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.utils;
+package com.kevalpatel2106.smartlens.imageProcessors.barcode;
+
+import android.graphics.Bitmap;
 
 /**
- * Created by Keval on 19-Jul-17.
- * Unit tests for {@link Utils}.
+ * Created by Keval Patel on 02/08/17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
-public final class UtilsTest {
 
+public interface BarcodeScannerHelper {
 
+    BarcodeInfo scanForBarcode(Bitmap bitmap);
+
+    boolean isSafeToStart();
+
+    void close();
 }

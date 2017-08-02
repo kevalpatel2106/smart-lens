@@ -44,6 +44,16 @@ import static org.junit.Assert.fail;
  */
 @RunWith(AndroidJUnit4.class)
 public final class UtilsTest extends BaseTestClass {
+
+    /**
+     * Test for {@link Utils#getDeviceName()}.
+     */
+    @Test
+    public void getDeviceName() throws Exception {
+        assertNotNull(Utils.getDeviceName());
+        assertTrue(Utils.getDeviceName().contains("-"));
+    }
+
     @SuppressLint("WrongConstant")
     @Test
     public void checkIfSaveFileWorks() throws Exception {

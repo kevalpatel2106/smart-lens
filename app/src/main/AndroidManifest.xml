@@ -58,7 +58,7 @@
 
         <!-- Home screen -->
         <activity
-            android:name=".Dashboard"
+            android:name=".dashboard.Dashboard"
             android:label="@string/title_home_activity"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"
@@ -74,7 +74,7 @@
             android:theme="@style/AppTheme.NoActionbar"
             tools:ignore="UnusedAttribute"/>
 
-        <service android:name=".tensorflow.TFModelDownloadService"/>
+        <service android:name=".plugins.tensorflowObjectRecogniser.TFModelDownloadService"/>
     </application>
 
 </manifest>

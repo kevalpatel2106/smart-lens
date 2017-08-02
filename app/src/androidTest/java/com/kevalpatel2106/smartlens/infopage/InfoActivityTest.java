@@ -25,11 +25,11 @@ import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.rule.ActivityTestRule;
 
 import com.kevalpatel2106.smartlens.R;
+import com.kevalpatel2106.smartlens.plugins.wikipedia.WikiHelper;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 import com.kevalpatel2106.smartlens.testUtils.CustomMatchers;
 import com.kevalpatel2106.smartlens.testUtils.Delay;
 import com.kevalpatel2106.smartlens.testUtils.TestConfig;
-import com.kevalpatel2106.smartlens.wikipedia.WikiHelper;
 
 import org.junit.After;
 import org.junit.Rule;

@@ -34,8 +34,8 @@ import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseActivity;
 import com.kevalpatel2106.smartlens.base.BaseImageView;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
+import com.kevalpatel2106.smartlens.plugins.wikipedia.WikiHelper;
 import com.kevalpatel2106.smartlens.utils.Utils;
-import com.kevalpatel2106.smartlens.wikipedia.WikiHelper;
 
 import java.util.ArrayList;
 
