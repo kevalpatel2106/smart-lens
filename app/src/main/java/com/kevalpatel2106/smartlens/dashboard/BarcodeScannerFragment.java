@@ -20,7 +20,6 @@ package com.kevalpatel2106.smartlens.dashboard;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -191,13 +190,10 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     }
 
     @Override
-    public void onImageCapture(@NonNull byte[] imageCaptured) {
+    public void onImageCapture(@NonNull Bitmap bitmap) {
 
         //Process the image using Tf.
         Flowable<BarcodeInfo> flowable = Flowable.create(e -> {
-            //Convert to bitmap
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageCaptured, 0, imageCaptured.length);
-
             //Scan the barcode
             BarcodeInfo barcodeInfo = mBarcodeScanner.scanForBarcode(bitmap);
 

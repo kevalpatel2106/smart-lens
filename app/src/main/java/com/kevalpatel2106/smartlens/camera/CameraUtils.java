@@ -20,18 +20,18 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.media.Image;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.app.ActivityCompat;
 
-import com.kevalpatel2106.smartlens.camera.config.CameraImageFormat;
 import com.kevalpatel2106.smartlens.camera.config.CameraRotation;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by Keval on 11-Nov-16.
@@ -72,6 +72,23 @@ public final class CameraUtils {
         return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
+    /**
+     * Convert the {@link Image} to {@link Bitmap}.
+     *
+     * @param image image to convert
+     * @return {@link Bitmap}
+     */
+    @Nullable
+    @WorkerThread
+    public static Bitmap imageToBitmap(@NonNull Image image) {
+        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+        byte[] bytes = new byte[buffer.capacity()];
+        buffer.get(bytes);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+    }
 
     /**
      * Rotate the bitmap by 90 degree.

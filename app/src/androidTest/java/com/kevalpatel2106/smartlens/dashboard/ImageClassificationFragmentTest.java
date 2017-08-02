@@ -85,10 +85,10 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
     @Test
     public void checkIfInitialized() throws Exception {
         assertNotNull(mImageClassifierFragment);
-        assertNotNull(mImageClassifierFragment.mCameraPreview);
+        assertNotNull(mImageClassifierFragment.mCamera2Api);
         assertNotNull(mImageClassifierFragment.mImageClassifier);
 
-        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
     }
 
     @Test
@@ -102,7 +102,7 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
         } catch (NoMatchingViewException e) {
             //Pass
         }
-        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
         Espresso.onView(allOf(withId(android.support.design.R.id.snackbar_text),
                 withText(R.string.image_classifier_frag_error_camera_open)))
                 .check(matches(isDisplayed()));
-        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
     }
 
     @SuppressLint("WrongConstant")
@@ -124,7 +124,7 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
                 withText(R.string.image_classifier_frag_error_camera_open)))
                 .check(matches(isDisplayed()));
 
-        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
     }
 
     @Test
@@ -133,7 +133,7 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
         mImageClassifierFragment.onCameraError(CameraError.ERROR_DOES_NOT_HAVE_FRONT_CAMERA);
         Espresso.onView((withId(android.support.design.R.id.snackbar_text)))
                 .check(matches(isDisplayed()));
-        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
     }
 
     @Test
@@ -143,21 +143,21 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
         Espresso.onView(withId(android.support.design.R.id.snackbar_text))
                 .check(matches(isDisplayed()));
 
-        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
     }
 
     @Test
     public void checkIfCameraWorking() throws Exception {
         //Test if the camera opened
-        assertTrue(mImageClassifierFragment.mCameraPreview.isSafeToTakePicture());
+        assertTrue(mImageClassifierFragment.mCamera2Api.isSafeToTakePicture());
 
         //Test take the picture
-        mImageClassifierFragment.mCameraPreview.takePicture();
-        assertFalse(mImageClassifierFragment.mCameraPreview.isSafeToTakePicture());
+        mImageClassifierFragment.mCamera2Api.takePicture();
+        assertFalse(mImageClassifierFragment.mCamera2Api.isSafeToTakePicture());
 
         // Check if it can release the camera.
-        mImageClassifierFragment.mCameraPreview.stopPreviewAndReleaseCamera();
-        assertFalse(mImageClassifierFragment.mCameraPreview.isSafeToTakePicture());
+        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
+        assertFalse(mImageClassifierFragment.mCamera2Api.isSafeToTakePicture());
     }
 
     @Override

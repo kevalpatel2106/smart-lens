@@ -21,7 +21,6 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,18 +29,18 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
+import com.kevalpatel2106.smartlens.camera.Camera2Api;
 import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
 import com.kevalpatel2106.smartlens.camera.CameraConfig;
 import com.kevalpatel2106.smartlens.camera.CameraError;
-import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
@@ -77,16 +76,15 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
-    FrameLayout mContainer;
+    TextureView mTextureView;
     @BindView(R.id.recognition_tv)
     BaseTextView mClassifiedTv;
 
     List<Recognition> mLastRecognition;
 
     ProgressDialog mProgressDialog;
-    CameraPreview mCameraPreview;
+    Camera2Api mCamera2Api;
     TFImageClassifier mImageClassifier;
-    boolean isTakePictureWorking = false;
     private Disposable mTakePicDisposable;
 
     public ImageClassifierFragment() {
@@ -187,9 +185,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
         mClassifiedTv.setVisibility(View.GONE);
 
         //Add the camera preview.
-        mCameraPreview = new CameraPreview(getActivity(), this);
-        mContainer.removeAllViews();
-        mContainer.addView(mCameraPreview);
+        mCamera2Api = new Camera2Api(getActivity(),
+                mTextureView,
+                this);
     }
 
     @Override
@@ -208,7 +206,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
             downloadDataDialog();
         } else if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {//Start the camera.
             //Start the camera.
-            mCameraPreview.startCamera(new CameraConfig().getBuilder(mContext)
+            mCamera2Api.startCamera(new CameraConfig().getBuilder(mContext)
                     .setCameraResolution(CameraResolution.LOW_RESOLUTION)
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
@@ -217,13 +215,12 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
             Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(AndroidSchedulers.mainThread())
-                    .filter(l -> mCameraPreview != null
-                            && mCameraPreview.isSafeToTakePicture()
+                    .filter(l -> mCamera2Api != null
                             && mImageClassifier != null
                             && isVisible())
                     .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
-                    .doOnNext(aLong -> mCameraPreview.takePicture())
-                    .doOnError(throwable -> Snackbar.make(mContainer,
+                    .doOnNext(aLong -> mCamera2Api.takePicture())
+                    .doOnError(throwable -> Snackbar.make(mTextureView,
                             R.string.image_classifier_frag_error_image_detection_failed,
                             Toast.LENGTH_LONG).show())
                     .subscribe();
@@ -233,17 +230,14 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     }
 
     private void stopImageRecognition() {
+        mCamera2Api.closeCamera();
         if (mTakePicDisposable != null) mTakePicDisposable.dispose();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        //Stop and release the camera
-        if (mCameraPreview != null) {
-            mCameraPreview.stopPreviewAndReleaseCamera();
-            stopImageRecognition();
-        }
+        stopImageRecognition();
     }
 
     @Override
@@ -256,7 +250,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     safeStartImageRecognition();
                 } else {
                     //Permission not granted. Explain dialog.
-                    Snackbar.make(mContainer, R.string.camera_frag_permission_denied_statement,
+                    Snackbar.make(mTextureView, R.string.camera_frag_permission_denied_statement,
                             Snackbar.LENGTH_INDEFINITE)
                             .setAction(R.string.camera_frag_btn_grant_access,
                                     view -> requestPermissions(new String[]{Manifest.permission.CAMERA},
@@ -270,11 +264,9 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     }
 
     @Override
-    public void onImageCapture(@NonNull byte[] imageCaptured) {
-
+    public void onImageCapture(@NonNull Bitmap bitmap) {
         //Process the image using Tf.
         Flowable<List<Recognition>> flowable = Flowable.create(e -> {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageCaptured, 0, imageCaptured.length);
             e.onNext(mImageClassifier.recognizeImage(bitmap));
             e.onComplete();
         }, BackpressureStrategy.DROP);
@@ -308,16 +300,16 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
                 break;
             case CameraError.ERROR_DOES_NOT_HAVE_FRONT_CAMERA:
-                Snackbar.make(mContainer, R.string.image_classifier_frag_error_no_front_camera, Snackbar.LENGTH_LONG)
+                Snackbar.make(mTextureView, R.string.image_classifier_frag_error_no_front_camera, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
             case CameraError.ERROR_IMAGE_WRITE_FAILED:
-                Snackbar.make(mContainer, R.string.image_classifier_frag_error_save_image, Snackbar.LENGTH_LONG)
+                Snackbar.make(mTextureView, R.string.image_classifier_frag_error_save_image, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
             case CameraError.ERROR_CAMERA_OPEN_FAILED:
             default:
-                Snackbar.make(mContainer, R.string.image_classifier_frag_error_camera_open, Snackbar.LENGTH_LONG)
+                Snackbar.make(mTextureView, R.string.image_classifier_frag_error_camera_open, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
                 break;

@@ -55,7 +55,6 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
     //Create the picture callback.
     private Camera.PictureCallback mPictureCallback = (byte[] bytes, Camera camera) -> {
-        mCameraCallbacks.onImageCapture(bytes);
 
         isSafeToTakePicture = true;
 
