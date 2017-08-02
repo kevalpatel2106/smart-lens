@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.widget.Toast;
 
+import com.kevalpatel2106.smartlens.barcode.BarcodeScannerFragment;
 import com.kevalpatel2106.smartlens.base.BaseActivity;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.imageClassifier.ImageClassifierFragment;
@@ -32,6 +33,7 @@ public class Dashboard extends BaseActivity {
     BottomNavigationView mBottomNavigationView;
 
     ImageClassifierFragment mImageClassifierFragment;
+    BarcodeScannerFragment mBarcodeScannerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +49,13 @@ public class Dashboard extends BaseActivity {
         }
 
         mImageClassifierFragment = ImageClassifierFragment.getNewInstance();
+        mBarcodeScannerFragment = BarcodeScannerFragment.getNewInstance();
 
         //By default object recognition is selected.
         mBottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.action_image_recognition:
-                    //Set the camera fragment.
+                    //Set the image classifier fragment.
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.dashboard_container, mImageClassifierFragment)
                             .commit();
@@ -64,9 +67,9 @@ public class Dashboard extends BaseActivity {
                             .commit();
                     break;
                 case R.id.action_qr_scanner:
-                    //Set the camera fragment.
+                    //Set the barcode scanner fragment.
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.dashboard_container, mImageClassifierFragment)
+                            .replace(R.id.dashboard_container, mBarcodeScannerFragment)
                             .commit();
                     break;
                 default:

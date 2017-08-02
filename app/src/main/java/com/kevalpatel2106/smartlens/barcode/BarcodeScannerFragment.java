@@ -18,7 +18,6 @@ package com.kevalpatel2106.smartlens.barcode;
 
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,6 +33,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
+import com.kevalpatel2106.smartlens.barcodeScanner.BarcodeScanner;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
 import com.kevalpatel2106.smartlens.base.BaseTextView;
 import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
@@ -43,12 +43,10 @@ import com.kevalpatel2106.smartlens.camera.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
-import com.kevalpatel2106.smartlens.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.infopage.InfoActivity;
 
 import org.reactivestreams.Subscription;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -74,9 +72,8 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     FrameLayout mContainer;
     @BindView(R.id.recognition_tv)
     BaseTextView mScannedInfoTv;
-
-    ProgressDialog mProgressDialog;
     CameraPreview mCameraPreview;
+    private BarcodeScanner mBarcodeScanner;
     private Disposable mTakePicDisposable;
 
     public BarcodeScannerFragment() {
@@ -94,10 +91,7 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        //Create the download progressbar
-        mProgressDialog = new ProgressDialog(mContext);
-        mProgressDialog.setMessage(getString(R.string.image_classifire_download_progressbar_message));
-        mProgressDialog.setCancelable(false);
+        mBarcodeScanner = new BarcodeScanner(mContext);
         return inflater.inflate(R.layout.fragment_image_classifire, container, false);
     }
 
@@ -107,14 +101,13 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
      */
     @OnClick(R.id.recognition_tv)
     void openInfoScreen() {
-
+        stopBarcodeScanner();
     }
 
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         mScannedInfoTv.setVisibility(View.GONE);
 
         //Add the camera preview.
@@ -148,6 +141,7 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .filter(l -> mCameraPreview != null
                             && mCameraPreview.isSafeToTakePicture()
+                            && mBarcodeScanner.isSafeToStart()
                             && isVisible())
                     .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
                     .doOnNext(aLong -> mCameraPreview.takePicture())
@@ -161,24 +155,22 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     }
 
     private void stopBarcodeScanner() {
+        if (mCameraPreview != null) {
+            mCameraPreview.stopPreviewAndReleaseCamera();
+        }
         if (mTakePicDisposable != null) mTakePicDisposable.dispose();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        //Stop and release the camera
-        if (mCameraPreview != null) {
-            mCameraPreview.stopPreviewAndReleaseCamera();
-            stopBarcodeScanner();
-        }
+        stopBarcodeScanner();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQ_CODE_CAMERA_PERMISSION:
-
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //Start the camera.
                     safeStartBarcodeScanner();
@@ -201,10 +193,17 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     public void onImageCapture(@NonNull byte[] imageCaptured) {
 
         //Process the image using Tf.
-        Flowable<List<Recognition>> flowable = Flowable.create(e -> {
+        Flowable<BarcodeInfo> flowable = Flowable.create(e -> {
+            //Convert to bitmap
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageCaptured, 0, imageCaptured.length);
 
-            //TODO Scan the image
+            //Scan the barcode
+            BarcodeInfo barcodeInfo = mBarcodeScanner.scanForBarcode(bitmap);
+
+            //Check for the not null. Rx2.0 doesn't support null.
+            //https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#nulls
+            if (barcodeInfo != null) e.onNext(barcodeInfo);
+
             e.onComplete();
         }, BackpressureStrategy.DROP);
 
@@ -217,10 +216,8 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
                     subscriptions[0].cancel();
                 })
                 .doOnComplete(() -> subscriptions[0].cancel())
-                .subscribe(labels -> {
-                    mScannedInfoTv.setVisibility(View.VISIBLE);
-                    mScannedInfoTv.setText(labels.get(0).getTitle());
-
+                .subscribe(barcodeInfo -> {
+                    //TODO Display the info
                 });
     }
 

@@ -24,7 +24,7 @@ import com.google.android.gms.vision.barcode.Barcode;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class BarcodeScannerUtils {
+class BarcodeScannerUtils {
 
     static String getEmailTypeString(int type) {
         switch (type) {

@@ -166,7 +166,7 @@ public class BarcodeScanner implements BarcodeScannnerHelper {
     }
 
     @Override
-    public boolean isSafeToStart(Context context) {
+    public boolean isSafeToStart() {
         return mBarcodeDetector != null && mBarcodeDetector.isOperational();
     }
 

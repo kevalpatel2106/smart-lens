@@ -118,8 +118,11 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     @Nullable
     static String getFocusMode(Camera.Parameters parameters) {
         List<String> focusModes = parameters.getSupportedFocusModes();
-        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
-            return (Camera.Parameters.FOCUS_MODE_AUTO);
+        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE))
+            return (Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+            return Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO;
+        }
         return null;
     }
 

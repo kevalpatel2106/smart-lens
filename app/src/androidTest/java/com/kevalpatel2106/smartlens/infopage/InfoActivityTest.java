@@ -47,7 +47,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -91,7 +91,7 @@ public class InfoActivityTest extends BaseTestClass {
         return sb.toString();
     }
 
-    public void openActivity() {
+    private void openActivity() {
         ArrayList<String> labels = new ArrayList<>();
         labels.add(MOCK_LABEL);
 
@@ -110,7 +110,7 @@ public class InfoActivityTest extends BaseTestClass {
         onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
 
         //Check if there are text?
-        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+        assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
                 INFO_VIEW);
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
@@ -134,10 +134,10 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
-        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
+        onView(withId(R.id.root_flipper)).perform(ViewActions.click());
 
         //Check if there are text?
-        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+        assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
                 INFO_VIEW);
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(CustomMatchers.hasImage()));
@@ -163,10 +163,10 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
-        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
+        onView(withId(R.id.root_flipper)).perform(ViewActions.click());
 
         //Check if is error?
-        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+        assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
                 ERROR_VIEW);
 
         Delay.stopDelay();
@@ -187,10 +187,10 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
-        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
+        onView(withId(R.id.root_flipper)).perform(ViewActions.click());
 
         //Check if error occurred?
-        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+        assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
                 ERROR_VIEW);
 
         Delay.stopDelay();
@@ -211,10 +211,10 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
-        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
+        onView(withId(R.id.root_flipper)).perform(ViewActions.click());
 
         //Check if there are text?
-        assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
+        assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
                 INFO_VIEW);
         onView(withId(R.id.wiki_page_tv)).check(ViewAssertions.matches(CustomMatchers.hasText()));
         onView(withId(R.id.wiki_page_iv)).check(ViewAssertions.matches(not(CustomMatchers.hasImage())));

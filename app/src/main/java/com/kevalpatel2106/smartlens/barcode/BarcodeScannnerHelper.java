@@ -16,7 +16,6 @@
 
 package com.kevalpatel2106.smartlens.barcode;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 /**
@@ -29,7 +28,7 @@ public interface BarcodeScannnerHelper {
 
     BarcodeInfo scanForBarcode(Bitmap bitmap);
 
-    boolean isSafeToStart(Context context);
+    boolean isSafeToStart();
 
     void close();
 }
