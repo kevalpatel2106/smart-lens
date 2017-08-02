@@ -185,7 +185,7 @@ public final class CameraPreview extends SurfaceView implements SurfaceHolder.Ca
     }
 
     /**
-     * Initialize the camera and start the preview of the camera.
+     * Initialize the camera and startTimeMills the preview of the camera.
      *
      * @param cameraConfig camera configurations.
      * @see CameraConfig

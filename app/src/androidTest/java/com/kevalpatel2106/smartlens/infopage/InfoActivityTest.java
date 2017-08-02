@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.rule.ActivityTestRule;
 
@@ -31,7 +32,6 @@ import com.kevalpatel2106.smartlens.testUtils.TestConfig;
 import com.kevalpatel2106.smartlens.wikipedia.WikiHelper;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -91,8 +91,7 @@ public class InfoActivityTest extends BaseTestClass {
         return sb.toString();
     }
 
-    @Before
-    public void init() {
+    public void openActivity() {
         ArrayList<String> labels = new ArrayList<>();
         labels.add(MOCK_LABEL);
 
@@ -104,12 +103,11 @@ public class InfoActivityTest extends BaseTestClass {
     @Test
     public void checkRealApiResponse() throws Exception {
         WikiHelper.BASE_WIKI_URL = "https://en.wikipedia.org/w/";
-        //Wait for the rx bus to get register after view creation
-        Delay.startDelay(1000);
-        onView(withId(R.id.wiki_page_tv));
+        openActivity();
 
         //Wait for the api call
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
+        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
 
         //Check if there are text?
         assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
@@ -132,9 +130,11 @@ public class InfoActivityTest extends BaseTestClass {
                 .setResponseCode(200)
                 .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
                         com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
+        openActivity();
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
+        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
 
         //Check if there are text?
         assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
@@ -159,9 +159,11 @@ public class InfoActivityTest extends BaseTestClass {
                 .setResponseCode(200)
                 .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
                         com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
+        openActivity();
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
+        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
 
         //Check if is error?
         assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
@@ -181,9 +183,11 @@ public class InfoActivityTest extends BaseTestClass {
                 .setResponseCode(200)
                 .setBody(getStringFromFile(InstrumentationRegistry.getInstrumentation().getContext(),
                         com.kevalpatel2106.smartlens.test.R.raw.wiki_image_success_response)));
+        openActivity();
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
+        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
 
         //Check if error occurred?
         assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
@@ -203,9 +207,11 @@ public class InfoActivityTest extends BaseTestClass {
                         com.kevalpatel2106.smartlens.test.R.raw.wiki_info_success_response)));
         //Fail response for the image api.
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        openActivity();
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
+        onView(withId(R.id.wiki_page_tv)).perform(ViewActions.click());
 
         //Check if there are text?
         assertEquals(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild(),
@@ -230,8 +236,8 @@ public class InfoActivityTest extends BaseTestClass {
             return mockWebServer;
         } catch (IOException e) {
             e.printStackTrace();
-            fail("Failed to start mock server.");
-            throw new RuntimeException("Failed to start mock server.");
+            fail("Failed to startTimeMills mock server.");
+            throw new RuntimeException("Failed to startTimeMills mock server.");
         }
     }
 

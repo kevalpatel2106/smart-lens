@@ -45,7 +45,7 @@ import timber.log.Timber;
  */
 
 public class WikiHelper extends BaseInfoHelper {
-    public static String BASE_WIKI_URL = "https://en.wikipedia.org/w/";
+    public static volatile String BASE_WIKI_URL = "https://en.wikipedia.org/w/";
     private final RetrofitHelper mRetrofitHelper;
     private int position = 0;
 

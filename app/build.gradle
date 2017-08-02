@@ -169,6 +169,9 @@ dependencies {
     implementation retrofitLib.rxPlugin
     implementation retrofitLib.logger
 
+    //Play service and firebase
+    implementation playServiceLib.vision
+
     //Support
     implementation supportLib.appCompat
     implementation supportLib.recyclerView
