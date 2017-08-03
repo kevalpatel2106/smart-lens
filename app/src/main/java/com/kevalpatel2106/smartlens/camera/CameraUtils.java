@@ -97,7 +97,7 @@ public final class CameraUtils {
      * @return rotated bitmap
      */
     @WorkerThread
-    static Bitmap rotateBitmap(@NonNull Bitmap bitmap, @CameraRotation.SupportedRotation int rotation) {
+    public static Bitmap rotateBitmap(@NonNull Bitmap bitmap, @CameraRotation.SupportedRotation int rotation) {
         Matrix matrix = new Matrix();
         matrix.postRotate(rotation);
         return Bitmap.createBitmap(bitmap,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.camera;
+package com.kevalpatel2106.smartlens.camera.camera2;
 
 import android.content.Context;
 import android.util.AttributeSet;

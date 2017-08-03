@@ -70,26 +70,26 @@ public final class CameraConfig {
     }
 
     @CameraResolution.SupportedResolution
-    int getResolution() {
+    public int getResolution() {
         return mResolution;
     }
 
     @CameraFacing.SupportedCameraFacing
-    int getFacing() {
+    public int getFacing() {
         return mFacing;
     }
 
     @CameraImageFormat.SupportedImageFormat
-    int getImageFormat() {
+    public int getImageFormat() {
         return mImageFormat;
     }
 
-    File getImageFile() {
+    public File getImageFile() {
         return mImageFile;
     }
 
     @CameraRotation.SupportedRotation
-    int getImageRotation() {
+    public int getImageRotation() {
         return mImageRotation;
     }
 

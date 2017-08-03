@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.camera;
+package com.kevalpatel2106.smartlens.camera.camera2;
 
 import android.Manifest;
 import android.app.Activity;
@@ -43,6 +43,10 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 
+import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
+import com.kevalpatel2106.smartlens.camera.CameraConfig;
+import com.kevalpatel2106.smartlens.camera.CameraError;
+import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 
 import java.util.ArrayList;
@@ -64,6 +68,7 @@ import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 public class Camera2Api {
 
+    //Camera orientation based on the screen orientation.
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
     static {
@@ -73,10 +78,19 @@ public class Camera2Api {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
+    //The caller activity
     private final Activity mActivity;
+
+    //Texture view
     private final TextureView mTextureView;
+
+    //Camera callbacks to get notify when image is captured or error occurred.
     private final CameraCallbacks mCameraCallbacks;
+
+    //Camera config. You can set the camera config while starting the camera.
     private CameraConfig mCameraConfig;
+
+
     private Size mImageDimension;
 
     //Camera device

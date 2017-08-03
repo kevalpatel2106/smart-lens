@@ -21,7 +21,7 @@
     tools:activity="com.kevalpatel2106.smartlens.dashboard.ImageClassifierFragment">
 
     <!--Frame container for the camera preview.-->
-    <com.kevalpatel2106.smartlens.camera.AutoFitTextureView
+    <com.kevalpatel2106.smartlens.camera.camera2.AutoFitTextureView
         android:id="@+id/camera_preview_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

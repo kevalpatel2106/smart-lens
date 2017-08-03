@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.camera;
+package com.kevalpatel2106.smartlens.camera.camera1;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -27,6 +27,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
+import com.kevalpatel2106.smartlens.camera.CameraConfig;
+import com.kevalpatel2106.smartlens.camera.CameraError;
+import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
 
 import java.io.IOException;
