@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.camera;
+package com.kevalpatel2106.smartlens.imageProcessors.objectClassifier;
+
+import com.kevalpatel2106.smartlens.imageProcessors.BaseProcessedInfo;
+
+import java.util.List;
 
 /**
- * Created by Keval on 02-Aug-17.
+ * Created by Keval on 03-Aug-17.
  */
 
-public interface BaseCameraHelper {
+public class Recognitions extends BaseProcessedInfo {
 
+    private final List<Recognition> mRecognitions;
+
+    public Recognitions(List<Recognition> recognitions) {
+        mRecognitions = recognitions;
+    }
+
+    public List<Recognition> getRecognitions() {
+        return mRecognitions;
+    }
 }

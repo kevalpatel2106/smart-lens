@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.camera.camera1;
+package com.kevalpatel2106.smartlens.plugins.legacyCamera;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

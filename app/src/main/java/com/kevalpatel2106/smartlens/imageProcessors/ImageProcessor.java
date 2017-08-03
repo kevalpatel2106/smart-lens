@@ -14,24 +14,30 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.imageProcessors.objectRecognition;
+package com.kevalpatel2106.smartlens.imageProcessors;
 
-import android.graphics.Bitmap;
+import android.content.Context;
+import android.support.annotation.NonNull;
 
-import java.util.List;
+import com.kevalpatel2106.smartlens.imageProcessors.barcode.BaseBarcodeScanner;
 
 /**
- * Created by Keval Patel on 19/04/17.
- * Generic interface for interacting with different recognition engines.
- *
- * @author 'https://github.com/androidthings/sample-tensorflow-imageclassifier/blob/master/app/src/main/java/com/example/androidthings/imageclassifier/classifier/Classifier.java'
+ * Created by Keval on 03-Aug-17.
  */
-public interface BaseImageClassifire {
-    List<Recognition> recognizeImage(Bitmap bitmap);
 
-    void close();
+public class ImageProcessor {
+    private Context mContext;
 
-    void downloadModels();
+    /**
+     * Public constructor.
+     *
+     * @param context Instance of the caller.
+     */
+    public ImageProcessor(@NonNull Context context) {
+        mContext = context;
+    }
 
-    boolean isModelDownloaded();
+    public void addBarcodeScanner(BaseBarcodeScanner baseBarcodeScanner) {
+
+    }
 }

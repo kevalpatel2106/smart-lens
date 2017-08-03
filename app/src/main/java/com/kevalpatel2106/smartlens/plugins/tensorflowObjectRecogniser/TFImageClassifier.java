@@ -22,8 +22,9 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
 
-import com.kevalpatel2106.smartlens.imageProcessors.objectRecognition.BaseImageClassifire;
-import com.kevalpatel2106.smartlens.imageProcessors.objectRecognition.Recognition;
+import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.BaseImageClassifier;
+import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognition;
+import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognitions;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
@@ -39,7 +40,7 @@ import java.util.List;
 /**
  * A classifier specialized to label images using TensorFlow.
  */
-public final class TFImageClassifier implements BaseImageClassifire {
+public final class TFImageClassifier extends BaseImageClassifier {
 
     private static final String TAG = TFImageClassifier.class.getSimpleName();
 
@@ -184,7 +185,7 @@ public final class TFImageClassifier implements BaseImageClassifire {
      * @return List of top three confidant {@link Recognition}.
      */
     @Override
-    public List<Recognition> recognizeImage(Bitmap bitmap) {
+    public Recognitions scan(Bitmap bitmap) {
         bitmap = Bitmap.createScaledBitmap(bitmap,
                 TFImageClassifier.INPUT_SIZE,
                 TFImageClassifier.INPUT_SIZE,
@@ -222,14 +223,19 @@ public final class TFImageClassifier implements BaseImageClassifire {
         }
 
         //If no match found...
-        if (recognitions.size() <= 0) return recognitions;
+        if (recognitions.size() <= 0) return new Recognitions(recognitions);
 
         //Sort based on the confidence level
         Collections.sort(recognitions, mConfidenceComparator);
 
         //Return max top 3 results.
         int recognitionsSize = Math.min(recognitions.size(), MAX_RESULTS);
-        return recognitions.subList(0, recognitionsSize - 1);
+        return new Recognitions(recognitions.subList(0, recognitionsSize - 1));
+    }
+
+    @Override
+    public boolean isSafeToStart() {
+        return mTensorFlowInferenceInterface != null;
     }
 
     /**

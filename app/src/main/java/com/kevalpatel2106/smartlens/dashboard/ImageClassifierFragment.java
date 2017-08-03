@@ -29,10 +29,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
@@ -41,11 +39,12 @@ import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
 import com.kevalpatel2106.smartlens.camera.CameraConfig;
 import com.kevalpatel2106.smartlens.camera.CameraError;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
-import com.kevalpatel2106.smartlens.camera.camera2.Camera2Api;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
-import com.kevalpatel2106.smartlens.imageProcessors.objectRecognition.Recognition;
+import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognition;
 import com.kevalpatel2106.smartlens.infopage.InfoActivity;
+import com.kevalpatel2106.smartlens.plugins.camera2.AutoFitTextureView;
+import com.kevalpatel2106.smartlens.plugins.camera2.Camera2Api;
 import com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser.TFDownloadProgressEvent;
 import com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser.TFImageClassifier;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
@@ -54,13 +53,11 @@ import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -76,7 +73,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
-    TextureView mTextureView;
+    AutoFitTextureView mTextureView;
     @BindView(R.id.recognition_tv)
     BaseTextView mClassifiedTv;
 
@@ -211,19 +208,19 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
 
-            //Start taking picture after every second.
-            Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .filter(l -> mCamera2Api != null
-                            && mImageClassifier != null
-                            && isVisible())
-                    .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
-                    .doOnNext(aLong -> mCamera2Api.takePicture())
-                    .doOnError(throwable -> Snackbar.make(mTextureView,
-                            R.string.image_classifier_frag_error_image_detection_failed,
-                            Toast.LENGTH_LONG).show())
-                    .subscribe();
+//            //Start taking picture after every second.
+//            Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribeOn(AndroidSchedulers.mainThread())
+//                    .filter(l -> mCamera2Api != null
+//                            && mImageClassifier != null
+//                            && isVisible())
+//                    .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
+//                    .doOnNext(aLong -> mCamera2Api.takePicture())
+//                    .doOnError(throwable -> Snackbar.make(mTextureView,
+//                            R.string.image_classifier_frag_error_image_detection_failed,
+//                            Toast.LENGTH_LONG).show())
+//                    .subscribe();
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
@@ -264,10 +261,12 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     }
 
     @Override
-    public void onImageCapture(@NonNull Bitmap bitmap) {
+    public void onImageCapture(@Nullable byte[] imageBytes) {
         //Process the image using Tf.
         Flowable<List<Recognition>> flowable = Flowable.create(e -> {
-            e.onNext(mImageClassifier.recognizeImage(bitmap));
+            Bitmap bitmap = null;
+            if (imageBytes != null) bitmap = CameraUtils.bytesToBitmap(imageBytes);
+            if (bitmap != null) e.onNext(mImageClassifier.scan(bitmap).getRecognitions());
             e.onComplete();
         }, BackpressureStrategy.DROP);
 

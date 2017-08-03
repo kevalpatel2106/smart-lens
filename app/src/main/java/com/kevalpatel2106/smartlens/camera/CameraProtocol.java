@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.imageProcessors.barcode;
-
-import android.graphics.Bitmap;
+package com.kevalpatel2106.smartlens.camera;
 
 /**
- * Created by Keval Patel on 02/08/17.
- *
- * @author 'https://github.com/kevalpatel2106'
+ * Created by Keval on 02-Aug-17.
  */
 
-public interface BarcodeScannerHelper {
+public interface CameraProtocol {
 
-    BarcodeInfo scanForBarcode(Bitmap bitmap);
-
-    boolean isSafeToStart();
-
-    void close();
 }

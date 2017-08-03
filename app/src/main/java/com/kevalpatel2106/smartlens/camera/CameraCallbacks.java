@@ -16,8 +16,7 @@
 
 package com.kevalpatel2106.smartlens.camera;
 
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Created by Keval on 14-Oct-16.
@@ -29,10 +28,8 @@ public interface CameraCallbacks {
 
     /**
      * This callback will notify whenever new image is captured.
-     *
-     * @param bitmap The bitmap of the captured image.
      */
-    void onImageCapture(@NonNull Bitmap bitmap);
+    void onImageCapture(@Nullable byte[] imageBytes);
 
     /**
      * This callback will notify whenever any error occurs while working with the camera.

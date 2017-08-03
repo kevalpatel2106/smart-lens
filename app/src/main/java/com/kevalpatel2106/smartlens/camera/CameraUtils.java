@@ -31,8 +31,6 @@ import android.support.v4.app.ActivityCompat;
 
 import com.kevalpatel2106.smartlens.camera.config.CameraRotation;
 
-import java.nio.ByteBuffer;
-
 /**
  * Created by Keval on 11-Nov-16.
  * This class holds common camera utils.
@@ -75,19 +73,15 @@ public final class CameraUtils {
     /**
      * Convert the {@link Image} to {@link Bitmap}.
      *
-     * @param image image to convert
+     * @param byteImage image to convert
      * @return {@link Bitmap}
      */
     @Nullable
     @WorkerThread
-    public static Bitmap imageToBitmap(@NonNull Image image) {
-        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-        byte[] bytes = new byte[buffer.capacity()];
-        buffer.get(bytes);
-
+    public static Bitmap bytesToBitmap(@NonNull byte[] byteImage) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        return BitmapFactory.decodeByteArray(byteImage, 0, byteImage.length, options);
     }
 
     /**

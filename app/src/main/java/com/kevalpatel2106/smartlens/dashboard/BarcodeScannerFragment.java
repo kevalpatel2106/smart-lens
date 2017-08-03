@@ -28,7 +28,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.base.BaseFragment;
@@ -37,25 +36,21 @@ import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
 import com.kevalpatel2106.smartlens.camera.CameraConfig;
 import com.kevalpatel2106.smartlens.camera.CameraError;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
-import com.kevalpatel2106.smartlens.camera.camera2.AutoFitTextureView;
-import com.kevalpatel2106.smartlens.camera.camera2.Camera2Api;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
 import com.kevalpatel2106.smartlens.imageProcessors.barcode.BarcodeInfo;
 import com.kevalpatel2106.smartlens.infopage.InfoActivity;
+import com.kevalpatel2106.smartlens.plugins.camera2.AutoFitTextureView;
+import com.kevalpatel2106.smartlens.plugins.camera2.Camera2Api;
 import com.kevalpatel2106.smartlens.plugins.visionBarcodeScanner.BarcodeScanner;
 
 import org.reactivestreams.Subscription;
-
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -63,9 +58,6 @@ import timber.log.Timber;
  * A simple {@link Fragment} subclass.
  */
 public final class BarcodeScannerFragment extends BaseFragment implements CameraCallbacks {
-    private static final String TAG = "ImageClassifierFragment";
-    private static final long FIRST_CAPTURE_DELAY = 4000L;  //4 seconds
-    private static final long INTERVAL_DELAY = 2000L;   //2 seconds
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
@@ -74,7 +66,6 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     BaseTextView mScannedInfoTv;
     Camera2Api mCamera2Api;
     private BarcodeScanner mBarcodeScanner;
-    private Disposable mTakePicDisposable;
 
     public BarcodeScannerFragment() {
         // Required empty public constructor
@@ -132,20 +123,6 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
                     .setCameraResolution(CameraResolution.LOW_RESOLUTION)
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
-
-            //Start taking picture after every second.
-            Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .filter(l -> mCamera2Api != null
-                            && mBarcodeScanner.isSafeToStart()
-                            && isVisible())
-                    .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
-                    .doOnNext(aLong -> mCamera2Api.takePicture())
-                    .doOnError(throwable -> Snackbar.make(mAutoFitTextureView,
-                            R.string.image_classifier_frag_error_image_detection_failed,
-                            Toast.LENGTH_LONG).show())
-                    .subscribe();
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
@@ -153,7 +130,6 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
 
     private void stopBarcodeScanner() {
         if (mCamera2Api != null) mCamera2Api.closeCamera();
-        if (mTakePicDisposable != null) mTakePicDisposable.dispose();
     }
 
     @Override
@@ -185,17 +161,12 @@ public final class BarcodeScannerFragment extends BaseFragment implements Camera
     }
 
     @Override
-    public void onImageCapture(@NonNull Bitmap bitmap) {
-
+    public void onImageCapture(@Nullable byte[] imageBytes) {
         //Process the image using Tf.
         Flowable<BarcodeInfo> flowable = Flowable.create(e -> {
-            //Scan the barcode
-            BarcodeInfo barcodeInfo = mBarcodeScanner.scanForBarcode(bitmap);
-
-            //Check for the not null. Rx2.0 doesn't support null.
-            //https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#nulls
-            if (barcodeInfo != null) e.onNext(barcodeInfo);
-
+            Bitmap bitmap = null;
+            if (imageBytes != null) bitmap = CameraUtils.bytesToBitmap(imageBytes);
+            if (bitmap != null) e.onNext(mBarcodeScanner.scan(bitmap));
             e.onComplete();
         }, BackpressureStrategy.DROP);
 

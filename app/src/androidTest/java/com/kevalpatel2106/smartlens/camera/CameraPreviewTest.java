@@ -33,8 +33,8 @@ import android.widget.FrameLayout;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.TestActivity;
-import com.kevalpatel2106.smartlens.camera.camera1.CameraPreview;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
+import com.kevalpatel2106.smartlens.plugins.legacyCamera.CameraPreview;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Rule;

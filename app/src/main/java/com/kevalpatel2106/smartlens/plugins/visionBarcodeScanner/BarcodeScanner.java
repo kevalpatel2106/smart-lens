@@ -26,7 +26,7 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.kevalpatel2106.smartlens.imageProcessors.barcode.BarcodeInfo;
-import com.kevalpatel2106.smartlens.imageProcessors.barcode.BarcodeScannerHelper;
+import com.kevalpatel2106.smartlens.imageProcessors.barcode.BaseBarcodeScanner;
 
 import java.util.Calendar;
 
@@ -36,14 +36,11 @@ import java.util.Calendar;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class BarcodeScanner implements BarcodeScannerHelper {
+public class BarcodeScanner extends BaseBarcodeScanner {
 
-    private final Context mContext;
     private BarcodeDetector mBarcodeDetector;
 
     public BarcodeScanner(Context context) {
-        mContext = context;
-
         //Build the detector
         mBarcodeDetector = new BarcodeDetector.Builder(context.getApplicationContext())
                 .build();
@@ -123,7 +120,7 @@ public class BarcodeScanner implements BarcodeScannerHelper {
     }
 
     @Override
-    public BarcodeInfo scanForBarcode(Bitmap bitmap) {
+    public BarcodeInfo scan(Bitmap bitmap) {
         Frame frame = new Frame.Builder().setBitmap(bitmap).build();
 
         SparseArray<Barcode> barcodes = mBarcodeDetector.detect(frame);

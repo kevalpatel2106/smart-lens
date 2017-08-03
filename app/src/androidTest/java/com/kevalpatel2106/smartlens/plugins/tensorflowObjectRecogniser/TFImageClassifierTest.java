@@ -22,7 +22,7 @@ import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.kevalpatel2106.smartlens.imageProcessors.objectRecognition.Recognition;
+import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognition;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Before;
