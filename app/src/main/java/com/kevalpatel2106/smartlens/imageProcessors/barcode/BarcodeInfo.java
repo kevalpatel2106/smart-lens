@@ -20,8 +20,6 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.kevalpatel2106.smartlens.imageProcessors.BaseProcessedInfo;
-
 import java.util.ArrayList;
 
 /**
@@ -30,7 +28,7 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class BarcodeInfo extends BaseProcessedInfo {
+public class BarcodeInfo {
     //TODO add wifi info object
     private Phone mPhone;
     private Rect mBoundingBox;

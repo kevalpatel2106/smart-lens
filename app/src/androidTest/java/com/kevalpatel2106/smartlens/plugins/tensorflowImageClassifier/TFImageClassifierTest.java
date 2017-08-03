@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser;
+package com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -22,7 +22,7 @@ import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognition;
+import com.kevalpatel2106.smartlens.imageProcessors.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Before;

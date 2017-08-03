@@ -60,4 +60,8 @@
     <style name="ToolbarColoredBackArrow" parent="AppTheme">
         <item name="android:textColorSecondary">@color/colorPrimaryText</item>
     </style>
+
+    <style name="AlertDialogTheme" parent="AppTheme">
+        <item name="android:textColorSecondary">@color/colorPrimaryText</item>
+    </style>
 </resources>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser;
+package com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

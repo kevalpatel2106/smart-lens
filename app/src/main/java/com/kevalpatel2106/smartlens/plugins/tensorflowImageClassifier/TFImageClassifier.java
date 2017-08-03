@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser;
+package com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,9 +22,8 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
 
-import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.BaseImageClassifier;
-import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognition;
-import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognitions;
+import com.kevalpatel2106.smartlens.imageProcessors.imageClassifier.BaseImageClassifier;
+import com.kevalpatel2106.smartlens.imageProcessors.imageClassifier.Recognition;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
@@ -124,7 +123,7 @@ public final class TFImageClassifier extends BaseImageClassifier {
         mContext = context;
 
         //Check if the models downloaded?
-        if (!isModelDownloaded())
+        if (!isModelDownloaded(context))
             throw new RuntimeException("Models are not downloaded yet. Download them first.");
 
         this.inputName = inputName;
@@ -147,6 +146,10 @@ public final class TFImageClassifier extends BaseImageClassifier {
         //Initialize TF
         mTensorFlowInferenceInterface = new TensorFlowInferenceInterface(context.getAssets(),
                 TFUtils.getImageGraph(mContext).getAbsolutePath());
+    }
+
+    public static boolean isModelDownloaded(Context context) {
+        return TFUtils.isModelsDownloaded(context);
     }
 
     /**
@@ -185,7 +188,7 @@ public final class TFImageClassifier extends BaseImageClassifier {
      * @return List of top three confidant {@link Recognition}.
      */
     @Override
-    public Recognitions scan(Bitmap bitmap) {
+    public List<Recognition> scan(Bitmap bitmap) {
         bitmap = Bitmap.createScaledBitmap(bitmap,
                 TFImageClassifier.INPUT_SIZE,
                 TFImageClassifier.INPUT_SIZE,
@@ -223,14 +226,14 @@ public final class TFImageClassifier extends BaseImageClassifier {
         }
 
         //If no match found...
-        if (recognitions.size() <= 0) return new Recognitions(recognitions);
+        if (recognitions.size() <= 0) return recognitions;
 
         //Sort based on the confidence level
         Collections.sort(recognitions, mConfidenceComparator);
 
         //Return max top 3 results.
         int recognitionsSize = Math.min(recognitions.size(), MAX_RESULTS);
-        return new Recognitions(recognitions.subList(0, recognitionsSize - 1));
+        return recognitions.subList(0, recognitionsSize - 1);
     }
 
     @Override
@@ -254,10 +257,5 @@ public final class TFImageClassifier extends BaseImageClassifier {
         } else {
             mContext.startForegroundService(new Intent(mContext, TFModelDownloadService.class));
         }
-    }
-
-    @Override
-    public boolean isModelDownloaded() {
-        return TFUtils.isModelsDownloaded(mContext);
     }
 }

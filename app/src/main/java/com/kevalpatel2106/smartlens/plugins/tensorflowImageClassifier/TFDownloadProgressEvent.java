@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser;
+package com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier;
 
 /**
  * Created by Keval on 31-Jul-17.

@@ -20,6 +20,13 @@ package com.kevalpatel2106.smartlens.camera;
  * Created by Keval on 02-Aug-17.
  */
 
-public interface CameraProtocol {
+public abstract class CameraProtocol {
 
+    public CameraProtocol(@SuppressWarnings("unused") CameraCallbacks cameraCallbacks) {
+        //Dp nothing
+    }
+
+    public abstract void startCamera(CameraConfig cameraConfig);
+
+    public abstract void closeCamera();
 }

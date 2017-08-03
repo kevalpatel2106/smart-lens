@@ -62,7 +62,7 @@
             android:label="@string/title_home_activity"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionbar.NoBackground"
+            android:theme="@style/AppTheme.Translucent.NoBackground"
             tools:ignore="UnusedAttribute"/>
 
         <!-- Info screen -->
@@ -74,7 +74,7 @@
             android:theme="@style/AppTheme.NoActionbar"
             tools:ignore="UnusedAttribute"/>
 
-        <service android:name=".plugins.tensorflowObjectRecogniser.TFModelDownloadService"/>
+        <service android:name=".plugins.tensorflowImageClassifier.TFModelDownloadService"/>
     </application>
 
 </manifest>

@@ -24,7 +24,8 @@
     <com.kevalpatel2106.smartlens.plugins.camera2.AutoFitTextureView
         android:id="@+id/camera_preview_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"/>
 
     <!--Point image-->
     <com.kevalpatel2106.smartlens.base.BaseImageView

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.imageProcessors.objectClassifier;
+package com.kevalpatel2106.smartlens.imageProcessors.imageClassifier;
 
 import android.graphics.RectF;
 

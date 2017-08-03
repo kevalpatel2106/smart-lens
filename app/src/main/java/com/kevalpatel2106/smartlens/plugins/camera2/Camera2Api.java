@@ -46,6 +46,7 @@ import android.view.TextureView;
 import com.kevalpatel2106.smartlens.camera.CameraCallbacks;
 import com.kevalpatel2106.smartlens.camera.CameraConfig;
 import com.kevalpatel2106.smartlens.camera.CameraError;
+import com.kevalpatel2106.smartlens.camera.CameraProtocol;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 
 import java.nio.ByteBuffer;
@@ -68,7 +69,7 @@ import timber.log.Timber;
  * <li>Take picture</li>
  */
 
-public class Camera2Api {
+public class Camera2Api extends CameraProtocol {
 
     /**
      * The camera preview size will be chosen to be the smallest frame by pixel size capable of
@@ -139,15 +140,23 @@ public class Camera2Api {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         }
     };
+
+    /**
+     * Callback to receive when the image is captured. This runs on the background thread.
+     */
     private ImageReader.OnImageAvailableListener mOnImageAvailableListener = imageReader -> {
         if (mCameraCallbacks != null) {
             Image image = imageReader.acquireLatestImage();
             if (image != null) {
+
+                //Convert byte to bitmap
                 ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                 byte[] bytes = new byte[buffer.capacity()];
                 buffer.get(bytes);
-                Timber.e(bytes.length + "");
+
                 mCameraCallbacks.onImageCapture(bytes);
+
+                //Close the image
                 image.close();
             }
         }
@@ -193,6 +202,7 @@ public class Camera2Api {
     public Camera2Api(@NonNull Activity activity,
                       @NonNull AutoFitTextureView autoFitTextureView,
                       @NonNull CameraCallbacks cameraCallbacks) {
+        super(cameraCallbacks);
         mActivity = activity;
         mCameraCallbacks = cameraCallbacks;
 
@@ -207,16 +217,14 @@ public class Camera2Api {
      * @param choices The list of sizes that the camera supports for the intended output class
      * @return The optimal {@code Size}, or an arbitrary one if none were big enough
      */
-    private static Size chooseOptimalSize(final Size[] choices) {
-        int minWidth = 640;
-        int minHeight = 480;
-
+    private static Size chooseOptimalSize(final Size[] choices, int minWidth, int minHeight) {
         final int minSize = Math.max(Math.min(minWidth, minHeight), MINIMUM_PREVIEW_SIZE);
         final Size desiredSize = new Size(minWidth, minHeight);
 
         // Collect the supported resolutions that are at least as big as the preview Surface
         boolean exactSizeFound = false;
         final List<Size> bigEnough = new ArrayList<>();
+        //noinspection MismatchedQueryAndUpdateOfCollection
         final List<Size> tooSmall = new ArrayList<>();
         for (final Size option : choices) {
             if (option.equals(desiredSize)) {
@@ -246,6 +254,7 @@ public class Camera2Api {
      *
      * @param cameraConfig {@link CameraConfig}
      */
+    @Override
     public void startCamera(@NonNull CameraConfig cameraConfig) {
         //Validate argument
         //noinspection ConstantConditions
@@ -268,6 +277,7 @@ public class Camera2Api {
     /**
      * Close and release the camera.
      */
+    @Override
     public void closeCamera() {
         try {
             mCameraOpenCloseLock.acquire();
@@ -308,18 +318,17 @@ public class Camera2Api {
 
             // Create the reader for the preview frames.
             mPreviewReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(),
-                    ImageFormat.YUV_420_888, 2);
+                    ImageFormat.JPEG, 2);
             mPreviewReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
             mCaptureRequestBuilder.addTarget(mPreviewReader.getSurface());
 
             //noinspection ArraysAsListWithZeroOrOneArgument
-            mCameraDevice.createCaptureSession(
-                    Arrays.asList(surface, mPreviewReader.getSurface()),
+            mCameraDevice.createCaptureSession(Arrays.asList(surface, mPreviewReader.getSurface()),
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                             //The camera is already closed
-                            if (null == mCameraDevice) {
+                            if (mCameraDevice == null) {
                                 mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
                                 return;
                             }
@@ -359,7 +368,7 @@ public class Camera2Api {
      * Open the camera. This is the internal method to handle camera. This method will be called once
      * whenever the texture is ready in {@link #mSurfaceTextureListener}.
      */
-    private void openCamera(final int width, final int height) {
+    private void openCamera(final int viewWidth, final int viewHeight) {
         // Add permission for camera and let user grant the permission
         if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -367,7 +376,7 @@ public class Camera2Api {
             return;
         }
 
-        configureTransform(width, height);
+        configureTransform(viewWidth, viewHeight);
 
         try {
             CameraManager manager = (CameraManager) mActivity.getSystemService(Context.CAMERA_SERVICE);
@@ -405,7 +414,7 @@ public class Camera2Api {
             // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
             // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
             // garbage capture data.
-            mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class));
+            mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), viewWidth, viewHeight);
 
             // We fit the aspect ratio of TextureView to the size of preview we picked.
             final int orientation = mActivity.getResources().getConfiguration().orientation;

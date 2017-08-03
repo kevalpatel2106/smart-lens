@@ -31,7 +31,7 @@ import android.os.PowerManager;
 import android.support.test.runner.AndroidJUnitRunner;
 import android.util.Log;
 
-import com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser.TFUtils;
+import com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier.TFUtils;
 import com.kevalpatel2106.smartlens.utils.FileUtils;
 
 import org.junit.Assert;

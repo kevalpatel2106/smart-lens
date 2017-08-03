@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.imageProcessors.objectClassifier;
+package com.kevalpatel2106.smartlens.imageProcessors.imageClassifier;
 
-import com.kevalpatel2106.smartlens.imageProcessors.BaseProcessedInfo;
+import android.graphics.Bitmap;
 
 import java.util.List;
 
 /**
- * Created by Keval on 03-Aug-17.
+ * Created by Keval Patel on 19/04/17.
+ * Generic interface for interacting with different recognition engines.
+ *
+ * @author 'https://github.com/androidthings/sample-tensorflow-imageclassifier/blob/master/app/src/main/java/com/example/androidthings/imageclassifier/classifier/Classifier.java'
  */
+public abstract class BaseImageClassifier {
+    public abstract List<Recognition> scan(Bitmap bitmap);
 
-public class Recognitions extends BaseProcessedInfo {
+    public abstract void downloadModels();
 
-    private final List<Recognition> mRecognitions;
+    public abstract boolean isSafeToStart();
 
-    public Recognitions(List<Recognition> recognitions) {
-        mRecognitions = recognitions;
-    }
-
-    public List<Recognition> getRecognitions() {
-        return mRecognitions;
-    }
+    public abstract void close();
 }

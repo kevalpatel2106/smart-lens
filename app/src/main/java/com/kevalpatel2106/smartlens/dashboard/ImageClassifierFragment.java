@@ -22,12 +22,13 @@ import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,26 +42,19 @@ import com.kevalpatel2106.smartlens.camera.CameraError;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
-import com.kevalpatel2106.smartlens.imageProcessors.objectClassifier.Recognition;
+import com.kevalpatel2106.smartlens.imageProcessors.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.infopage.InfoActivity;
 import com.kevalpatel2106.smartlens.plugins.camera2.AutoFitTextureView;
 import com.kevalpatel2106.smartlens.plugins.camera2.Camera2Api;
-import com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser.TFDownloadProgressEvent;
-import com.kevalpatel2106.smartlens.plugins.tensorflowObjectRecogniser.TFImageClassifier;
+import com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier.TFDownloadProgressEvent;
+import com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier.TFImageClassifier;
 import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
-
-import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -68,8 +62,6 @@ import timber.log.Timber;
  */
 public final class ImageClassifierFragment extends BaseFragment implements CameraCallbacks {
     private static final String TAG = "ImageClassifierFragment";
-    private static final long FIRST_CAPTURE_DELAY = 4000L;  //4 seconds
-    private static final long INTERVAL_DELAY = 2000L;   //2 seconds
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
@@ -82,7 +74,7 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     ProgressDialog mProgressDialog;
     Camera2Api mCamera2Api;
     TFImageClassifier mImageClassifier;
-    private Disposable mTakePicDisposable;
+    private volatile boolean mIsProcessing;
 
     public ImageClassifierFragment() {
         // Required empty public constructor
@@ -99,8 +91,6 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        //Initiate the tensorflow classifier.
-        mImageClassifier = new TFImageClassifier(getActivity());
         mLastRecognition = new ArrayList<>();
 
         //Create the download progressbar
@@ -199,28 +189,15 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
      * <li>Tensorflow models are downloaded</li>
      */
     private void safeStartImageRecognition() {
-        if (!mImageClassifier.isModelDownloaded()) {    //Check if the tensorflow models are there
+        if (!TFImageClassifier.isModelDownloaded(mContext)) {    //Check if the tensorflow models are there
             downloadDataDialog();
         } else if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {//Start the camera.
+            if (mImageClassifier == null) mImageClassifier = new TFImageClassifier(mContext);
             //Start the camera.
             mCamera2Api.startCamera(new CameraConfig().getBuilder(mContext)
                     .setCameraResolution(CameraResolution.LOW_RESOLUTION)
                     .setCameraFacing(CameraFacing.REAR_FACING_CAMERA)
                     .build());
-
-//            //Start taking picture after every second.
-//            Observable.interval(FIRST_CAPTURE_DELAY, INTERVAL_DELAY, TimeUnit.MILLISECONDS)
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeOn(AndroidSchedulers.mainThread())
-//                    .filter(l -> mCamera2Api != null
-//                            && mImageClassifier != null
-//                            && isVisible())
-//                    .doOnSubscribe(disposable -> mTakePicDisposable = disposable)
-//                    .doOnNext(aLong -> mCamera2Api.takePicture())
-//                    .doOnError(throwable -> Snackbar.make(mTextureView,
-//                            R.string.image_classifier_frag_error_image_detection_failed,
-//                            Toast.LENGTH_LONG).show())
-//                    .subscribe();
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CODE_CAMERA_PERMISSION);
         }
@@ -228,7 +205,6 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
 
     private void stopImageRecognition() {
         mCamera2Api.closeCamera();
-        if (mTakePicDisposable != null) mTakePicDisposable.dispose();
     }
 
     @Override
@@ -262,34 +238,28 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
 
     @Override
     public void onImageCapture(@Nullable byte[] imageBytes) {
-        //Process the image using Tf.
-        Flowable<List<Recognition>> flowable = Flowable.create(e -> {
-            Bitmap bitmap = null;
-            if (imageBytes != null) bitmap = CameraUtils.bytesToBitmap(imageBytes);
-            if (bitmap != null) e.onNext(mImageClassifier.scan(bitmap).getRecognitions());
-            e.onComplete();
-        }, BackpressureStrategy.DROP);
+        if (mIsProcessing) return;
+        mIsProcessing = true;
 
-        final Subscription[] subscriptions = new Subscription[1];
-        flowable.subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(subscription -> subscriptions[0] = subscription)
-                .doOnError(t -> {
-                    Timber.e(t.getMessage());
-                    subscriptions[0].cancel();
-                })
-                .doOnComplete(() -> subscriptions[0].cancel())
-                .subscribe(labels -> {
-                    if (!labels.isEmpty()) {
-                        Log.d(TAG, "onImageCapture: " + labels.get(0).getTitle());
-                        mClassifiedTv.setVisibility(View.VISIBLE);
-                        mClassifiedTv.setText(labels.get(0).getTitle());
+        Bitmap bitmap = null;
+        if (imageBytes != null) bitmap = CameraUtils.bytesToBitmap(imageBytes);
 
-                        //Load as the last recognition
-                        mLastRecognition.clear();
-                        mLastRecognition.addAll(labels);
-                    }
-                });
+        if (bitmap != null) {
+            List<Recognition> labels = mImageClassifier.scan(bitmap);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (!labels.isEmpty()) {
+                    Timber.d("Image label: " + labels.get(0).getTitle());
+                    mClassifiedTv.setVisibility(View.VISIBLE);
+                    mClassifiedTv.setText(labels.get(0).getTitle());
+
+                    //Load as the last recognition
+                    mLastRecognition.clear();
+                    mLastRecognition.addAll(labels);
+                }
+
+                mIsProcessing = false;
+            });
+        }
     }
 
     @Override
