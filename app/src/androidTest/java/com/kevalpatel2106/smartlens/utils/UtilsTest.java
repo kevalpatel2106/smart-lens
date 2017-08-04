@@ -16,20 +16,15 @@
 
 package com.kevalpatel2106.smartlens.utils;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.os.Build;
-import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.kevalpatel2106.smartlens.camera.config.CameraImageFormat;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,7 +32,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -47,9 +41,6 @@ import static org.junit.Assert.fail;
  */
 @RunWith(AndroidJUnit4.class)
 public final class UtilsTest extends BaseTestClass {
-
-    @Rule
-    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     /**
      * Test for {@link Utils#getDeviceName()}.
@@ -68,23 +59,8 @@ public final class UtilsTest extends BaseTestClass {
         int mockBmpHeight = 50;
         Bitmap mockBmp = Bitmap.createBitmap(mockBmpWidth, mockBmpHeight, Bitmap.Config.RGB_565);
 
-        //Create mock file with external directory. External file don't have write permission.
-        File mockSaveFile = new File(Environment.getExternalStorageDirectory()
-                + "/IMG" + System.currentTimeMillis() + ".png");
-
-        //Check the output png
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            assertTrue(Utils.saveImageFromFile(mockBmp,
-                    mockSaveFile,
-                    CameraImageFormat.FORMAT_PNG));
-        } else {
-            assertFalse(Utils.saveImageFromFile(mockBmp,
-                    mockSaveFile,
-                    CameraImageFormat.FORMAT_PNG));
-        }
-
         //Create mock file with cache directory. Cache file has always write permission.
-        mockSaveFile = new File(FileUtils.getCacheDir(InstrumentationRegistry.getTargetContext())
+        File mockSaveFile = new File(FileUtils.getCacheDir(InstrumentationRegistry.getTargetContext())
                 + "/IMG" + System.currentTimeMillis() + ".jpg");
 
         //Check the output of jpg
