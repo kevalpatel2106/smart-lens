@@ -359,13 +359,13 @@ public class BarcodeInfo {
             mType = type;
         }
 
-        public Address(@NonNull String email) {
+        public Address(@NonNull String address) {
 
             //noinspection ConstantConditions
-            if (email == null)
+            if (address == null)
                 throw new IllegalArgumentException("Address cannot be null.");
 
-            mAddress = email;
+            mAddress = address;
         }
 
         @NonNull
@@ -396,13 +396,13 @@ public class BarcodeInfo {
             mType = type;
         }
 
-        public Phone(@NonNull String email) {
+        public Phone(@NonNull String phone) {
 
             //noinspection ConstantConditions
-            if (email == null)
+            if (phone == null)
                 throw new IllegalArgumentException("Phone cannot be null.");
 
-            mPhone = email;
+            mPhone = phone;
         }
 
         @NonNull

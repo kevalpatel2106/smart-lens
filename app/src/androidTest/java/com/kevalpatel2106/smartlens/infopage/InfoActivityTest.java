@@ -107,7 +107,7 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for the api call
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
-        onView(withId(R.id.root_view)).perform(ViewActions.click());
+        onView(withId(R.id.root_view)).perform(ViewActions.closeSoftKeyboard());
 
         //Check if there are text?
         assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
@@ -134,7 +134,7 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_REAL_API);
-        onView(withId(R.id.root_view)).perform(ViewActions.click());
+        onView(withId(R.id.root_view)).perform(ViewActions.closeSoftKeyboard());
 
         //Check if there are text?
         assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
@@ -163,7 +163,7 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
-        onView(withId(R.id.root_view)).perform(ViewActions.click());
+        onView(withId(R.id.root_view)).perform(ViewActions.closeSoftKeyboard());
 
         //Check if is error?
         assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
@@ -187,7 +187,7 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
-        onView(withId(R.id.root_view)).perform(ViewActions.click());
+        onView(withId(R.id.root_view)).perform(ViewActions.closeSoftKeyboard());
 
         //Check if error occurred?
         assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==
@@ -211,7 +211,7 @@ public class InfoActivityTest extends BaseTestClass {
 
         //Wait for mock api
         Delay.startDelay(TestConfig.DELAY_FOR_MOCK_API);
-        onView(withId(R.id.root_view)).perform(ViewActions.click());
+        onView(withId(R.id.root_view)).perform(ViewActions.closeSoftKeyboard());
 
         //Check if there are text?
         assertTrue(mWikiFragmentFragmentTestRule.getActivity().mViewFlipper.getDisplayedChild() ==

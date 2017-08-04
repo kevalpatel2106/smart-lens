@@ -49,7 +49,7 @@ import static org.junit.Assert.fail;
 public final class UtilsTest extends BaseTestClass {
 
     @Rule
-    private GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     /**
      * Test for {@link Utils#getDeviceName()}.
