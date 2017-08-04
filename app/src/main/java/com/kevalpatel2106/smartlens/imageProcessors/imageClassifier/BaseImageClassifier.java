@@ -16,6 +16,7 @@
 
 package com.kevalpatel2106.smartlens.imageProcessors.imageClassifier;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import java.util.List;
@@ -27,11 +28,25 @@ import java.util.List;
  * @author 'https://github.com/androidthings/sample-tensorflow-imageclassifier/blob/master/app/src/main/java/com/example/androidthings/imageclassifier/classifier/Classifier.java'
  */
 public abstract class BaseImageClassifier {
+    private Context mContext;
+
+    public BaseImageClassifier(Context context) {
+        mContext = context;
+    }
+
     public abstract List<Recognition> scan(Bitmap bitmap);
 
     public abstract void downloadModels();
 
+    public abstract boolean isModelDownloaded();
+
+    public abstract void init();
+
     public abstract boolean isSafeToStart();
 
     public abstract void close();
+
+    protected Context getContext() {
+        return mContext;
+    }
 }

@@ -61,7 +61,7 @@
         <item name="android:textColorSecondary">@color/colorPrimaryText</item>
     </style>
 
-    <style name="AlertDialogTheme" parent="AppTheme">
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:textColorSecondary">@color/colorPrimaryText</item>
     </style>
 </resources>

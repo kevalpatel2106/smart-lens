@@ -19,6 +19,10 @@ package com.kevalpatel2106.smartlens.dashboard;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -28,6 +32,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,13 +47,12 @@ import com.kevalpatel2106.smartlens.camera.CameraError;
 import com.kevalpatel2106.smartlens.camera.CameraUtils;
 import com.kevalpatel2106.smartlens.camera.config.CameraFacing;
 import com.kevalpatel2106.smartlens.camera.config.CameraResolution;
+import com.kevalpatel2106.smartlens.downloader.ModelDownloadService;
 import com.kevalpatel2106.smartlens.imageProcessors.imageClassifier.Recognition;
 import com.kevalpatel2106.smartlens.infopage.InfoActivity;
 import com.kevalpatel2106.smartlens.plugins.camera2.AutoFitTextureView;
 import com.kevalpatel2106.smartlens.plugins.camera2.Camera2Api;
-import com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier.TFDownloadProgressEvent;
 import com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier.TFImageClassifier;
-import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +65,6 @@ import timber.log.Timber;
  * A simple {@link Fragment} subclass.
  */
 public final class ImageClassifierFragment extends BaseFragment implements CameraCallbacks {
-    private static final String TAG = "ImageClassifierFragment";
     private static final int REQ_CODE_CAMERA_PERMISSION = 7436;
 
     @BindView(R.id.camera_preview_container)
@@ -71,10 +74,32 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
 
     List<Recognition> mLastRecognition;
 
-    ProgressDialog mProgressDialog;
     Camera2Api mCamera2Api;
     TFImageClassifier mImageClassifier;
     private volatile boolean mIsProcessing;
+    private ProgressDialog mProgressDialog;
+    private BroadcastReceiver mDownloadProgressReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (mProgressDialog != null && mProgressDialog.isShowing())
+                mProgressDialog.cancel();
+
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mDownloadProgressReceiver);
+
+            if (intent.hasExtra(ModelDownloadService.DOWNLOAD_ERROR_MESSAGE)) {
+                new AlertDialog.Builder(mContext, R.style.AlertDialogTheme)
+                        .setMessage(intent.getStringExtra(ModelDownloadService.DOWNLOAD_ERROR_MESSAGE))
+                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                            //Kill the activity.
+                            finish();
+                        })
+                        .setCancelable(false)
+                        .show();
+            } else {
+                safeStartImageRecognition();
+            }
+        }
+    };
 
     public ImageClassifierFragment() {
         // Required empty public constructor
@@ -91,14 +116,8 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
+        mImageClassifier = new TFImageClassifier(mContext);
         mLastRecognition = new ArrayList<>();
-
-        //Create the download progressbar
-        mProgressDialog = new ProgressDialog(mContext);
-        mProgressDialog.setMessage(getString(R.string.image_classifire_download_progressbar_message));
-        mProgressDialog.setCancelable(false);
-
-        registerModelDownloadProgressListener();
 
         return inflater.inflate(R.layout.fragment_image_classifire, container, false);
     }
@@ -119,50 +138,6 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
         ArrayList<String> labels = new ArrayList<>(mLastRecognition.size());
         for (Recognition recognition : mLastRecognition) labels.add(recognition.getTitle());
         InfoActivity.launch(getActivity(), labels, null);
-    }
-
-    /**
-     * Register the bus to receive the download progress. This will update the download progress.
-     */
-    private void registerModelDownloadProgressListener() {
-        RxBus.getDefault().register(TFDownloadProgressEvent.class)
-                .doOnSubscribe(this::addSubscription)
-                .doOnNext(event -> {
-                    TFDownloadProgressEvent TFDownloadProgressEvent =
-                            (TFDownloadProgressEvent) event.getObject();
-
-                    if (TFDownloadProgressEvent.getErrorMsg() != null) {
-                        //Error occurred while downloading
-                        mProgressDialog.cancel();
-
-                        new AlertDialog.Builder(mContext)
-                                .setMessage(TFDownloadProgressEvent.getErrorMsg())
-                                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                                    //Kill the activity.
-                                    finish();
-                                })
-                                .setCancelable(false)
-                                .show();
-                    } else if (TFDownloadProgressEvent.isDownloading() && !mProgressDialog.isShowing()) {
-                        //Progress updated
-                        //Display the progress percentage
-                        mProgressDialog.setMessage(getString(R.string.image_classifire_download_progressbar_message)
-                                + "(" + TFDownloadProgressEvent.getPercent() + "%)");
-                        mProgressDialog.show();
-                    } else if (!TFDownloadProgressEvent.isDownloading() && mProgressDialog.isShowing()) {
-                        //Download complete
-                        mProgressDialog.dismiss();
-
-                        //Initiate the recognizer
-                        safeStartImageRecognition();
-                    }
-                })
-                .doOnDispose(() -> {
-                    //Hide the progressbar
-                    if (mProgressDialog != null && mProgressDialog.isShowing())
-                        mProgressDialog.cancel();
-                })
-                .subscribe();
     }
 
     @Override
@@ -189,10 +164,11 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
      * <li>Tensorflow models are downloaded</li>
      */
     private void safeStartImageRecognition() {
-        if (!TFImageClassifier.isModelDownloaded(mContext)) {    //Check if the tensorflow models are there
+        if (!mImageClassifier.isModelDownloaded()) {    //Check if the tensorflow models are there
             downloadDataDialog();
         } else if (CameraUtils.checkIfCameraPermissionGranted(getActivity())) {//Start the camera.
-            if (mImageClassifier == null) mImageClassifier = new TFImageClassifier(mContext);
+            if (!mImageClassifier.isSafeToStart()) mImageClassifier.init();
+
             //Start the camera.
             mCamera2Api.startCamera(new CameraConfig().getBuilder(mContext)
                     .setCameraResolution(CameraResolution.LOW_RESOLUTION)
@@ -272,10 +248,12 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
                 Snackbar.make(mTextureView, R.string.image_classifier_frag_error_no_front_camera, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
+                break;
             case CameraError.ERROR_IMAGE_WRITE_FAILED:
                 Snackbar.make(mTextureView, R.string.image_classifier_frag_error_save_image, Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, view -> getActivity().finish())
                         .show();
+                break;
             case CameraError.ERROR_CAMERA_OPEN_FAILED:
             default:
                 Snackbar.make(mTextureView, R.string.image_classifier_frag_error_camera_open, Snackbar.LENGTH_LONG)
@@ -290,10 +268,17 @@ public final class ImageClassifierFragment extends BaseFragment implements Camer
      * Confirmation dialog to download the tensorflow models.
      */
     private void downloadDataDialog() {
-        new AlertDialog.Builder(mContext)
+        new AlertDialog.Builder(mContext, R.style.AlertDialogTheme)
                 .setMessage(R.string.image_classifire_frag_additional_download_explain)
                 .setPositiveButton(R.string.image_classifire_frag_btn_download, (dialogInterface, i) -> {
+                    mProgressDialog = new ProgressDialog(mContext);
+                    mProgressDialog.setMessage(getString(R.string.image_classifire_download_progressbar_message));
+                    mProgressDialog.setCancelable(false);
                     mProgressDialog.show();
+
+                    //Register the local broadcast
+                    LocalBroadcastManager.getInstance(mContext).registerReceiver(mDownloadProgressReceiver,
+                            new IntentFilter(ModelDownloadService.DOWNLOAD_COMPLETE_BROADCAST));
 
                     //Start downloading message.
                     mImageClassifier.downloadModels();

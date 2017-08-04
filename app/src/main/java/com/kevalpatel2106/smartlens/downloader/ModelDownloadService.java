@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier;
+package com.kevalpatel2106.smartlens.downloader;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.kevalpatel2106.smartlens.R;
 import com.kevalpatel2106.smartlens.utils.FileUtils;
-import com.kevalpatel2106.smartlens.utils.rxBus.Event;
-import com.kevalpatel2106.smartlens.utils.rxBus.RxBus;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -35,61 +36,85 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Keval on 31-Jul-17.
  */
 
-public class TFModelDownloadService extends Service {
+public class ModelDownloadService extends Service {
+
+    public static final String DOWNLOAD_COMPLETE_BROADCAST = "download_progress";
+    public static final String DOWNLOAD_ERROR_MESSAGE = "download_progress_error_message";
+
     private static final String ARG_CANCEL_DOWNLOAD = "arg_cancel_download";
-    private static final String TENSORFLOW_GRAPH_URL = "https://github.com/kevalpatel2106/smart-lens/blob/master/tf_models/tensorflow_inception_graph.pb?raw=true";
-    private static final String TENSORFLOW_LABEL_URL = "https://raw.githubusercontent.com/kevalpatel2106/smart-lens/master/tf_models/imagenet_comp_graph_label_strings.txt";
+    private static final String ARG_DOWNLOAD = "arg_download";
     private CompositeDisposable mCompositeDisposable;
+    private HashMap<String, File> mDownloads;
+    private Iterator<String> mUrlIterator;
+
+    public static void startDownload(@NonNull Context context,
+                                     @NonNull HashMap<String, File> downloads) {
+        Intent intent = new Intent(context, ModelDownloadService.class);
+        intent.putExtra(ARG_DOWNLOAD, downloads);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+            context.startService(intent);
+        } else {
+            context.startForegroundService(intent);
+        }
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void onCreate() {
         super.onCreate();
-        //Make foreground
-        startForeground(TFModelDownloadingNotification.NOTIFICATION_TAG,
-                TFModelDownloadingNotification.getNotification(this, 0, true));
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) { //Make foreground
+            startForeground(ModelDownloadingNotification.NOTIFICATION_TAG,
+                    ModelDownloadingNotification.getNotification(this, 0, true));
+        }
 
         mCompositeDisposable = new CompositeDisposable();
-
-        //Download tensorflow graph
-        File file = TFUtils.getImageGraph(this);
-        if (file.exists()) file.delete();
-        downloadFile(TENSORFLOW_GRAPH_URL, file, () -> {
-
-            //Download supported labels
-            File fileLabel = TFUtils.getImageLabels(TFModelDownloadService.this);
-            if (fileLabel.exists()) file.delete();
-            downloadFile(TENSORFLOW_LABEL_URL, file, this::stopSelf);
-        });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.hasExtra(ARG_CANCEL_DOWNLOAD)) stopSelf();
+        if (intent.hasExtra(ARG_CANCEL_DOWNLOAD)) {
+            stopSelf();
+        } else {
+            //Get the download
+            mDownloads = (HashMap<String, File>) intent.getSerializableExtra(ARG_DOWNLOAD);
+            if (mDownloads == null || mDownloads.isEmpty())
+                throw new IllegalArgumentException("Downloads cannot be null or empty.");
+
+            mUrlIterator = mDownloads.keySet().iterator();
+
+            //Download
+            String firstUrl = mUrlIterator.next();
+            downloadFile(firstUrl, mDownloads.get(firstUrl));
+        }
         return START_NOT_STICKY;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void downloadFile(@NonNull String urlToDownload,
-                              @NonNull File file,
-                              @NonNull Action actionOnComplete) {
+                              @NonNull File file) {
+
+        //Create the observable.
+        //This will download files.
         Observable<Integer> observable = Observable.create(e -> {
             try {
                 e.onNext(-1);       //Start indeterminant process
 
                 //Create temp file.
-                File tempFile = new File(FileUtils.getCacheDir(TFModelDownloadService.this)
+                File tempFile = new File(FileUtils.getCacheDir(ModelDownloadService.this)
                         + "/" + file.getName());
                 tempFile.createNewFile();
 
@@ -120,7 +145,7 @@ public class TFModelDownloadService extends Service {
                 input.close();
 
                 //Make indeterminate
-                TFModelDownloadingNotification.notify(this, 0, true);
+                ModelDownloadingNotification.notify(this, 0, true);
 
                 //Copy the file to the main url
                 if (FileUtils.copyFile(file, tempFile)) {
@@ -139,20 +164,32 @@ public class TFModelDownloadService extends Service {
         observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(disposable -> mCompositeDisposable.add(disposable))
-                .doOnComplete(actionOnComplete)
-                .subscribe(integer -> {
-                            //Update the notification with the new percentage
-                            TFModelDownloadingNotification.notify(TFModelDownloadService.this,
-                                    integer,
-                                    integer < 0);
+                .doOnComplete(() -> {
+                    //Check if there are more files to download?
+                    if (mUrlIterator.hasNext()) {
 
-                            //Publish the event to other activity
-                            RxBus.getDefault()
-                                    .post(new Event(new TFDownloadProgressEvent(true, integer)));
+                        //Start downloading the next file.
+                        String url = mUrlIterator.next();
+                        downloadFile(url, mDownloads.get(url));
+                    } else {
+
+                        //There are no more files to download
+                        //Stop the service.
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(DOWNLOAD_COMPLETE_BROADCAST));
+                        stopSelf();
+                    }
+                })
+                .subscribe(percentage -> {
+                            //Update the notification with the new percentage
+                            ModelDownloadingNotification.notify(ModelDownloadService.this,
+                                    percentage, percentage < 0);
                         },
                         throwable -> {
-                            RxBus.getDefault()
-                                    .post(new Event(new TFDownloadProgressEvent(throwable.getMessage())));
+                            //Error occurred.
+                            //Stop the service.
+                            Intent intent = new Intent(DOWNLOAD_COMPLETE_BROADCAST);
+                            intent.putExtra(DOWNLOAD_ERROR_MESSAGE, throwable.getMessage());
+                            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                             stopSelf();
                         });
     }
@@ -163,10 +200,7 @@ public class TFModelDownloadService extends Service {
         mCompositeDisposable.dispose();
 
         //Remove the notification
-        TFModelDownloadingNotification.cancel(this);
-
-        //Hide the dialog.
-        RxBus.getDefault().post(new Event(new TFDownloadProgressEvent(false, 0)));
+        ModelDownloadingNotification.cancel(this);
     }
 
     @Nullable

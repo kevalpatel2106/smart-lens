@@ -74,7 +74,7 @@
             android:theme="@style/AppTheme.NoActionbar"
             tools:ignore="UnusedAttribute"/>
 
-        <service android:name=".plugins.tensorflowImageClassifier.TFModelDownloadService"/>
+        <service android:name=".downloader.ModelDownloadService"/>
     </application>
 
 </manifest>

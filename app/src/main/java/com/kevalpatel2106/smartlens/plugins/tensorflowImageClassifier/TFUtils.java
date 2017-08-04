@@ -27,6 +27,8 @@ import java.io.File;
  * Created by Keval on 31-Jul-17.
  */
 public final class TFUtils {
+    static final String TENSORFLOW_GRAPH_URL = "https://github.com/kevalpatel2106/smart-lens/blob/master/tf_models/tensorflow_inception_graph.pb?raw=true";
+    static final String TENSORFLOW_LABEL_URL = "https://raw.githubusercontent.com/kevalpatel2106/smart-lens/master/tf_models/imagenet_comp_graph_label_strings.txt";
     private static final String TF_CACHE_DIRECTORY = "tensorflow";
 
     public static File getImageGraph(@Nullable Context context) {

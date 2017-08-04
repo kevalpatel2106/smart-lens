@@ -37,7 +37,6 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static junit.framework.TestCase.assertFalse;
 import static org.hamcrest.Matchers.allOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -88,7 +87,7 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
         assertNotNull(mImageClassifierFragment.mCamera2Api);
         assertNotNull(mImageClassifierFragment.mImageClassifier);
 
-        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.closeCamera();
     }
 
     @Test
@@ -102,7 +101,7 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
         } catch (NoMatchingViewException e) {
             //Pass
         }
-        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.closeCamera();
     }
 
     @Test
@@ -112,7 +111,7 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
         Espresso.onView(allOf(withId(android.support.design.R.id.snackbar_text),
                 withText(R.string.image_classifier_frag_error_camera_open)))
                 .check(matches(isDisplayed()));
-        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.closeCamera();
     }
 
     @SuppressLint("WrongConstant")
@@ -124,40 +123,27 @@ public class ImageClassificationFragmentTest extends BaseTestClass {
                 withText(R.string.image_classifier_frag_error_camera_open)))
                 .check(matches(isDisplayed()));
 
-        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.closeCamera();
     }
 
     @Test
     public void checkNoFrontCameraError() throws Exception {
         //Generate doesn't have the front camera
         mImageClassifierFragment.onCameraError(CameraError.ERROR_DOES_NOT_HAVE_FRONT_CAMERA);
-        Espresso.onView((withId(android.support.design.R.id.snackbar_text)))
+        Espresso.onView(allOf(withId(android.support.design.R.id.snackbar_text),
+                withText(R.string.image_classifier_frag_error_no_front_camera)))
                 .check(matches(isDisplayed()));
-        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
+        mImageClassifierFragment.mCamera2Api.closeCamera();
     }
 
     @Test
     public void checkSaveFailedError() throws Exception {
         //Generate cannot save image
         mImageClassifierFragment.onCameraError(CameraError.ERROR_IMAGE_WRITE_FAILED);
-        Espresso.onView(withId(android.support.design.R.id.snackbar_text))
+        Espresso.onView(allOf(withId(android.support.design.R.id.snackbar_text),
+                withText(R.string.image_classifier_frag_error_save_image)))
                 .check(matches(isDisplayed()));
-
-        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
-    }
-
-    @Test
-    public void checkIfCameraWorking() throws Exception {
-        //Test if the camera opened
-        assertTrue(mImageClassifierFragment.mCamera2Api.isSafeToTakePicture());
-
-        //Test take the picture
-        mImageClassifierFragment.mCamera2Api.takePicture();
-        assertFalse(mImageClassifierFragment.mCamera2Api.isSafeToTakePicture());
-
-        // Check if it can release the camera.
-        mImageClassifierFragment.mCamera2Api.stopPreviewAndReleaseCamera();
-        assertFalse(mImageClassifierFragment.mCamera2Api.isSafeToTakePicture());
+        mImageClassifierFragment.mCamera2Api.closeCamera();
     }
 
     @Override

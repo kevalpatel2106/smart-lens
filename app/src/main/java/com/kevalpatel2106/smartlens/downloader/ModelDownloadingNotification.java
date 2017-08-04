@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier;
+package com.kevalpatel2106.smartlens.downloader;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 
 import com.kevalpatel2106.smartlens.R;
@@ -33,7 +30,7 @@ import com.kevalpatel2106.smartlens.R;
  * This class makes heavy use of the {@link NotificationCompat.Builder} helper
  * class to create notifications in a backward-compatible way.
  */
-final class TFModelDownloadingNotification {
+final class ModelDownloadingNotification {
     /**
      * The unique identifier for this type of notification.
      */
@@ -53,14 +50,11 @@ final class TFModelDownloadingNotification {
 
     @SuppressWarnings("deprecation")
     static Notification getNotification(Context context, int progress, boolean isIndeterminant) {
-        final Resources res = context.getResources();
-        final Bitmap picture = BitmapFactory.decodeResource(res, R.drawable.ic_stat_model_downloading);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_model_downloading)
                 .setContentTitle(context.getString(R.string.model_downloading_notification_title))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setProgress(100, progress, isIndeterminant)
-                .setLargeIcon(picture)
                 .setOngoing(true)
                 .setAutoCancel(false);
         return builder.build();

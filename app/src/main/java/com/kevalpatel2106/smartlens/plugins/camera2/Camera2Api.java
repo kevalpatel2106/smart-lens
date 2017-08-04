@@ -349,7 +349,7 @@ public class Camera2Api extends CameraProtocol {
                                 CaptureRequest previewRequest = mCaptureRequestBuilder.build();
                                 mCameraCaptureSession.setRepeatingRequest(
                                         previewRequest, null, mBackgroundHandler);
-                            } catch (final CameraAccessException e) {
+                            } catch (final CameraAccessException | IllegalStateException e) {
                                 mCameraCallbacks.onCameraError(CameraError.ERROR_CAMERA_OPEN_FAILED);
                             }
                         }

@@ -46,6 +46,7 @@ public class TFImageClassifierTest extends BaseTestClass {
     public void init() {
         System.gc();
         mTFImageClassifier = new TFImageClassifier(InstrumentationRegistry.getTargetContext());
+        mTFImageClassifier.init();
     }
 
     @Test
@@ -66,7 +67,7 @@ public class TFImageClassifierTest extends BaseTestClass {
         assertNotNull("Test image not found. Did you set correctly?", mockImage);
 
         // Classify image
-        List<Recognition> labels = mTFImageClassifier.recognizeImage(mockImage);
+        List<Recognition> labels = mTFImageClassifier.scan(mockImage);
 
         //Validate cases
         assertNotNull(labels);

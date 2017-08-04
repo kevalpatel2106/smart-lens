@@ -18,13 +18,15 @@ package com.kevalpatel2106.smartlens.camera;
 
 import android.support.annotation.Nullable;
 
+import java.io.Serializable;
+
 /**
  * Created by Keval on 14-Oct-16.
  * Interface to receive the camera callbacks.
  *
  * @author {@link 'https://github.com/kevalpatel2106'}
  */
-public interface CameraCallbacks {
+public interface CameraCallbacks extends Serializable {
 
     /**
      * This callback will notify whenever new image is captured.

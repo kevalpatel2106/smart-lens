@@ -17,11 +17,10 @@
 package com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.util.Log;
 
+import com.kevalpatel2106.smartlens.downloader.ModelDownloadService;
 import com.kevalpatel2106.smartlens.imageProcessors.imageClassifier.BaseImageClassifier;
 import com.kevalpatel2106.smartlens.imageProcessors.imageClassifier.Recognition;
 
@@ -34,10 +33,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * A classifier specialized to label images using TensorFlow.
+ * <p>
+ * numClasses The number of classes output by the model.
+ * inputSize  The input size. A square image of inputSize x inputSize is assumed.
+ * imageMean  The assumed mean of the image values.
+ * imageStd   The assumed std of the image values.
+ * inputName  The label of the image input node.
+ * outputName The label of the output node.
  */
 public final class TFImageClassifier extends BaseImageClassifier {
 
@@ -85,7 +92,6 @@ public final class TFImageClassifier extends BaseImageClassifier {
         // Intentionally reversed to put high confidence at the head of the queue.
         return Float.compare(rhs.getConfidence(), lhs.getConfidence());
     };
-    private Context mContext;
 
     /**
      * Initializes a native TensorFlow session for classifying images.
@@ -93,63 +99,35 @@ public final class TFImageClassifier extends BaseImageClassifier {
      * @param context The context from which to get the asset manager to be used to load assets.
      */
     public TFImageClassifier(Context context) {
-        this(context, NUM_CLASSES,
-                INPUT_SIZE,
-                IMAGE_MEAN,
-                IMAGE_STD,
-                INPUT_NAME,
-                OUTPUT_NAME);
+        super(context);
     }
 
-    /**
-     * Initializes a native TensorFlow session for classifying images.
-     *
-     * @param context    The context.
-     * @param numClasses The number of classes output by the model.
-     * @param inputSize  The input size. A square image of inputSize x inputSize is assumed.
-     * @param imageMean  The assumed mean of the image values.
-     * @param imageStd   The assumed std of the image values.
-     * @param inputName  The label of the image input node.
-     * @param outputName The label of the output node.
-     */
-    @SuppressWarnings("WeakerAccess")
-    private TFImageClassifier(Context context,
-                              int numClasses,
-                              int inputSize,
-                              int imageMean,
-                              float imageStd,
-                              String inputName,
-                              String outputName) {
-        mContext = context;
-
+    @Override
+    public void init() {
         //Check if the models downloaded?
-        if (!isModelDownloaded(context))
+        if (!isModelDownloaded())
             throw new RuntimeException("Models are not downloaded yet. Download them first.");
 
-        this.inputName = inputName;
-        this.outputName = outputName;
+        this.inputName = INPUT_NAME;
+        this.outputName = OUTPUT_NAME;
 
         // Read the label names into memory.
-        this.labels = readLabels(TFUtils.getImageLabels(mContext));
-        Log.i(TAG, "Read " + labels.size() + ", " + numClasses + " specified");
+        this.labels = readLabels(TFUtils.getImageLabels(getContext()));
+        Log.i(TAG, "Read " + labels.size() + ", " + NUM_CLASSES + " specified");
 
-        this.inputSize = inputSize;
-        this.imageMean = imageMean;
-        this.imageStd = imageStd;
+        this.inputSize = INPUT_SIZE;
+        this.imageMean = IMAGE_MEAN;
+        this.imageStd = IMAGE_STD;
 
         // Pre-allocate buffers.
         this.outputNames = new String[]{outputName};
         this.floatValues = new float[inputSize * inputSize * 3];
-        this.outputs = new float[numClasses];
+        this.outputs = new float[NUM_CLASSES];
         this.mBmpPixelValues = new int[inputSize * inputSize];
 
         //Initialize TF
-        mTensorFlowInferenceInterface = new TensorFlowInferenceInterface(context.getAssets(),
-                TFUtils.getImageGraph(mContext).getAbsolutePath());
-    }
-
-    public static boolean isModelDownloaded(Context context) {
-        return TFUtils.isModelsDownloaded(context);
+        mTensorFlowInferenceInterface = new TensorFlowInferenceInterface(getContext().getAssets(),
+                TFUtils.getImageGraph(getContext()).getAbsolutePath());
     }
 
     /**
@@ -252,10 +230,14 @@ public final class TFImageClassifier extends BaseImageClassifier {
 
     @Override
     public void downloadModels() {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
-            mContext.startService(new Intent(mContext, TFModelDownloadService.class));
-        } else {
-            mContext.startForegroundService(new Intent(mContext, TFModelDownloadService.class));
-        }
+        HashMap<String, File> downloads = new HashMap<>();
+        downloads.put(TFUtils.TENSORFLOW_GRAPH_URL, TFUtils.getImageGraph(getContext()));
+        downloads.put(TFUtils.TENSORFLOW_LABEL_URL, TFUtils.getImageLabels(getContext()));
+        ModelDownloadService.startDownload(getContext(), downloads);
+    }
+
+    @Override
+    public boolean isModelDownloaded() {
+        return TFUtils.isModelsDownloaded(getContext());
     }
 }
