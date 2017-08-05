@@ -16,20 +16,27 @@
 
 package com.kevalpatel2106.smartlens.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.kevalpatel2106.smartlens.plugins.tensorflowImageClassifier.TFUtils;
 import com.kevalpatel2106.smartlens.testUtils.BaseTestClass;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -39,6 +46,10 @@ import static org.junit.Assert.fail;
  */
 @RunWith(AndroidJUnit4.class)
 public final class FileUtilsTest extends BaseTestClass {
+
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
     private Context mContext;
 
     @Before
@@ -53,13 +64,10 @@ public final class FileUtilsTest extends BaseTestClass {
             Constructor constructor = c.getDeclaredConstructors()[0];
             constructor.newInstance();
             fail("Should have thrown Arithmetic exception");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException
+                | IllegalAccessException
+                | InstantiationException
+                | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
@@ -73,6 +81,21 @@ public final class FileUtilsTest extends BaseTestClass {
         assertTrue(cachePath.equals(mContext.getExternalCacheDir() != null ?
                 mContext.getExternalCacheDir().getAbsolutePath()
                 : mContext.getCacheDir().getAbsolutePath()));
+    }
+
+
+    @Test
+    public void checkCopyFile() throws Exception {
+        File destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/destination.txt");
+        File source = TFUtils.getImageLabels(InstrumentationRegistry.getTargetContext());
+
+        if (!destination.exists()) assertFalse(FileUtils.copyFile(destination, source));
+
+        //Create destination file
+        assertTrue(destination.createNewFile());
+        assertTrue(FileUtils.copyFile(destination, source));
+        assertTrue(destination.length() > 0);
     }
 
     @Override
