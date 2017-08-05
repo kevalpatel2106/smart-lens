@@ -16,8 +16,6 @@
 
 package com.kevalpatel2106.smartlens.imageProcessors.barcode;
 
-import android.graphics.Rect;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,15 +26,6 @@ import static org.junit.Assert.assertEquals;
  * @author 'https://github.com/kevalpatel2106'
  */
 public class BarcodeInfoTest {
-    @Test
-    public void getBoundingBox() throws Exception {
-        //Set the bound
-        Rect rect = new Rect(1, 2, 3, 4);
-        BarcodeInfo barcodeInfo = new BarcodeInfo();
-        barcodeInfo.setBoundingBox(rect);
-
-        assertEquals(barcodeInfo.getBoundingBox(), rect);
-    }
 
     @Test
     public void getContact() throws Exception {

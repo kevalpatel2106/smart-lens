@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 public class BarcodeInfoTest extends BaseTestClass {
 
     @Test
-    public void getBoundingBox() throws Exception {
+    public void checkBoundingBox() throws Exception {
         //Set the bound
         Rect rect = new Rect(1, 2, 3, 4);
         BarcodeInfo barcodeInfo = new BarcodeInfo();
