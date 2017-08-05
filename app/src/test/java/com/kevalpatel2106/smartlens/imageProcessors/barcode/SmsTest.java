@@ -23,30 +23,29 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
- * Created by Keval on 04-Aug-17.
+ * Created by Keval Patel on 05/08/17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
-public class PhoneTest {
-    @SuppressWarnings("ConstantConditions")
+public class SmsTest {
+
     @Test
-    public void checkConstructor() throws Exception {
-        BarcodeInfo.Phone phone = new BarcodeInfo.Phone("7894561230");
-        assertEquals(phone.getPhone(), "7894561230");
-        assertNull(phone.getType());
+    public void checkConstructor() {
+        BarcodeInfo.Sms sms = new BarcodeInfo.Sms("This is test message.", "1234567890");
+        assertEquals(sms.getMessage(), "This is test message.");
+        assertEquals(sms.getPhoneNumber(), "1234567890");
 
-        phone = new BarcodeInfo.Phone("1234567890", "Work");
-        assertEquals(phone.getPhone(), "1234567890");
-        assertEquals(phone.getType(), "Work");
-
-        phone = new BarcodeInfo.Phone("1234567890", null);
-        assertEquals(phone.getPhone(), "1234567890");
-        assertNull(phone.getType());
+        sms = new BarcodeInfo.Sms("This is test message.", null);
+        assertEquals(sms.getMessage(), "This is test message.");
+        assertNull(sms.getPhoneNumber());
 
         try {
-            new BarcodeInfo.Phone(null, "Work");
-            new BarcodeInfo.Phone(null);
+            new BarcodeInfo.Sms(null, "1234567890");
+            new BarcodeInfo.Sms(null, null);
             fail();
         } catch (IllegalArgumentException e) {
             //Pass
         }
     }
+
 }

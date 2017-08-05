@@ -276,6 +276,8 @@ public class BarcodeInfo {
         public Sms(String message, String phoneNumber) {
             this.mMessage = message;
             this.mPhoneNumber = phoneNumber;
+
+            if (message == null) throw new IllegalArgumentException("Message cannot be null.");
         }
 
         public String getMessage() {

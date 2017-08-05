@@ -20,11 +20,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Keval on 04-Aug-17.
  */
 public class EmailTest {
+    @SuppressWarnings("ConstantConditions")
     @Test
     public void checkConstructor() throws Exception {
         BarcodeInfo.Email email = new BarcodeInfo.Email("kevalpatel2106@gmail.com");
@@ -34,5 +36,13 @@ public class EmailTest {
         email = new BarcodeInfo.Email("kevalonly111@gmail.com", "Work");
         assertEquals(email.getEmail(), "kevalonly111@gmail.com");
         assertEquals(email.getType(), "Work");
+
+        try {
+            new BarcodeInfo.Email(null, "Work");
+            new BarcodeInfo.Email(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
     }
 }

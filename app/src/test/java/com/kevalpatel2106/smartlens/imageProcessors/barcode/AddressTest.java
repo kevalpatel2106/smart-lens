@@ -23,30 +23,30 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
- * Created by Keval on 04-Aug-17.
+ * Created by Keval Patel on 05/08/17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
-public class PhoneTest {
+public class AddressTest {
+
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void checkConstructor() throws Exception {
-        BarcodeInfo.Phone phone = new BarcodeInfo.Phone("7894561230");
-        assertEquals(phone.getPhone(), "7894561230");
-        assertNull(phone.getType());
+    public void checkIfInitialized() {
+        BarcodeInfo.Address address = new BarcodeInfo.Address("MIG-27, Street A, DC India.");
+        assertEquals(address.getAddress(), "MIG-27, Street A, DC India.");
+        assertNull(address.getType());
 
-        phone = new BarcodeInfo.Phone("1234567890", "Work");
-        assertEquals(phone.getPhone(), "1234567890");
-        assertEquals(phone.getType(), "Work");
-
-        phone = new BarcodeInfo.Phone("1234567890", null);
-        assertEquals(phone.getPhone(), "1234567890");
-        assertNull(phone.getType());
+        address = new BarcodeInfo.Address("MIG-27, Street B India.", "Home");
+        assertEquals(address.getAddress(), "MIG-27, Street B India.");
+        assertEquals(address.getType(), "Home");
 
         try {
-            new BarcodeInfo.Phone(null, "Work");
-            new BarcodeInfo.Phone(null);
+            new BarcodeInfo.Address(null, "Work");
+            new BarcodeInfo.Address(null);
             fail();
         } catch (IllegalArgumentException e) {
             //Pass
         }
     }
+
 }
