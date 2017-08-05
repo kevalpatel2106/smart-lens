@@ -39,6 +39,12 @@ public class EmailTest {
 
         try {
             new BarcodeInfo.Email(null, "Work");
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
+
+        try {
             new BarcodeInfo.Email(null);
             fail();
         } catch (IllegalArgumentException e) {

@@ -42,6 +42,12 @@ public class AddressTest {
 
         try {
             new BarcodeInfo.Address(null, "Work");
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
+
+        try {
             new BarcodeInfo.Address(null);
             fail();
         } catch (IllegalArgumentException e) {

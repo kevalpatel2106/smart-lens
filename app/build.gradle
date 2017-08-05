@@ -103,6 +103,14 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    dexOptions {
+        preDexLibraries true
+    }
+
+    aaptOptions {
+        cruncherEnabled false
+    }
 }
 
 // Grant animation permissions to avoid test failure because of ui sync.

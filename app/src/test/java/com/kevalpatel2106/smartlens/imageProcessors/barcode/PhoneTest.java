@@ -43,6 +43,12 @@ public class PhoneTest {
 
         try {
             new BarcodeInfo.Phone(null, "Work");
+            fail();
+        } catch (IllegalArgumentException e) {
+            //Pass
+        }
+
+        try {
             new BarcodeInfo.Phone(null);
             fail();
         } catch (IllegalArgumentException e) {
